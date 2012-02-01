@@ -40,7 +40,7 @@ module.exports = (store) ->
       
       json.files[filename] = _.clone(file)
     
-    return next({number: 422, message: "Validation failed", errors: [{field: "index", message: "No file defined for index"}]}) unless json.files[json.index]
+    return next({number: 422, message: "Validation failed", errors: [{property: "index", message: "No file defined for index"}]}) unless json.files[json.index]
     
     store.create json, (err, plunk) ->
       if err then next(err)
@@ -50,3 +50,11 @@ module.exports = (store) ->
     delete req.plunk.token unless req.authorized
     
     res.json(req.plunk)
+  
+  destroy: (req, res, next) ->
+    return next({number: 404, message: "Not found"}) unless req.authorized
+    
+    store.destroy req.plunk.id, (err) ->
+      return next({number: 500, message: err}) if err
+      return res.send(204)
+      

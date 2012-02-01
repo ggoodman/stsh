@@ -28,10 +28,12 @@ class exports.Store
   constructor: ({@ttl, @server} = {ttl: 60 * 60 * 24 * 2, server: ""})->
     @plunks = {}
     @timeouts = {}
+    @destructors = {}
     
   createDestructor: (id) ->
     self = @
-    ->
+    @destructors[id] = ->
+      clearTimeout(self.timeouts[id])
       delete self.plunks[id]
       delete self.timeouts[id]
   
@@ -57,3 +59,8 @@ class exports.Store
       plunk.ttl = Math.floor((cromag.parse(plunk.expires) - cromag.now()) / 1000)
     
     return cb(null, plunk)
+  
+  destroy: (id, cb) ->
+    if destructor = @destructors[id]
+      destructor()
+    cb(null)
