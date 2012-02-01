@@ -28,7 +28,7 @@ module.exports = (store) ->
     {valid, errors} = schema.validate(json, require("../lib/schema/create"))
     
     # Trigger an appropriate error if validation fails
-    unless valid then return next({number: 422, message: "Validation failed", errors: errors })
+    return next({number: 422, message: "Validation failed", errors: errors }) unless valid
     
     # Files can be provided as a hash of filename => contents or filename => file descriptor
     # This code normalizes them to the latter format
@@ -39,6 +39,8 @@ module.exports = (store) ->
       file.encoding ||= mime.charsets.lookup(file.mime)
       
       json.files[filename] = _.clone(file)
+    
+    return next({number: 422, message: "Validation failed", errors: [{field: "index", message: "No file defined for index"}]}) unless json.files[json.index]
     
     store.create json, (err, plunk) ->
       if err then next(err)
