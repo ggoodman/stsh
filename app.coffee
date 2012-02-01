@@ -1,16 +1,20 @@
 express = require("express")
 resource = require("express-resource")
+_ = require("underscore")._
 
-config = require("./config")
+config = _.defaults require("./config"),
+  store: "memory"
+  ttl: 60 * 60 * 24 * 2 # 2 days
 
 app = module.exports = express.createServer()
   
 app.configure ->
   app.use express.logger()
   app.use express.methodOverride()
-  app.use express.bodyParser()      
+  app.use express.bodyParser()
+  
 
-{Store} = require("./lib/stores/memory")
+{Store} = require("./lib/stores/#{config.store}")
 store = new Store(config)
 
 # Expose the public api for plunks
@@ -40,10 +44,11 @@ app.get "/:id/*", (req, res, next) ->
     return res.send(404) unless file
     return res.send(file.content, {"Content-Type": file.mime})
 
-# Handle errors
+### Handle errors
 app.error (err, req, res, next) ->
   body = {}
   if err.message then body.message = err.message
   if err.errors then body.errors = err.errors
   
   res.json body, err.number or 400
+###

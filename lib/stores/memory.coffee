@@ -41,9 +41,10 @@ class exports.Store
     json.token = uid(16)
     json.ttl = @ttl
     json.expires = new cromag(cromag.now() + json.ttl * 1000).toISOString()
-    json.url = "#{@server}/#{json.id}/"
     
     json.id = uid(6) while @exists(json.id)
+    
+    json.url = "#{@server}/#{json.id}/"
     
     @plunks[json.id] = json
     @timeouts[json.id] = setTimeout(@createDestructor(json.id), json.ttl * 1000)
