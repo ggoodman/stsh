@@ -17,6 +17,14 @@ app.configure ->
 {Store} = require("./lib/stores/#{config.store}")
 store = new Store(config)
 
+app.all "/api/*", (req, res, next) ->
+  res.header("Access-Control-Allow-Origin", "*")
+  res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
+  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
+  res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
+  
+  next()
+
 # Expose the public api for plunks
 app.resource "api/v1/plunks", require("./api/plunks")(store)
     
