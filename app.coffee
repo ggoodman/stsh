@@ -12,6 +12,7 @@ app.configure ->
   app.use express.logger()
   app.use express.methodOverride()
   app.use express.bodyParser()
+  app.use express.errorHandler({ dumpExceptions: true, showStack: true })
   
 
 {Store} = require("./lib/stores/#{config.store}")
