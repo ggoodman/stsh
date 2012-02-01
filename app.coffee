@@ -5,6 +5,7 @@ _ = require("underscore")._
 config = _.defaults require("./config"),
   store: "memory"
   ttl: 60 * 60 * 24 * 2 # 2 days
+  server: ""
 
 app = module.exports = express.createServer()
   
