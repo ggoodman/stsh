@@ -13,7 +13,6 @@ app.configure ->
   app.use express.logger()
   app.use express.methodOverride()
   app.use express.bodyParser()
-  app.use express.errorHandler({ dumpExceptions: true, showStack: true })
   
 
 {Store} = require("./lib/stores/#{config.store}")
@@ -54,9 +53,10 @@ app.get "/:id/*", (req, res, next) ->
     return res.send(404) unless file
     return res.send(file.content, {"Content-Type": file.mime})
 
-#app.error (err, req, res, next) ->
-#  body = {}
-#  if err.message then body.message = err.message
-#  if err.errors then body.errors = err.errors
+app.error (err, req, res, next) ->
+  body = _.extend({}, err)
+  if err.message then body.message = err.message
+  if err.errors then body.errors = err.errors
+  if err.stack then body.stack = err.stack
   
-#  res.json body, err.number or 400
+  res.json body, err.number or 400
