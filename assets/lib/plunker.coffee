@@ -18,4 +18,9 @@ $ ->
     $("img.lazy").lazyload
       threshold: 200
       effect: "fadeIn"
-      
+  
+  $("pre>code").each ->
+    $pre = $(@)
+    $pre.parent().text($pre.text()).addClass("prettyprint").addClass("linenums")
+    $pre.remove()
+  

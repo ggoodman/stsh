@@ -3,9 +3,11 @@ mime = require("mime")
 _ = require("underscore")._
 
 module.exports = (store) ->
+  plunks = require("../lib/plunks")(store)
+
   load: (req, id, cb) ->
     # Fetch the plunk (async)
-    store.fetch id, (err, plunk) ->
+    plunks.fetch id, (err, plunk) ->
       return cb(err) if err
       
       # Although not necessarily the 'appropriate' place to put this check for
@@ -21,7 +23,7 @@ module.exports = (store) ->
       cb(null, plunk)
 
   index: (req, res, next) ->
-    store.list (err, plunks) ->
+    plunks.list (err, plunks) ->
       return next({number: 500, message: err}) if err
       
       _.each plunks, (plunk) ->
@@ -30,29 +32,11 @@ module.exports = (store) ->
       res.json(plunks)
     
   create: (req, res, next) ->
-    json = _.clone(req.body)
-    
-    # Validate the json against the json-schema
-    {valid, errors} = schema.validate(json, require("../lib/schema/create"))
-    
-    # Trigger an appropriate error if validation fails
-    return next({number: 422, message: "Validation failed", errors: errors }) unless valid
-    
-    # Files can be provided as a hash of filename => contents or filename => file descriptor
-    # This code normalizes them to the latter format
-    _.each json.files, (file, filename) ->
-      if _.isString(file) then file = { content: file }
-      file.filename = filename
-      file.mime ||= mime.lookup(file.filename)
-      file.encoding ||= mime.charsets.lookup(file.mime)
+    plunks.create req.body, (err, plunk) ->
+      return next(err) if err
       
-      json.files[filename] = _.clone(file)
-    
-    return next({number: 422, message: "Validation failed", errors: [{property: "index", message: "No file defined for index"}]}) unless json.files[json.index]
-    
-    store.create json, (err, plunk) ->
-      if err then next(err)
-      else res.json(plunk)
+      res.json(plunk)
+
   
   show: (req, res, next) ->
     delete req.plunk.token unless req.authorized

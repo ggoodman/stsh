@@ -52,6 +52,8 @@ class exports.Store
     
     json.url = "#{@server}/#{json.id}/"
     
+    file.url = json.url + file.filename for filename, file of json.files
+    
     @plunks[json.id] = json
     @timeouts[json.id] = setTimeout(@createDestructor(json.id), json.ttl * 1000)
     @queue.push json.id

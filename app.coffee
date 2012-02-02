@@ -1,6 +1,7 @@
 express = require("express")
 resource = require("express-resource")
 _ = require("underscore")._
+Gisty = require("gisty")
 
 config = _.defaults require("./config"),
   store: "memory"
@@ -37,13 +38,44 @@ app.all "/api/*", (req, res, next) ->
     return res.send() if req.method == "OPTIONS"
   
   next()
-
+  
 # Expose the public api for plunks
 app.resource "api/v1/plunks", require("./api/plunks")(store)
 
 
 app.get "/", (req, res, next) ->
   res.render("index")
+
+
+
+plunks = require("./lib/plunks")(store)
+gists = {}
+
+app.get "/gist/:id", (req, res, next) ->
+  return res.redirect(gists[req.params.id]) if gists[req.params.id]
+  
+  gisty = new Gisty
+  gisty.fetch req.params.id, (err, gist) ->
+    return res.render("error/gist", {id: req.params.id, error: err}) if err
+    
+    files = {}
+    _.map gist.files, (file, filename) ->
+      files[filename] = 
+        content: file.content
+        mime: file.type
+    
+    json =
+      description: gist.description
+      files: files
+      
+    if req.query.index then json.index = req.query.index
+    
+    plunks.create json, (err, plunk) ->
+      return next(err) if err
+      
+      gists[gist.id] = plunk.url
+      
+      res.redirect(plunk.url)
 
 # Serve up a plunk
 app.get "/:id/", (req, res, next) ->
