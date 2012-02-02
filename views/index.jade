@@ -1,0 +1,29 @@
+!!! 5
+html
+  head
+    title Plunker
+    link(rel="stylesheet",href="style/bootstrap.css")
+    link(rel="stylesheet",href="style/plunker.css")
+    script(type="text/javascript",src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
+    script(type="text/javascript",src="lib/jquery.lazyload.min.js")
+    script(type="text/javascript",src="lib/bootstrap.js")
+    script(type="text/javascript",src="lib/plunker.js")
+  body
+    div.container
+      div.hero-unit
+        h1 Welcome to Plunker!
+        p
+          | Plunker is an ultra-simple webservice that allows client-side apps
+          | to create, manage and preview simple static webpages. Consider it
+          | a sort of <a href="jsfiddle.net">jsFiddle</a> without the interface
+          | with a publicly accessible and CORS-friendly API.
+      div.row
+        div.span12
+          h1 Recent plunks
+          p.
+            This is a list of the last 12 plunks that were created. The images
+            are provided courtesy of the service at
+            <a href="http://immediatenet.com/thumbnail_api.html">Immedianet</a>.
+            Because they provide a free service, it is possible that not all
+            plunks' renderings will be available.
+          ul#recent.thumbnails

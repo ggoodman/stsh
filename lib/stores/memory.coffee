@@ -25,15 +25,19 @@ deepClone = (obj) ->
   clone
 
 class exports.Store
-  constructor: ({@ttl, @server} = {ttl: 60 * 60 * 24 * 2, server: ""})->
+  constructor: ({@ttl, @server, @queueSize} = {ttl: 60 * 60 * 24 * 2, server: "", queueSize: 12})->
     @plunks = {}
     @timeouts = {}
     @destructors = {}
+    @queue = []
     
   createDestructor: (id) ->
     self = @
     @destructors[id] = ->
       clearTimeout(self.timeouts[id])
+      
+      self.queue = _.without(self.queue, id)
+      
       delete self.plunks[id]
       delete self.timeouts[id]
   
@@ -50,8 +54,21 @@ class exports.Store
     
     @plunks[json.id] = json
     @timeouts[json.id] = setTimeout(@createDestructor(json.id), json.ttl * 1000)
+    @queue.push json.id
+    @queue = _.last(@queue, 12)
     
     cb(null, json)
+  
+  list: (options, cb) ->
+    if _.isFunction(options) then [cb, options] = [options, {}]
+    
+    options = _.defaults options,
+      start: 0
+      end: 12
+    
+    self = @
+    
+    cb null, _.map self.queue, (id) -> self.plunks[id]
   
   fetch: (id, cb) ->
     if plunk = @plunks[id]

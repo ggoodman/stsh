@@ -1,24 +1,22 @@
 module.exports =
   type: "object"
-  additionalProperties: false
   properties:
     description:
       type: "string"
     index:
       type: "string"
       default: "index.html"
-    additionalProperties: false
     files:
       required: true
-      type: "object"
-      minProperties: 1
-      additionalProperties:
-        type: [
-          type: "string"
-        ,
+      type: [
+        type: "array"
+        minItems: 1
+        items:
           type: "object"
-          additionalProperties: false
           properties:
+            filename:
+              type: "string"
+              required: true
             content:
               type: "string"
               required: true
@@ -26,4 +24,9 @@ module.exports =
               type: "string"
             encoding:
               type: "string"
-        ]
+      ,
+        type: "object"
+        minProperties: 1
+        items: 
+          type: "string"
+      ]

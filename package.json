@@ -5,6 +5,8 @@
     "coffee-script": "1.2.0",
     "cromag": "0.1.1",
     "express": "2.5.6",
+    "jade": "0.20.0",
+    "less": "1.2.1",
     "lingo": "0.0.4",
     "express-resource": "0.2.4",
     "json-schema": "0.2.0",

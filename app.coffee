@@ -10,25 +10,39 @@ config = _.defaults require("./config"),
 app = module.exports = express.createServer()
   
 app.configure ->
+  app.set "views", "#{__dirname}/views"
+  app.set "view engine", "jade"
+  app.set "view options", layout: false
+  
   app.use express.logger()
   app.use express.methodOverride()
   app.use express.bodyParser()
-  
+  app.use express.compiler
+    src: "#{__dirname}/assets"
+    dest: "#{__dirname}/public"
+    enable: ["coffeescript"]
+  app.use express.static("#{__dirname}/public")
 
 {Store} = require("./lib/stores/#{config.store}")
 store = new Store(config)
 
 app.all "/api/*", (req, res, next) ->
-  res.header("Access-Control-Allow-Origin", "*")
-  res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
-  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
-  res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
+  if req.method == "OPTIONS"
+    res.header("Access-Control-Allow-Origin", "*")
+    res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
+    res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
+    res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
+  
+    return res.send()
   
   next()
 
 # Expose the public api for plunks
 app.resource "api/v1/plunks", require("./api/plunks")(store)
-    
+
+
+app.get "/", (req, res, next) ->
+  res.render("index")
 
 # Serve up a plunk
 app.get "/:id/", (req, res, next) ->
@@ -53,10 +67,11 @@ app.get "/:id/*", (req, res, next) ->
     return res.send(404) unless file
     return res.send(file.content, {"Content-Type": file.mime})
 
-app.error (err, req, res, next) ->
-  body = _.extend({}, err)
-  if err.message then body.message = err.message
-  if err.errors then body.errors = err.errors
-  if err.stack then body.stack = err.stack
-  
-  res.json body, err.number or 400
+
+#app.error (err, req, res, next) ->
+#  body = _.extend({}, err)
+#  if err.message then body.message = err.message
+#  if err.errors then body.errors = err.errors
+#  if err.stack then body.stack = err.stack
+#  
+#  res.json body, err.number or 400

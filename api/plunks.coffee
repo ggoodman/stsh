@@ -20,6 +20,14 @@ module.exports = (store) ->
       
       cb(null, plunk)
 
+  index: (req, res, next) ->
+    store.list (err, plunks) ->
+      return next({number: 500, message: err}) if err
+      
+      _.each plunks, (plunk) ->
+        delete plunk.token 
+      
+      res.json(plunks)
     
   create: (req, res, next) ->
     json = _.clone(req.body)

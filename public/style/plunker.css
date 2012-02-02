@@ -1,0 +1,8 @@
+#recent .thumbnail img {
+  width: 205px;
+  height: 154px;
+}
+
+#recent .thumbnail p {
+  color: #333;
+}
