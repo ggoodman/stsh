@@ -1,5 +1,5 @@
 $ ->
-  jQuery.getJSON "http://stsh.ggoodman.c9.io/api/v1/plunks", (json) ->
+  jQuery.getJSON "//#{location.hostname}/api/v1/plunks", (json) ->
     for plunk in json
       $li = $("<li></li>").addClass("span3")
       $a = $("<a></a>").attr("href", plunk.url).addClass("thumbnail").appendTo($li)
