@@ -1,8 +1,29 @@
-#recent .thumbnail img {
+#recent a.thumbnail {
+}
+
+#recent a.thumbnail img {
   width: 205px;
   height: 154px;
 }
 
-#recent .thumbnail p {
+#recent a.thumbnail p.description {
   color: #333;
+  height: 18px;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+}
+
+#recent a.thumbnail:hover {
+  text-decoration: none;
+}
+
+#recent a.thumbnail p.actions {
+  text-align: right;
+}
+
+iframe.preview {
+  border: none;
+  width: 100%;
+  height: 300px;
 }

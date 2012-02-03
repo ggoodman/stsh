@@ -3,16 +3,12 @@ mime = require("mime")
 _ = require("underscore")._
 
 module.exports = (store) ->
-  create: (json, cb) ->
-    console.log "CREATE", json
-    
+  create: (json, cb) ->    
     # Validate the json against the json-schema
     {valid, errors} = schema.validate(json, require("../lib/schema/create"))
     
     # Trigger an appropriate error if validation fails
     return cb({number: 422, message: "Validation failed", errors: errors }) unless valid
-    
-    console.log "Validation succeeded", json
     
     # Files can be provided as a hash of filename => contents or filename => file descriptor
     # This code normalizes them to the latter format
