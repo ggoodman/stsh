@@ -19,13 +19,6 @@ $ ->
         .attr("title", plunk.description or "Untitled")
         .addClass("description")
         .appendTo($caption)
-#      $actions = $("<p></p>")
-#        .addClass("actions")
-#        .appendTo($caption)
-#      $launch = $("<a><i class=\"icon-resize-full icon-white\"></i> Launch</a>")
-#        .attr("href", plunk.url)
-#        .addClass("btn btn-primary launch")
-#        .appendTo($actions)
 
       $a.on "click", ->
         $modal = $("<div></div>").addClass("modal")
@@ -42,7 +35,7 @@ $ ->
         $footer = $("<div></div>")
           .addClass("modal-footer")
           .appendTo($modal)
-        $launch = $("<a><i class=\"icon-resize-full icon-white\"></i> Launch</a>")
+        $launch = $("<a><i class=\"icon-resize-full icon-white\"></i> Fullscreen</a>")
           .attr("href", plunk.url)
           .addClass("btn")
           .addClass("btn-primary")
