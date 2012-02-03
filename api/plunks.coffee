@@ -35,7 +35,7 @@ module.exports = (store) ->
     plunks.create req.body, (err, plunk) ->
       return next(err) if err
       
-      res.json(plunk)
+      res.json(plunk, 201)
 
   
   show: (req, res, next) ->
