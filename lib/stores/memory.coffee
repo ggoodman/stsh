@@ -56,8 +56,8 @@ class exports.Store
     
     @plunks[json.id] = json
     @timeouts[json.id] = setTimeout(@createDestructor(json.id), json.ttl * 1000)
-    @queue.push json.id
-    @queue = _.last(@queue, 12)
+    @queue.unshift json.id
+    @queue = _.first(@queue, 12)
     
     cb(null, json)
   
