@@ -1,6 +1,6 @@
 $ ->
   jQuery.getJSON "//#{location.hostname}/api/v1/plunks", (json) ->
-    for plunk in json
+    for plunk in json then do (plunk) ->
       $li = $("<li></li>").addClass("span3").addClass("plunk")
       $a = $("<a></a>").attr("href", plunk.url).addClass("thumbnail").appendTo($li)
       $img = $("<img />")
@@ -29,7 +29,7 @@ $ ->
 
       $a.on "click", ->
         $modal = $("<div></div>").addClass("modal")
-        $header = $("<div><a class=\"close\" data-dismiss=\"modal\">×</a><h3>#{plunk.description}</h3></div>")
+        $header = $("<div><a class=\"close\" data-dismiss=\"modal\">×</a><h3>#{plunk.description or 'Untitled'}</h3></div>")
           .addClass("modal-header")
           .appendTo($modal)
         $body = $("<div></div>")
