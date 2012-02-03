@@ -1,4 +1,5 @@
 express = require("express")
+gzippo = require("gzippo")
 resource = require("express-resource")
 _ = require("underscore")._
 Gisty = require("gisty")
@@ -22,7 +23,8 @@ app.configure ->
     src: "#{__dirname}/assets"
     dest: "#{__dirname}/public"
     enable: ["coffeescript"]
-  app.use express.static("#{__dirname}/public")
+  app.use gzippo.staticGzip("#{__dirname}/public")
+  app.use gzippo.compress()
 
 {Store} = require("./lib/stores/#{config.store}")
 store = new Store(config)
