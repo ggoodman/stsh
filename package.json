@@ -11,7 +11,7 @@
     "markdown": "0.3.x",
     "lingo": "0.0.x",
     "express-resource": "0.2.x",
-    "json-schema": "0.2.0",
+    "json-schema": "<0.2.0",
     "mime": "1.2.x",
     "underscore": "1.3.x"
   }
