@@ -32,12 +32,12 @@ store = new Store(config)
 app.all "/api/*", (req, res, next) ->
   res.header("Access-Control-Allow-Origin", "*")
   
-  if req.method == "OPTIONS"
-    res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
-    res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
-    res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
+  #if req.method == "OPTIONS"
+  res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
+  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
+  res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
   
-    return res.send() if req.method == "OPTIONS"
+    #return res.send() if req.method == "OPTIONS"
   
   next()
   
