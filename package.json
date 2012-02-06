@@ -2,7 +2,7 @@
   "name": "plunker",
   "version": "0.0.2",
   "dependencies": {
-    "json-schema": "0.2.0",
+    "json-schema": "0.2.x",
     "coffee-script": "1.2.x",
     "cromag": "0.1.x",
     "express": "2.5.x",
