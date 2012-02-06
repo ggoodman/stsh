@@ -56,7 +56,7 @@ loadGist = (id) ->
 
 # Return Promise
 createPlunk = (json) ->
-  jQuery.ajax "http://plunker.no.de/api/v1/plunks",
+  jQuery.ajax "//#{location.hostname}/api/v1/plunks",
     type: "post",
     dataType: "json"
     contentType: "application/json"
