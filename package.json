@@ -1,7 +1,8 @@
 {
   "name": "plunker",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "dependencies": {
+    "json-schema": "0.2.x",
     "coffee-script": "1.2.x",
     "cromag": "0.1.x",
     "express": "2.5.x",
@@ -11,7 +12,6 @@
     "markdown": "0.3.x",
     "lingo": "0.0.x",
     "express-resource": "0.2.x",
-    "json-schema": "<0.2.0",
     "mime": "1.2.x",
     "underscore": "1.3.x"
   }
