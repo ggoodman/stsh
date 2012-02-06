@@ -1,4 +1,4 @@
-schema = require("json-schema")
+schema = require("./json-schema")
 mime = require("mime")
 _ = require("underscore")._
 
