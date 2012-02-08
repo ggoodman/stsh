@@ -19,9 +19,11 @@ module.exports = (store) ->
       file.encoding ||= mime.charsets.lookup(file.mime)
       
       json.files[filename] = _.clone(file)
-      
+    
     json.index ||= do ->
       filenames = _.keys(json.files)
+      
+      console.log "Filenames", filenames
       
       if "index.html" in filenames then "index.html"
       else

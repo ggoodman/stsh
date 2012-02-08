@@ -1,4 +1,3 @@
-schema = require("../lib/validate")
 mime = require("mime")
 _ = require("underscore")._
 

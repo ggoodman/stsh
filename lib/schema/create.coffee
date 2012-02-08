@@ -6,8 +6,26 @@ module.exports =
       type: "string"
     index:
       type: "string"
-      default: "index.html"
-    additionalProperties: false
+    source:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          required: true
+        url:
+          type: "string"
+          required: true
+    creator:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+          required: true
+        url:
+          type: "string"
+          required: true
+        avatar_url:
+          type: "string"
     files:
       required: true
       type: "object"

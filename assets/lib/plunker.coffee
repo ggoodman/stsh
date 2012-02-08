@@ -23,7 +23,7 @@ addThumbnail = (plunk) ->
     showPreview(plunk)
     false
   
-  $li.appendTo("#recent")
+  $li.prependTo("#recent")
   
 showPreview = (plunk) ->
   $modal = $("<div></div>").addClass("modal")
@@ -62,19 +62,50 @@ createPlunk = (json) ->
     contentType: "application/json"
     data: JSON.stringify(json)
 
+showMessage = (title, message, additionalClass) ->
+  $msg = $("<div></div>").addClass("alert alert-block fade in")
+  $msg.addClass(additionalClass) if additionalClass?
+  $close = $("<a>×</a>")
+    .addClass("close")
+    .attr("href", "#")
+    .attr("data-dismiss", "alert")
+    .appendTo($msg)
+  $title = $("<h4>#{title}</h4>")
+    .addClass("alert-heading")
+    .appendTo($msg)
+  $body = $("<p>#{message}</p>").appendTo($msg)
+  
+  $msg.insertAfter("form.gist-import")
+
+showError = (xhr, err) ->
+  showMessage("Import failed", err.toString(), "alert-error")
+  $("form.gist-import input, form.gist-import button").prop("disabled", false)
+
+  
 $ ->
   $("form.gist-import").on "submit", ->
-    loadGist($("input.gist").val()).done (gist) ->
+    $("form.gist-import input, form.gist-import button").prop("disabled", true)
+    loadGist($("input.gist").val()).fail(showError).done (gist) ->
       gist = gist.data
       json =
         description: gist.description or ""
+        source:
+          name: "Github"
+          url: gist.html_url
+        creator:
+          name: gist.user.login
+          url: "https://github.com/#{gist.user.login}"
+          avatar_url: gist.user.avatar_url
         files: {}
       
       json.files[filename] = file.content for filename, file of gist.files
       
-      createPlunk(json).done (data) ->
+      createPlunk(json).fail(showError).done (data) ->
         showPreview(data)
         addThumbnail(data)
+        showMessage("Import successful", "The gist was successfully imported into Plunker", "alert-success")
+        $("form.gist-import input").val("").prop("disabled", false)
+        $("form.gist-import button").prop("disabled", false)
       
     false
     
