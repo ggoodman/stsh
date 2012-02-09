@@ -15,7 +15,7 @@ module.exports =
         url:
           type: "string"
           required: true
-    creator:
+    author:
       type: "object"
       properties:
         name:

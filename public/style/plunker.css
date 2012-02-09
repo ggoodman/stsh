@@ -1,12 +1,17 @@
-#recent a.thumbnail {
+#recent .thumbnail {
+  text-align: center;
 }
 
-#recent a.thumbnail img {
+#recent .thumbnail img {
   width: 205px;
   height: 154px;
 }
 
-#recent a.thumbnail p.description {
+#recent .thumbnail .caption {
+  text-align: left;
+}
+
+#recent .thumbnail .description {
   color: #333;
   height: 18px;
   overflow: hidden;
@@ -14,8 +19,15 @@
   text-overflow: ellipsis;
 }
 
-#recent a.thumbnail:hover {
-  text-decoration: none;
+#recent .thumbnail .created_at {
+  text-transform: none;
+}
+
+#recent .thumbnail:hover {
+  border-color: #0088cc;
+  -webkit-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  -moz-box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
+  box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
 }
 
 

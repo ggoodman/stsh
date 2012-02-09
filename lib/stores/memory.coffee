@@ -66,6 +66,7 @@ class exports.Store
   create: (json, cb) ->
     json.id = uid(6)
     json.token = uid(16)
+    json.created_at = new cromag().toISOString()
     json.ttl = @ttl
     json.expires = new cromag(cromag.now() + json.ttl * 1000).toISOString()
     json.id = uid(6) while @exists(json.id)

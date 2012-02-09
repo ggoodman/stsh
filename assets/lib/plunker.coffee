@@ -1,7 +1,7 @@
 
 addThumbnail = (plunk) ->
-  $li = $("<li></li>").addClass("span3").addClass("plunk")
-  $a = $("<a></a>").attr("href", plunk.url).addClass("thumbnail").appendTo($li)
+  $li = $("<li></li>").addClass("span3").addClass("plunk").addClass("thumbnail")
+  $a = $("<a></a>").attr("href", plunk.url).appendTo($li)
   $img = $("<img />")
     .attr("src", "http://placehold.it/205x154&text=Loading...")
     .attr("data-original", "http://immediatenet.com/t/l3?Size=1024x768&URL=#{plunk.url}")
@@ -10,14 +10,42 @@ addThumbnail = (plunk) ->
     .appendTo($a)
   $caption = $("<div></div>")
     .addClass("caption")
-    .appendTo($a)
-  $title = $("<h5>Plunk: #{plunk.id}</h5>")
-    .addClass("title")
-    .appendTo($caption)
-  $desc = $("<p>#{plunk.description or 'Untitled'}</p>")
+    .appendTo($li)
+  $description = $("<h5>#{plunk.description or 'Untitled'}</h5>")
     .attr("title", plunk.description or "Untitled")
     .addClass("description")
     .appendTo($caption)
+  
+  $about = $("<p>by&nbsp;</p>")
+    .addClass("about")
+    .appendTo($caption)
+  
+  if plunk.author
+    $author = $("<a>#{plunk.author.name}</a>")
+      .attr("href", plunk.author.url)
+       .attr("target", "_blank")
+  else
+    $author = $("<span>Anonymous</span>")
+  
+  $author.addClass("creator").appendTo($about)
+  $about.append(" ")
+  
+  $when = $("<abbr>#{new Cromag(plunk.created_at).toLocaleString()}</abbr>")
+    .addClass("timeago")
+    .addClass("created_at")
+    .attr("title", plunk.created_at)
+    .appendTo($about)
+    .timeago()
+  
+  $about.append("<br />")
+  
+  if plunk.source
+    $about.append("from ")
+    $source = $("<a>#{plunk.source.name}</a>")
+      .addClass("source")
+      .attr("href", plunk.source.url)
+      .attr("target", "_blank")
+      .appendTo($about)
 
   $a.on "click", ->
     showPreview(plunk)
@@ -92,7 +120,7 @@ $ ->
         source:
           name: "Github"
           url: gist.html_url
-        creator:
+        author:
           name: gist.user.login
           url: "https://github.com/#{gist.user.login}"
           avatar_url: gist.user.avatar_url
