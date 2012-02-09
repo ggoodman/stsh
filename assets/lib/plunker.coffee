@@ -1,7 +1,8 @@
 
 addThumbnail = (plunk) ->
-  $li = $("<li></li>").addClass("span3").addClass("plunk").addClass("thumbnail")
-  $a = $("<a></a>").attr("href", plunk.url).appendTo($li)
+  $li = $("<li></li>").addClass("span3").addClass("plunk")
+  $div = $("<div></div>").addClass("thumbnail").appendTo($li)
+  $a = $("<a></a>").attr("href", plunk.url).appendTo($div)
   $img = $("<img />")
     .attr("src", "http://placehold.it/205x154&text=Loading...")
     .attr("data-original", "http://immediatenet.com/t/l3?Size=1024x768&URL=#{plunk.url}")
@@ -10,7 +11,7 @@ addThumbnail = (plunk) ->
     .appendTo($a)
   $caption = $("<div></div>")
     .addClass("caption")
-    .appendTo($li)
+    .appendTo($div)
   $description = $("<h5>#{plunk.description or 'Untitled'}</h5>")
     .attr("title", plunk.description or "Untitled")
     .addClass("description")
@@ -118,7 +119,7 @@ $ ->
       json =
         description: gist.description or ""
         source:
-          name: "Github"
+          name: "gist: #{gist.id}"
           url: gist.html_url
         author:
           name: gist.user.login
