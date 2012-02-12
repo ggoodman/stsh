@@ -12,7 +12,8 @@ addThumbnail = (plunk) ->
   $caption = $("<div></div>")
     .addClass("caption")
     .appendTo($div)
-  $description = $("<h5>#{plunk.description or 'Untitled'}</h5>")
+  $description = $("<h5></h5>")
+    .text("#{plunk.description or 'Untitled'}")
     .attr("title", plunk.description or "Untitled")
     .addClass("description")
     .appendTo($caption)
@@ -22,9 +23,10 @@ addThumbnail = (plunk) ->
     .appendTo($caption)
   
   if plunk.author
-    $author = $("<a>#{plunk.author.name}</a>")
+    $author = $("<a></a>")
+      .text(plunk.author.name)
       .attr("href", plunk.author.url)
-       .attr("target", "_blank")
+      .attr("target", "_blank")
   else
     $author = $("<span>Anonymous</span>")
   
