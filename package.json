@@ -1,12 +1,13 @@
 {
   "name": "plunker",
   "version": "0.0.2",
+  "private": true,
   "dependencies": {
     "coffee-script": "1.2.x",
     "cromag": "0.1.x",
     "express": "2.5.7",
     "gzippo": "0.1.x",
-    "jade": "0.20.x",
+    "jade": "0.20.0",
     "gisty": "0.0.x",
     "markdown": "0.3.x",
     "lingo": "0.0.x",

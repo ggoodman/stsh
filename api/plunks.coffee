@@ -28,19 +28,25 @@ module.exports = (store) ->
       _.each plunks, (plunk) ->
         delete plunk.token 
       
-      res.json(plunks)
+      return res.json(plunks)
     
   create: (req, res, next) ->
     plunks.create req.body, (err, plunk) ->
       return next(err) if err
-      
-      res.json(plunk, 201)
+      return res.json(plunk, 201)
 
   
   show: (req, res, next) ->
     delete req.plunk.token unless req.authorized
     
-    res.json(req.plunk)
+    return res.json(req.plunk)
+  
+  update: (req, res, next) ->
+    return next({number: 404, message: "Not authorized"}) unless req.authorized
+
+    plunks.update req.plunk, req.body, (err, plunk) ->
+      return next(err) if err
+      return res.json(plunk, 200)
   
   destroy: (req, res, next) ->
     return next({number: 404, message: "Not found"}) unless req.authorized
