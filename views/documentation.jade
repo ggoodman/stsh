@@ -56,28 +56,153 @@ append content
         HTTP/1.1 201 Created
       pre.body.prettyprint.language-js.
         {
-          "created_at": "2012-02-16T05:34:05.362Z",
-          "expires": "2012-02-18T05:34:05.362Z",
-          "token": "315JrkFQhdzcAmBk",
+          "created_at": "2012-02-16T22:28:27.424Z",
+          "expires": "2012-02-18T22:28:27.424Z",
+          "token": "cnAF8G3sY5fXBuUd",
           "files": {
             "style/style.css": {
-              "html_url": "http://plunker.no.de/0xF5qW/style/style.css",
-              "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/style/style.css",
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/style/style.css",
               "filename": "style/style.css",
               "content": "h1 { color: red; }",
+              "html_url": "http://plunker.no.de/SJUZAQ/style/style.css",
               "mime": "text/css"
             },
             "index.html": {
-              "html_url": "http://plunker.no.de/0xF5qW/index.html",
-              "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/index.html",
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/index.html",
               "filename": "index.html",
               "content": "<link rel=\\"stylesheet\\" href=\\"style/style.css\\" /><h1>Header</h1><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p>",
+              "html_url": "http://plunker.no.de/SJUZAQ/index.html",
               "mime": "text/html"
             }
           },
-          "html_url": "http://plunker.no.de/0xF5qW/",
-          "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/",
-          "id": "0xF5qW",
+          "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ",
+          "id": "SJUZAQ",
           "index": "index.html",
-          "description": "Optional description of the plunk"
+          "description": "Optional description of the plunk",
+          "html_url": "http://plunker.no.de/SJUZAQ/"
         }
+      h2 Read a plunk
+
+      p: code GET /plunks/0xF5qW
+
+      h3 Response
+
+      pre.headers.
+        HTTP/1.1 200 OK
+      pre.body.prettyprint.language-js.
+        {
+          "created_at": "2012-02-16T22:28:27.424Z",
+          "expires": "2012-02-18T22:28:27.424Z",
+          "files": {
+            "style/style.css": {
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/style/style.css",
+              "filename": "style/style.css",
+              "content": "h1 { color: red; }",
+              "html_url": "http://plunker.no.de/SJUZAQ/style/style.css",
+              "mime": "text/css"
+            },
+            "index.html": {
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/index.html",
+              "filename": "index.html",
+              "content": "<link rel=\"stylesheet\" href=\"style/style.css\" /><h1>Header</h1><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p>",
+              "html_url": "http://plunker.no.de/SJUZAQ/index.html",
+              "mime": "text/html"
+            }
+          },
+          "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ",
+          "id": "SJUZAQ",
+          "index": "index.html",
+          "description": "Optional description of the plunk",
+          "html_url": "http://plunker.no.de/SJUZAQ/"
+        }
+      h2 Update a plunk
+
+      p: code POST /plunks/0xF5qW
+
+      h3 Input
+      dl
+        dt description
+        dd
+          em Optional
+          | &nbsp;
+          strong  String
+
+        dt index
+        dd
+          em Optional
+          | &nbsp;
+          strong  String
+        dd The default file to be served when a user navigates to the plunk.
+        dd Defaults to <em>index.html</em> if the file is provided otherwise an arbitrary file.
+
+        dt files
+        dd
+          em Optional
+          | &nbsp;
+          strong hash
+        dd New files and modifications to existing files can be specified in the same way as creating a plunk (filename => content)
+        dd However, to rename files each record in the file hash should be a mapping of filename => a hash as outlined below:
+          dl
+            dt filename
+            dd
+              em Optional
+              | &nbsp;
+              strong String
+            dd The new filename to use for this file
+
+            dt content
+            dd
+              em Optional
+              | &nbsp;
+              strong String
+
+      pre.prettyprint.language-js.
+        {
+          "description": "Rename index.html to main.html",
+          "index": "main.html",
+          "files": {
+            "index.html": {
+              "filename": "main.html"
+            },
+          }
+        }
+
+      h3 Response
+
+      pre.headers.
+        HTTP/1.1 200 OK
+      pre.body.prettyprint.language-js.
+        {
+          "created_at": "2012-02-16T22:28:27.424Z",
+          "expires": "2012-02-18T22:28:27.424Z",
+          "token": "cnAF8G3sY5fXBuUd",
+          "files": {
+            "style/style.css": {
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/style/style.css",
+              "filename": "style/style.css",
+              "content": "h1 { color: red; }",
+              "html_url": "http://plunker.no.de/SJUZAQ/style/style.css",
+              "mime": "text/css"
+            },
+            "main.html": {
+              "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ/main.html",
+              "filename": "main.html",
+              "content": "<link rel=\\"stylesheet\\" href=\\"style/style.css\\" /><h1>Header</h1><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p>",
+              "html_url": "http://plunker.no.de/SJUZAQ/main.html",
+              "mime": "text/html"
+            }
+          },
+          "url": "http://plunker.no.de/api/v1/plunks/SJUZAQ",
+          "id": "SJUZAQ",
+          "index": "main.html",
+          "description": "Rename index.html to main.html",
+          "html_url": "http://plunker.no.de/SJUZAQ/"
+        }
+      h2 Delete a plunk
+
+      p: code DELETE /plunks/0xF5qW
+
+      h3 Response
+
+      pre.headers.no-response.
+        HTTP/1.1 204 No content

@@ -20,6 +20,14 @@ pre.headers {
   text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
 }
 
+pre.no-response {
+  -webkit-border-radius: 3px 3px;
+  -moz-border-radius: 3px 3px;
+  border-radius: 3px 3px;
+  border-color: #ccc;
+  border-color: solid rgba(0, 0, 0, 0.15);
+}
+
 pre.headers + pre.body {
   -webkit-border-radius: 0 0 3px 3px;
   -moz-border-radius: 0 0 3px 3px;
