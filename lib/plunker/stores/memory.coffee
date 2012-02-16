@@ -42,6 +42,8 @@ class Store
         self._add(plunk) for id, plunk of JSON.parse(data)
         console.log "Restore completed"
 
+        self.queue = _.sortBy self.queue, (id) -> new cromag(self.plunks[id].created_at).valueOf()
+
     setInterval @backup, 1000 * 30 # Every 30s
 
   backup: =>
@@ -72,6 +74,11 @@ class Store
 
     cb(null, json)
 
+  update: (json, cb) ->
+    @plunks[json.id] = json
+
+    cb(null, deepClone(json))
+
   reserveId: (cb) -> cb(null, uid(6))
 
   list: (options, cb) ->
@@ -83,7 +90,7 @@ class Store
 
     self = @
 
-    cb null, _.map self.queue, (id) -> self.plunks[id]
+    cb null, _.map self.queue, (id) -> deepClone(self.plunks[id])
 
   fetch: (id, cb) ->
     if plunk = @plunks[id]

@@ -64,11 +64,14 @@ class Creater
         token: uid()
         created_at: now.toISOString()
         expires: now.addSeconds(self.config.ttl)
-        url: "#{self.config.url}/#{id}/"
+        url: "#{self.config.url}/api/v1/plunks/#{id}"
+        html_url: "#{self.config.url}/#{id}/"
 
-      file.url = "#{json.url}/#{filename}" for filename, file of json.files
+      for filename, file of json.files
+        file.url = "#{json.url}/#{filename}"
+        file.html_url = "#{json.html_url}#{filename}"
 
-      self.store.create(json, next)
+      next(null, json)
 
   create: (json, cb) ->
     self = @
@@ -77,7 +80,9 @@ class Creater
       if err then cb(err)
       else self.mapFiles json, (err, json) ->
         if err then cb(err)
-        else self.addFields json, cb
+        else self.addFields json, (err, json) ->
+          if err then cb(err)
+          else self.store.create json, cb
 
 
 class Updater
@@ -119,11 +124,13 @@ class Updater
 
 
   update: (plunk, json, cb) ->
-    @validate json, (err, json) ->
-      if err then return cb(err)
+    self = @
 
-      @
-    async.waterfall [@store.fetch()]
+    self.validate json, (err, json) ->
+      if err then cb(err)
+      else self.handleFileChanges json, (err, json) ->
+        if err then cb(err)
+        else self.store.update json, cb
 
 class Interface
   constructor: (config = {}) ->
@@ -144,12 +151,14 @@ class Interface
   delete: (id, cb) -> @store.delete(id, cb)
 
 module.exports = do ->
+  middleware = null
+
   createInterface: (config) -> new Interface(config)
 
   middleware: (config) ->
-    interface = new Interface(config)
+    middleware ||= new Interface(config)
 
     (req, res, next) ->
-      interface.config.url ||= req.headers.host
-      req.plunker = interface
+      middleware.config.url ||= "http://#{req.headers.host}"
+      req.plunker = middleware
       next()

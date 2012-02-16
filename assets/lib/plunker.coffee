@@ -2,10 +2,10 @@
 addThumbnail = (plunk) ->
   $li = $("<li></li>").addClass("span3").addClass("plunk")
   $div = $("<div></div>").addClass("thumbnail").appendTo($li)
-  $a = $("<a></a>").attr("href", plunk.url).appendTo($div)
+  $a = $("<a></a>").attr("href", plunk.html_url).appendTo($div)
   $img = $("<img />")
     .attr("src", "http://placehold.it/205x154&text=Loading...")
-    .attr("data-original", "http://immediatenet.com/t/l3?Size=1024x768&URL=#{plunk.url}")
+    .attr("data-original", "http://immediatenet.com/t/l3?Size=1024x768&URL=#{plunk.html_url}")
     .attr("alt", plunk.description or "Plunk: #{plunk.id}")
     .addClass("lazy")
     .appendTo($a)
@@ -50,9 +50,14 @@ addThumbnail = (plunk) ->
       .attr("target", "_blank")
       .appendTo($about)
 
+  if plunk.token
+    $li.addClass("authorized")
+
   $a.on "click", ->
     showPreview(plunk)
     false
+
+  $("#recent>li").slice(11).remove()
 
   $li.prependTo("#recent")
 
@@ -65,14 +70,14 @@ showPreview = (plunk) ->
     .addClass("modal-body")
     .appendTo($modal)
   $iframe = $("<iframe></iframe>")
-    .attr("src", plunk.url)
+    .attr("src", plunk.html_url)
     .addClass("preview")
     .appendTo($body)
   $footer = $("<div></div>")
     .addClass("modal-footer")
     .appendTo($modal)
   $launch = $("<a><i class=\"icon-resize-full icon-white\"></i> Fullscreen</a>")
-    .attr("href", plunk.url)
+    .attr("href", plunk.html_url)
     .addClass("btn")
     .addClass("btn-primary")
     .appendTo($footer)
@@ -94,49 +99,64 @@ createPlunk = (json) ->
     data: JSON.stringify(json)
 
 showMessage = (title, message, additionalClass) ->
-  $msg = $("<div></div>").addClass("alert alert-block fade in")
+  $msg = $("<div></div>").addClass("alert fade in")
   $msg.addClass(additionalClass) if additionalClass?
   $close = $("<a>×</a>")
     .addClass("close")
-    .attr("href", "#")
+    .attr("href", "javascript:void(0)")
     .attr("data-dismiss", "alert")
     .appendTo($msg)
-  $title = $("<h4>#{title}</h4>")
-    .addClass("alert-heading")
-    .appendTo($msg)
-  $body = $("<p>#{message}</p>").appendTo($msg)
+  $title = $("<strong>#{title}: </strong>").appendTo($msg)
+  $body = $("<span>#{message}</span>").appendTo($msg)
 
   $msg.insertAfter("form.gist-import")
 
 showError = (xhr, err) ->
   showMessage("Import failed", err.toString(), "alert-error")
   $("form.gist-import input, form.gist-import button").prop("disabled", false)
+  $("form.gist-import input").val("")
 
+determineStrategy = (input) ->
+  if matches = input.match(/^(?:(?:https?\:\/\/)?gist\.github\.com\/)?(\d+)(?:#.+)?$/)
+    strategy = ->
+      loadGist(matches[1])
+
+  # Fall back to the gist loader
+  unless strategy
+    strategy = -> loadGist(input)
+
+  return strategy
 
 $ ->
-  $("form.gist-import").on "submit", ->
+  $("form.gist-import").on "submit", (e) ->
+    e.preventDefault()
+
+    strategy = determineStrategy($("input.gist").val())
+
     $("form.gist-import input, form.gist-import button").prop("disabled", true)
-    loadGist($("input.gist").val()).fail(showError).done (gist) ->
-      gist = gist.data
-      json =
-        description: gist.description or ""
-        source:
-          name: "gist: #{gist.id}"
-          url: gist.html_url
-        author:
-          name: gist.user.login
-          url: "https://github.com/#{gist.user.login}"
-          avatar_url: gist.user.avatar_url
-        files: {}
+    strategy().fail(showError).done (data) ->
+      if data.meta.status >= 400 then showError(null, data.data.message)
+      else
+        gist = data.data
+        json =
+          description: gist.description or ""
+          source:
+            name: "gist: #{gist.id}"
+            url: gist.html_url
+          author:
+            name: gist.user.login
+            url: "https://github.com/#{gist.user.login}"
+            avatar_url: gist.user.avatar_url
+          files: {}
 
-      json.files[filename] = file.content for filename, file of gist.files
+        json.files[filename] = file.content for filename, file of gist.files
 
-      createPlunk(json).fail(showError).done (data) ->
-        showPreview(data)
-        addThumbnail(data)
-        showMessage("Import successful", "The gist was successfully imported into Plunker", "alert-success")
-        $("form.gist-import input").val("").prop("disabled", false)
-        $("form.gist-import button").prop("disabled", false)
+        createPlunk(json).fail(showError).done (data) ->
+          showPreview(data)
+          addThumbnail(data)
+          showMessage("Success", "A new plunk was born!", "alert-success")
+          $("form.gist-import input").val("").prop("disabled", false)
+          $("form.gist-import button").prop("disabled", false)
 
     false
 

@@ -62,7 +62,8 @@ app.get "/plunks", (req, res) ->
     if err then return apiError(res, err)
     else
       for plunk in plunks
-        unless req.cookies[plunk.id]? and req.cookies[plunk.id] == plunk.token
+        # TODO: WTF Express, why are all cookies lowercase?
+        unless req.cookies[plunk.id.toLowerCase()] == plunk.token
           delete plunk.token
       res.json(plunks, 200)
 
@@ -71,7 +72,7 @@ app.post "/plunks", (req, res) ->
   req.plunker.create req.body, (err, plunk) ->
     if err then return apiError(res, err)
     else
-      res.cookie plunk.id, plunk.token, { expires: new Date(plunk.expires), httpOnly: true, path: "/api/v1/plunks" }
+      res.cookie plunk.id, plunk.token, { expires: new Date(plunk.expires), httpOnly: true, path: "/api/v1/" }
       res.json(plunk, 201) # Created
 
 # Read

@@ -5,19 +5,30 @@ gzippo = require("gzippo")
 app = module.exports = express.createServer()
 
 app.configure ->
-  #app.use express.logger()
+  app.set "views", "#{__dirname}/views"
+  app.set "view engine", "jade"
+  app.set "view options", layout: false
+
+  app.use express.logger()
   app.use express.compiler
     src: "#{__dirname}/assets"
     dest: "#{__dirname}/public"
     enable: ["coffeescript"]
   app.use gzippo.staticGzip("#{__dirname}/public")
   app.use gzippo.compress()
+  app.use express.static("#{__dirname}/public")
   app.use express.errorHandler({ dumpExceptions: true, showStack: true })
 
 
+app.get "/", (req, res) ->
+  res.render("index", page: "/")
+
+app.get "/documentation", (req, res) ->
+  res.render("documentation", page: "/documentation")
+
+
 app.use "/api", require("./servers/api")
-app.use require("./servers/landing")
-app.use require("./servers/plunks")
+app.use "/", require("./servers/plunks")
 
 
 if require.main == module

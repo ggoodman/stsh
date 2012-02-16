@@ -1,176 +1,32 @@
-!!! 5
-html
-  head
-    meta(charset="utf-8")
-    meta(name="viewport",content="width=device-width, initial-scale=1.0")
-    title Plunker
-    link(rel="stylesheet",href="style/bootstrap.min.css")
-    link(rel="stylesheet",href="style/plunker.css")
-    // if lt IE 9
-      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
-    script(type="text/javascript",src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js")
-    script(type="text/javascript",src="lib/jquery.lazyload.min.js")
-    script(type="text/javascript",src="lib/jquery.timeago.js")
-    script(type="text/javascript",src="lib/cromag.min.js")
-    script(type="text/javascript",src="lib/bootstrap.min.js")
-    script(type="text/javascript",src="lib/plunker.js")
-    script
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-28929036-1']);
-      _gaq.push(['_trackPageview']);
-    
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-  body(data-spy="scroll",data-offset="50")
-    div.navbar.navbar-fixed-top
-      div.navbar-inner
-        div.container
-          a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
-            span.icon-bar
-            span.icon-bar
-            span.icon-bar
+extends layout
 
-          a.brand(href="#") Plunker
-          
-          div.nav-collapse
-            ul.nav
-              li: a(href="#browse") Browse
-              li: a(href="#api") API
-              li: a(href="#gist") Import
-    div.container
-      div.hero-unit
-        h1#description Get your Plunk on!
+append scripts
+  script(type="text/javascript",src="lib/jquery.lazyload.min.js")
+  script(type="text/javascript",src="lib/jquery.timeago.js")
+  script(type="text/javascript",src="lib/cromag.min.js")
+  script(type="text/javascript",src="lib/plunker.js")
+
+append content
+  section#marketing
+    div.page-header
+      h1 Plunker is a RESTful service for hoisting web snippets online
+      p.byline To try it out, paste the id or url of a gist below and cross your fingers
+    div.row
+      div.span12
+        form.form-search.gist-import.well(action="",method="get")
+          input.gist(type="text",placeholder="Gist ID or url")
+          | &nbsp;
+          button.btn.btn-large.btn-primary(type="submit") Import
+  section#browse
+    div.page-header
+      h1 Gallery
+    div.row
+      div.span12
         p.
-          Plunker is an ultra-simple webservice that allows client-side apps
-          to create, manage and preview simple static webpages. Consider it
-          a sort of <a href="http://jsfiddle.net">jsFiddle</a> without the
-          interface with a publicly accessible and CORS-friendly API.
-      section#marketing
-        div.page-header
-          h1 What is plunker?
-        div.row
-          div.span12
-            p.
-              Plunker is a four-operation, ultra-simple REST web API. Take your
-              code and plunk it online in one simple operation. It will run online
-              without any modification for 48 hours.
-          div.span4
-            h3 Features
-            ul
-              li Test your static web pages / webapps online.
-              li Have a simple, short url to share with others.
-              li Plunk your code and forget. Plunks will expire after 48 hours.
-              li Working on a jsFiddle killer? Use Plunker to run your previews.
-          div.span4
-            h3 Import a gist
-            p.
-              Importing a gist from github is as easy as typing a url in the browser.
-              Here, I've made it even easier. Just put in the gist id and hit 
-              import.
-            form.form-search.gist-import
-              input.gist.input-small(type="text",placeholder="Gist ID")
-              | 
-              button.btn.primary(type="submit") Import
-          div.span4
-            h3 Inspiration
-            p.
-              Plunker was inspired by a number of amazing projects. Here are a
-              few of those.
-            ul
-              li: a(href="http://gist.github.com") Github's gist
-              li: a(href="http://bl.ocks.org") bl.ocks.org
-              li: a(href="http://jsfiddle.net") jsFiddle
-              li: a(href="http://twitter.github.com/bootstrap/") Twitter's bootstrap
-      section#browse
-        div.page-header
-          h1 Recent plunks
-        div.row
-          div.span12
-            p.
-              This is a list of the last few plunks that were created. The images
-              are provided courtesy of the service at
-              <a href="http://immediatenet.com/thumbnail_api.html">Immedianet</a>.
-              Because they provide a free service, it is possible that not all
-              plunks' renderings will be available.
-            p.
-              The images may take a few seconds to load at their first viewing.
-              Please be patient.
-            ul#recent.thumbnails
-      section#api
-        div.page-header
-          h1 Public API
-        div.row
-          div.span12
-            :markdown
-              ## Create a plunk
-              
-              `POST  http://plunker.no.de/api/v1/plunks`
+          This is a list of the last few plunks that were created. The images
+          are provided courtesy of the service at
+          <a href="http://immediatenet.com/thumbnail_api.html">Immedianet</a>.
+          Because they provide a free service, it is possible that not all
+          plunks' renderings will be available. Please be patient while they load.
 
-              Request body:
-              
-            script(src="https://gist.github.com/1730292.js?file=create.request.json")
-            
-            :markdown
-              Response:
-              
-            script(src="https://gist.github.com/1730292.js?file=create.response.json")
-            
-            :markdown
-              ## Retrieve a plunk
-              
-              `GET  http://plunker.no.de/api/v1/plunks/:id`
-              
-              Response:
-              
-            script(src="https://gist.github.com/1730292.js?file=get.response.json")
-
-            :markdown
-              ## Update a plunk
-              
-              `PATCH  http://plunker.no.de/api/v1/plunks/:id`
-              
-              Not yet implemented
-              
-              ## Destroy a plunk
-              
-              `DELETE	http://plunker.no.de/api/v1/plunks/:id`
-  
-              Not yet implemented
-      section#gist
-        div.page-header
-          h1 Create a plunk from a gist
-        div.row
-          div.span12
-            :markdown
-              You can use a special url to easily import gists into plunker.
-              You can think of this as an alternative to [bl.ocks.org](http://bl.ocks.org)
-              that creates a short-term copy of the gist instead of acting as
-              a proxy to [Github](http://github.com).
-
-              To use this, refer to the url pattern: `http://plunker.no.de/gist/[gistid]`
-              and replace `[gistid]` with the appropriate id of the gist.
-
-              ## Index detection
-
-              Plunker will try and automatically detect the 'index' file which
-              defaults to _index.html_, or the first .html/.htm file. If no html
-              files are found, it will simply use the first file.
-
-              ## Manual index
-
-              You can manually specify an index by appending `?index=[file]` to
-              the query string. Plunker will throw an error if that file does
-              not exist in the gist.
-
-              ### Example
-              
-              `http://plunker.no.de/gist/1198937?file=index.html`
-
-              Not that in the above case, index would have been used anyway.
-      hr
-      footer
-        p Built by <a href="https://github.com/ggoodman">Geoff Goodman</a> (<a href="http://twitter.com/g_goodman">@g_goodman</a>)
-        p &copy; Filearts (2012) (<a href="http://twitter.com/filearts">@filearts</a>)
+        ul#recent.thumbnails

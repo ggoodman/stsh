@@ -1,0 +1,83 @@
+extends layout
+
+append styles
+  link(rel="stylesheet",href="/style/prettify.css")
+
+append scripts
+  script(src="/lib/prettify.min.js")
+  script
+    $(function(){prettyPrint();});
+
+append content
+  div.page-header
+    h1 Public API
+  div.row
+    div.span12
+      h2 Create a plunk
+
+      p: code POST /plunks
+
+      h3 Input
+      dl
+        dt description
+        dd
+          em Optional
+          | &nbsp;
+          strong  String
+
+        dt index
+        dd
+          em Optional
+          | &nbsp;
+          strong  String
+        dd The default file to be served when a user navigates to the plunk.
+        dd Defaults to <em>index.html</em> if the file is provided otherwise an arbitrary file.
+
+        dt files
+        dd
+          em Required
+          | &nbsp;
+          strong hash
+        dd Files are listed as a hash of filename => content
+
+      pre.prettyprint.language-js.
+        {
+          "description": "Optional description of the plunk",
+          "index": "index.html",
+          "files": {
+            "index.html": "<link rel=\\"stylesheet\\" href=\\"style/style.css\\" /><h1>Header</h1><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p>",
+            "style/style.css": "h1 { color: red; }"
+          }
+        }
+
+      h3 Response
+
+      pre.headers.
+        HTTP/1.1 201 Created
+      pre.body.prettyprint.language-js.
+        {
+          "created_at": "2012-02-16T05:34:05.362Z",
+          "expires": "2012-02-18T05:34:05.362Z",
+          "token": "315JrkFQhdzcAmBk",
+          "files": {
+            "style/style.css": {
+              "html_url": "http://plunker.no.de/0xF5qW/style/style.css",
+              "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/style/style.css",
+              "filename": "style/style.css",
+              "content": "h1 { color: red; }",
+              "mime": "text/css"
+            },
+            "index.html": {
+              "html_url": "http://plunker.no.de/0xF5qW/index.html",
+              "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/index.html",
+              "filename": "index.html",
+              "content": "<link rel=\\"stylesheet\\" href=\\"style/style.css\\" /><h1>Header</h1><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p>",
+              "mime": "text/html"
+            }
+          },
+          "html_url": "http://plunker.no.de/0xF5qW/",
+          "url": "http://plunker.no.de/api/v3/plunks/0xF5qW/",
+          "id": "0xF5qW",
+          "index": "index.html",
+          "description": "Optional description of the plunk"
+        }

@@ -11,20 +11,16 @@ config = _.defaults require("../config"),
 app.configure ->
   app.use require("../lib/plunker").middleware(config)
 
-  app.use express.logger()
-  app.use express.errorHandler({ dumpExceptions: true, showStack: true })
 
-
-
-app.param "plunk", (req, res, next, id) ->
-  req.plunker.read id, (err, plunk) ->
+loadPlunk = (req, res, next) ->
+  req.plunker.read req.params.id, (err, plunk) ->
     if err then next(err)
     else
       req.plunk = plunk
       next()
 
 # Serve up a plunk
-app.get "/:plunk/", (req, res, next) ->
+app.get "/:id/", loadPlunk, (req, res) ->
   return res.send(404) unless plunk = req.plunk
 
   file = plunk.files[plunk.index]
@@ -34,7 +30,7 @@ app.get "/:plunk/", (req, res, next) ->
 app.get "/:id", (req, res) -> res.redirect("/#{req.params.id}/", 301)
 
 # Serve a specific file in a plunk
-app.get "/:plunk/*", (req, res, next) ->
+app.get "/:id/*", loadPlunk, (req, res) ->
   return res.send(404) unless plunk = req.plunk
 
   file = plunk.files[req.params[0]]
