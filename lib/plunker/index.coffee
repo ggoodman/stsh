@@ -63,7 +63,7 @@ class Creater
         id: id
         token: uid()
         created_at: now.toISOString()
-        expires: now.addSeconds(self.config.ttl)
+        expires: now.addSeconds(self.config.ttl).toISOString()
         url: "#{self.config.url}/api/v1/plunks/#{id}"
         html_url: "#{self.config.url}/#{id}/"
 
