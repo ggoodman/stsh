@@ -71,7 +71,7 @@ jQuery.timeago.settings.strings.seconds = "seconds"
       self.cards = []
       @collection.on "reset", (coll) ->
         card.remove() for card in self.cards
-        coll.each (plunk) ->
+        coll.chain().first(8).each (plunk) ->
           card = new Card(model: plunk)
           card.render().$el.appendTo(self.$el)
           self.cards.push(card)        
