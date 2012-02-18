@@ -29,8 +29,10 @@ apiError = (res, err) ->
   if err.message then body.message = err.message
   if err.errors then body.errors = err.errors
   if err.stack then body.stack = err.stack
+  
+  delete body.statusCode
 
-  res.json(statusCode, err.statusCode or 500)
+  res.json(body, err.statusCode or 500)
 
 checkToken = (req, res, next) ->
   req.token =
@@ -38,8 +40,9 @@ checkToken = (req, res, next) ->
     else if auth = req.header("Authorization")
       [token] = auth.match(/^token (\S+)$/i)
       token
-    else if req.cookies[req.params.id]? then req.cookies[req.params.id]
-  req.authorized = (req.token == req.plunk.token)
+    else if req.cookies[req.params.id.toLowerCase()]? then req.cookies[req.params.id.toLowerCase()]
+  if req.plunk
+    req.authorized = (req.token == req.plunk.token)
 
   next()
 
@@ -77,19 +80,23 @@ app.post "/plunks", (req, res) ->
 
 # Read
 app.get "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
-  req.plunker.read req.params.id, (err, plunk) ->
-    if err then return apiError(res, err)
-    else
-      if req.token isnt plunk.token then delete plunk.token
-      res.json(plunk, 200)
+  unless req.plunk then return apiError res,
+    statusCode: 404
+    message: "Not found"
+  else
+    unless req.authorized then delete req.plunk.token
+    res.json(req.plunk, 200)
 
 # Update
 app.post "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
-  unless req.authorized then return apiError res,
+  unless req.plunk then return apiError res,
+    statusCode: 404
+    message: "Not found"
+  else unless req.authorized then return apiError res,
     statusCode: 403 # Forbidden
     message: "Unauthorized"
   else
-    req.plunker.update req.params.id, req.body, (err, plunk) ->
+    req.plunker.update req.plunk, req.body, (err, plunk) ->
       if err then return apiError(res, err)
       else res.json(plunk, 200)
 

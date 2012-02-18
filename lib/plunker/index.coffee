@@ -90,7 +90,7 @@ class Updater
 
   validate: (json, next) =>
     {@valid, @errors} = validator.validate(json, require("./schema/update"))
-
+    
     unless @valid then return next
       message: "Validation failed"
       errors: @errors
@@ -102,8 +102,11 @@ class Updater
     new_files = {}
 
     errors = []
+    
+    plunk.description = json.description or plunk.description
+    plunk.index = json.index or plunk.index
 
-    if json.files
+    if json.files and false
       for filename, new_file of json.files
         old_file = old_files[filename]
 
@@ -121,14 +124,17 @@ class Updater
 
           # Delete the old file from old_files hash
           delete old_files[filename]
+    next(null, plunk)
 
 
   update: (plunk, json, cb) ->
     self = @
-
+    
+    json = JSON.parse(json) if _.isString(json) 
+    
     self.validate json, (err, json) ->
       if err then cb(err)
-      else self.handleFileChanges json, (err, json) ->
+      else self.handleFileChanges plunk, json, (err, json) ->
         if err then cb(err)
         else self.store.update json, cb
 
@@ -147,7 +153,7 @@ class Interface
   index: (cb) -> @store.list(cb)
   create: (json, cb) -> @creater.create(json, cb)
   read: (id, cb) -> @store.fetch(id, cb)
-  update: (id, json, cb) -> @updater.update(json, cb)
+  update: (plunk, json, cb) -> @updater.update(plunk, json, cb)
   delete: (id, cb) -> @store.delete(id, cb)
 
 module.exports = do ->

@@ -1,8 +1,105 @@
+jQuery.timeago.settings.strings.seconds = "seconds"
 
-addThumbnail = (plunk) ->
+((exports) ->
+  Handlebars.registerHelper "dateToLocaleString", (isoString) ->
+    new Cromag(isoString).toLocaleString()
+  
+  exports.plunker = {}
+  
+  class exports.Plunk extends Backbone.Model
+    defaults:
+      description: "Untitled"
+    initialize: ->
+
+    toJSON: ->
+      json = super()
+      json.description ||= "Untitled"
+      json
+  
+  class exports.PlunkCollection extends Backbone.Collection
+    url: -> "/api/v1/plunks"
+    model: Plunk
+    comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
+    sync: (method, model, options) ->
+      params = _.extend {}, options,
+        url: @url()
+        dataType: "json"
+        
+      switch method
+        #when "create"
+        when "read"
+          params.type = "get"
+
+        #when "update"
+        #when "delete"
+      
+      $.ajax(params)
+  
+  class exports.Card extends Backbone.View
+    initialize: ->
+      @on "change", @render
+      
+    template: """
+      <li class="span3 plunk">
+        <div class="thumbnail">
+          <h5 class="description" title="{{description}}">{{description}}</h5>
+          <a href="{{html_url}}">
+            <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{html_url}}" class="lazy" />
+          </a>
+          <div class="caption">
+            <p>
+              {{#if author}}
+                by <a href="{{author.url}}">{{author.name}}</a>
+              {{else}}
+                by Anonymous
+              {{/if}}
+              
+              <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
+          </div>
+        </div>
+      </li>
+    """
+    render: =>
+      compiled = Handlebars.compile(@template)
+      @setElement $(compiled(@model.toJSON()))
+      @$(".timeago").timeago()
+      @
+
+  class exports.RecentPlunks extends Backbone.View
+    initialize: ->
+      self = @
+      self.cards = []
+      @collection.on "reset", (coll) ->
+        card.remove() for card in self.cards
+        coll.each (plunk) ->
+          card = new Card(model: plunk)
+          card.render().$el.appendTo(self.$el)
+          self.cards.push(card)        
+  
+  $ ->
+    plunks = new PlunkCollection()
+    recent = new RecentPlunks
+      collection: plunks
+      el: document.getElementById("recent")
+    
+    plunks.fetch()
+    
+    console.log recent
+  
+)(window)
+
+###
+addcard = (plunk) ->
   $li = $("<li></li>").addClass("span3").addClass("plunk")
-  $div = $("<div></div>").addClass("thumbnail").appendTo($li)
-  $a = $("<a></a>").attr("href", plunk.html_url).appendTo($div)
+  $div = $("<div></div>").addClass("card").appendTo($li)
+  $description = $("<h5></h5>")
+    .text("#{plunk.description or 'Untitled'}")
+    .attr("title", plunk.description or "Untitled")
+    .addClass("description")
+    .appendTo($div)
+  $a = $("<a></a>")
+    .attr("href", plunk.html_url)
+    .appendTo($div)
   $img = $("<img />")
     .attr("src", "http://placehold.it/205x154&text=Loading...")
     .attr("data-original", "http://immediatenet.com/t/l3?Size=1024x768&URL=#{plunk.html_url}")
@@ -12,11 +109,7 @@ addThumbnail = (plunk) ->
   $caption = $("<div></div>")
     .addClass("caption")
     .appendTo($div)
-  $description = $("<h5></h5>")
-    .text("#{plunk.description or 'Untitled'}")
-    .attr("title", plunk.description or "Untitled")
-    .addClass("description")
-    .appendTo($caption)
+
 
   $about = $("<p>by&nbsp;</p>")
     .addClass("about")
@@ -153,7 +246,7 @@ $ ->
 
         createPlunk(json).fail(showError).done (data) ->
           showPreview(data)
-          addThumbnail(data)
+          addcard(data)
           showMessage("Success", "A new plunk was born!", "alert-success")
           $("form.gist-import input").val("").prop("disabled", false)
           $("form.gist-import button").prop("disabled", false)
@@ -166,8 +259,9 @@ $ ->
     cache: false
     success: (json) ->
       for plunk in json then do (plunk) ->
-        addThumbnail(plunk)
+        addcard(plunk)
 
       $("img.lazy").lazyload
         threshold: 200
         effect: "fadeIn"
+###
