@@ -7,7 +7,10 @@ append scripts
   script(type="text/javascript",src="/lib/underscore.min.js")
   script(type="text/javascript",src="/lib/backbone.min.js")
   script(type="text/javascript",src="/lib/handlebars.js")
-  script(type="text/javascript",src="/lib/plunker.js")
+  script(type="text/javascript",src="/lib/models/plunks.js")
+  script(type="text/javascript",src="/lib/views/cards.js")
+  script(type="text/javascript",src="/lib/views/importer.js")
+  script(type="text/javascript",src="/lib/landing.js")
 
 append content
   section#marketing
@@ -16,10 +19,13 @@ append content
       p.byline To try it out, paste the id or url of a gist below and cross your fingers
     div.row
       div.span12
-        form.form-search.gist-import.well(action="",method="get")
-          input.gist(type="text",placeholder="Gist ID or url")
+        form#importer.form-search.gist-import.well(action="",method="get")
+          div.progress.progress-striped.progress-info.active
+            div.bar
+          input#importer-input.gist(type="text",placeholder="Gist ID or url")
           | &nbsp;
-          button.btn.btn-large.btn-primary(type="submit") Import
+          a.btn.btn-large.btn-primary(type="submit") Import
+
   section#browse
     div.page-header
       h1 Gallery

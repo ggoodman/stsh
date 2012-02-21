@@ -1,92 +1,27 @@
 jQuery.timeago.settings.strings.seconds = "seconds"
 
-((exports) ->
-  Handlebars.registerHelper "dateToLocaleString", (isoString) ->
-    new Cromag(isoString).toLocaleString()
-  
-  exports.plunker = {}
-  
-  class exports.Plunk extends Backbone.Model
-    defaults:
-      description: "Untitled"
-    initialize: ->
+Handlebars.registerHelper "dateToLocaleString", (isoString) ->
+  new Cromag(isoString).toLocaleString()
 
-    toJSON: ->
-      json = super()
-      json.description ||= "Untitled"
-      json
-  
-  class exports.PlunkCollection extends Backbone.Collection
-    url: -> "/api/v1/plunks"
-    model: Plunk
-    comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
-    sync: (method, model, options) ->
-      params = _.extend {}, options,
-        url: @url()
-        dataType: "json"
-        
-      switch method
-        #when "create"
-        when "read"
-          params.type = "get"
+Handlebars.registerHelper "arrayJoinSpace", (array) ->
+  array.join(" ")
 
-        #when "update"
-        #when "delete"
-      
-      $.ajax(params)
-  
-  class exports.Card extends Backbone.View
-    initialize: ->
-      @on "change", @render
-      
-    template: """
-      <li class="span3 plunk">
-        <div class="thumbnail">
-          <h5 class="description" title="{{description}}">{{description}}</h5>
-          <a href="{{html_url}}">
-            <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{html_url}}" class="lazy" />
-          </a>
-          <div class="caption">
-            <p>
-              {{#if author}}
-                by <a href="{{author.url}}">{{author.name}}</a>
-              {{else}}
-                by Anonymous
-              {{/if}}
-              
-              <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
-          </div>
-        </div>
-      </li>
-    """
-    render: =>
-      compiled = Handlebars.compile(@template)
-      @setElement $(compiled(@model.toJSON()))
-      @$(".timeago").timeago()
-      @
+$ ->
 
-  class exports.RecentPlunks extends Backbone.View
-    initialize: ->
-      self = @
-      self.cards = []
-      @collection.on "reset", (coll) ->
-        card.remove() for card in self.cards
-        coll.chain().first(8).each (plunk) ->
-          card = new Card(model: plunk)
-          card.render().$el.appendTo(self.$el)
-          self.cards.push(card)        
-  
-  $ ->
-    plunks = new PlunkCollection()
-    recent = new RecentPlunks
-      collection: plunks
-      el: document.getElementById("recent")
-    
-    plunks.fetch()
-    
-    console.log recent
-  
-)(window)
+  window.plunks = new PlunkCollection()
+
+  recent = new RecentPlunks
+    collection: plunks
+    el: document.getElementById("recent")
+
+  plunks.fetch()
+
+  importer = new Importer
+    collection: plunks
+    el: document.getElementById("importer")
+
+  console.log recent
+
 
 ###
 addcard = (plunk) ->

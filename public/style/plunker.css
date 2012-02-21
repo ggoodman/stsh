@@ -68,6 +68,28 @@ form.gist-import input.gist {
 form.gist-import button {
 }
 
+#importer .progress {
+  display: none;
+  height: 37px;
+  position: absolute;
+  width: auto;
+  top: 19px;
+  left: 19px;
+  right: 109px;
+}
+
+#importer .progress .bar {
+  height: 37px;
+  width: 0%;
+}
+
+#importer.import input.gist {
+  display: none;
+}
+#importer.import div.progress {
+  display: block;
+}
+
 #recent .plunk.authorized .thumbnail {
   background-color: #efe;
 }

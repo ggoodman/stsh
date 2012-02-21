@@ -26,6 +26,8 @@ app.get "/", (req, res) ->
 app.get "/documentation", (req, res) ->
   res.render("documentation", page: "/documentation")
 
+app.get "/preview/:id", (req, res) ->
+  res.render("preview", id: req.params.id)
 
 app.use "/api", require("./servers/api")
 app.use "/", require("./servers/plunks")

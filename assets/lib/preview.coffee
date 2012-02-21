@@ -1,0 +1,2 @@
+$ ->
+  editor = ace.edit("canvas")
