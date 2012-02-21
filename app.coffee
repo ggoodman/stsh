@@ -1,6 +1,7 @@
 coffee = require("coffee-script")
 express = require("express")
 gzippo = require("gzippo")
+assets = require("connect-assets")
 
 app = module.exports = express.createServer()
 
@@ -10,10 +11,7 @@ app.configure ->
   app.set "view options", layout: false
 
   app.use express.logger()
-  app.use express.compiler
-    src: "#{__dirname}/assets"
-    dest: "#{__dirname}/public"
-    enable: ["coffeescript"]
+  app.use assets()
   app.use gzippo.staticGzip("#{__dirname}/public")
   app.use gzippo.compress()
   app.use express.static("#{__dirname}/public")

@@ -1,16 +1,17 @@
 extends layout
 
 append scripts
-  script(type="text/javascript",src="/lib/jquery.lazyload.min.js")
-  script(type="text/javascript",src="/lib/jquery.timeago.js")
-  script(type="text/javascript",src="/lib/cromag.min.js")
-  script(type="text/javascript",src="/lib/underscore.min.js")
-  script(type="text/javascript",src="/lib/backbone.min.js")
-  script(type="text/javascript",src="/lib/handlebars.js")
-  script(type="text/javascript",src="/lib/models/plunks.js")
-  script(type="text/javascript",src="/lib/views/cards.js")
-  script(type="text/javascript",src="/lib/views/importer.js")
-  script(type="text/javascript",src="/lib/landing.js")
+  script(type="text/javascript",src="/js/jquery.lazyload.min.js")
+  script(type="text/javascript",src="/js/jquery.timeago.js")
+  script(type="text/javascript",src="/js/cromag.min.js")
+  script(type="text/javascript",src="/js/underscore.min.js")
+  script(type="text/javascript",src="/js/backbone.min.js")
+  script(type="text/javascript",src="/js/handlebars.js")
+
+  != js("models/plunks")
+  != js("views/cards")
+  != js("views/importer")
+  != js("landing")
 
 append content
   section#marketing
