@@ -16,6 +16,7 @@
     sync: (method, model, options) ->
       params = _.extend {}, options,
         url: @url()
+        cache: false
         dataType: "json"
 
       switch method
