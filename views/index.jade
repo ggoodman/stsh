@@ -26,6 +26,17 @@ append content
           input#importer-input.gist(type="text",placeholder="Gist ID or url")
           | &nbsp;
           a.btn.btn-large.btn-primary(type="submit") Import
+      div.span12
+        ul.quick-links
+          li
+            iframe.github-btn(src="http://markdotto.github.com/github-buttons/github-btn.html?user=ggoodman&repo=stsh&type=watch&count=true",allowtransparency="true",frameborder="0",scrolling="0",width="112px",height="20px")
+          li
+            iframe.github-btn(src="http://markdotto.github.com/github-buttons/github-btn.html?user=ggoodman&repo=stsh&type=fork&count=true",allowtransparency="true",frameborder="0",scrolling="0",width="95px",height="20px")
+          li.tweet-btn
+            a.twitter-share-button(href="https://twitter.com/share",data-url="http://plunker.no.de",data-text="Check out Plunker. Its a RESTful webservice for hoisting web snippets online.",data-via="g_goodman",data-count="horizontal",data-width="225px") Tweet
+          li.follow-btn
+            a.twitter-follow-button(href="https://twitter.com/g_goodman",data-show-count="true") Follow @g_goodman
+
 
   section#browse
     div.page-header
@@ -40,3 +51,4 @@ append content
           plunks' renderings will be available. Please be patient while they load.
 
         ul#recent.thumbnails
+  script !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src="//platform.twitter.com/widgets.js";fjs.parentNode.insertBefore(js,fjs);}}(document,"script","twitter-wjs");

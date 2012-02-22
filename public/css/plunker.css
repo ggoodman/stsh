@@ -2,6 +2,26 @@ body {
   padding-top: 60px;
 }
 
+.quick-links {
+  min-height: 30px;
+  padding: 5px 20px;
+  margin: 0;
+  list-style: none;
+  text-align: center;
+  overflow: hidden;
+}
+.quick-links li {
+  display: inline;
+  margin: 0 5px;
+  color: #999;
+}
+.quick-links .github-btn,
+.quick-links .tweet-btn,
+.quick-links .follow-btn {
+  position: relative;
+  top: 5px;
+}
+
 pre.headers {
   margin-bottom: 0;
   border-bottom-width: 0;
