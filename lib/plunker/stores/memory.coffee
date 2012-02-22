@@ -36,7 +36,7 @@ class Store
 
     console.log "Attempting to restore data"
 
-    fs.readFile "./backup.json", "utf8", (err, data) ->
+    fs.readFile "/tmp/backup.json", "utf8", (err, data) ->
       if err then console.log "Failed to restore data"
       else
         self._add(plunk) for id, plunk of JSON.parse(data)
@@ -47,7 +47,7 @@ class Store
     setInterval @backup, 1000 * 30 # Every 30s
 
   backup: =>
-    fs.writeFile "./backup.json", JSON.stringify(@plunks), (err) ->
+    fs.writeFile "/tmp/backup.json", JSON.stringify(@plunks), (err) ->
       if err then console.log "Backup failed"
       else console.log "Backup completed"
 
