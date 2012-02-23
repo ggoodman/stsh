@@ -5,7 +5,11 @@ html
   head
     meta(charset="utf-8")
     meta(name="viewport",content="width=device-width, initial-scale=1.0")
-    title Plunker
+    block title
+      if (typeof page_title != "undefined")
+        title Plunker - #{page_title}
+      else
+        title Plunker
     block styles
       link(rel="stylesheet",href="/css/bootstrap.min.css")
       link(rel="stylesheet",href="/css/plunker.css")
