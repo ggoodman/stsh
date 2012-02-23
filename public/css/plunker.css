@@ -14,12 +14,17 @@ body {
   display: inline;
   margin: 0 5px;
   color: #999;
+  height: 16px;
 }
 .quick-links .github-btn,
 .quick-links .tweet-btn,
-.quick-links .follow-btn {
+.quick-links .follow-btn,
+.quick-links .gplus-btn {
   position: relative;
   top: 5px;
+}
+.quick-links .gplus-btn>div {
+  float: right;
 }
 
 pre.headers {
