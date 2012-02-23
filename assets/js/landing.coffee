@@ -20,8 +20,6 @@ $ ->
     collection: plunks
     el: document.getElementById("importer")
 
-  console.log recent
-
 
 ###
 addcard = (plunk) ->

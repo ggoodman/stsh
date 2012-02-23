@@ -33,6 +33,7 @@
       compiled = Handlebars.compile(@template)
       @setElement $(compiled(@model.toJSON()))
       @$(".timeago").timeago()
+      @$("img.lazy").lazyload()
       @
 
 
@@ -46,7 +47,6 @@
       @collection.on "add", (plunk, coll, options) -> self.addCard(plunk, coll, options.index)
 
     addCard: (plunk, coll, index) =>
-      console.log "AddCard", arguments...
       card = new Card(model: plunk)
 
       if index
