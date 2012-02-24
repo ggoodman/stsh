@@ -123,15 +123,15 @@ class Updater
           mime: mime.lookup(filename)
         
         else
-          if new_file.filename? and new_file.filename != filename then errors.push
-            message: "The filename key and filename attribute must match"
-            property: "files['#{filename}'].filename"
           # File existed, therefore fields populated
-          else if old_file
+          if old_file
             new_file.mime ||= if new_file.filename then mime.lookup(new_file.filename) else old_file.mime
             new_file.filename ||= old_file.filename
             new_file.content ||= old_file.content
             old_files[new_file.filename] = new_file
+          else if new_file.filename? and new_file.filename != filename then errors.push
+            message: "The filename key and filename attribute must match"
+            property: "files['#{filename}'].filename"
           else
             new_file.filename = filename
             new_file.mime ||= mime.lookup(filename)
