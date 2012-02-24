@@ -98,7 +98,8 @@ class Updater
     next null, json
 
   handleFileChanges: (plunk, json, next) ->
-    old_files = _.clone(plunk.files)
+    old_files = {}
+    old_files[filename] = _.clone(file) for filename, file of plunk.files
 
     errors = []
     
