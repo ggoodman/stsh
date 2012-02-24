@@ -99,32 +99,47 @@ class Updater
 
   handleFileChanges: (plunk, json, next) ->
     old_files = _.clone(plunk.files)
-    new_files = {}
 
     errors = []
     
     plunk.description = json.description or plunk.description
     plunk.index = json.index or plunk.index
 
-    if json.files and false
+    if json.files
       for filename, new_file of json.files
-        old_file = old_files[filename]
+        old_file = _.clone(plunk.files[filename])
+        
+        # new_file is null so we're trying to delete
+        if _.isNull(new_file)
+          unless old_file then errors.push
+            message: "Cannot delete a file that does not exist"
+            property: "files['#{filename}']"
+          else delete old_files[filename]
 
-        if _.isString(new_file) then new_file =
-          content: file
+        # new_file is a string so we're changing contents or adding a new file
+        else if _.isString(new_file) then old_files[filename] =
+          content: new_file
           filename: filename
           mime: mime.lookup(filename)
-
-        # This is a modification to an existing file
-        if old_file
-          new_file = _.defaults new_file, old_file
-
-          # Change the name of an existing file
-          new_files[new_file.filename] = new_file
-
-          # Delete the old file from old_files hash
-          delete old_files[filename]
-    next(null, plunk)
+        
+        else
+          if new_file.filename? and new_file.filename != filename then errors.push
+            message: "The filename key and filename attribute must match"
+            property: "files['#{filename}'].filename"
+          # File existed, therefore fields populated
+          else if old_file
+            new_file.mime ||= if new_file.filename then mime.lookup(new_file.filename) else old_file.mime
+            new_file.filename ||= old_file.filename
+            new_file.content ||= old_file.content
+            old_files[new_file.filename] = new_file
+          else
+            new_file.filename = filename
+            new_file.mime ||= mime.lookup(filename)
+            new_file.content ||= old_file.content
+            old_files[new_file.filename] = new_file
+          
+    if errors.length then next(errors)
+    else next(null, plunk)
 
 
   update: (plunk, json, cb) ->

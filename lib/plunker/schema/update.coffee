@@ -22,6 +22,18 @@ module.exports =
           properties:
             filename:
               type: "string"
+              retuired: true
             content:
+              type: "string"
+            mime:
+              type: "string"
+        ,
+          type: "object"
+          additionalProperties: false
+          minProperties: 1
+          properties:
+            content:
+              type: "string"
+            mime:
               type: "string"
         ]
