@@ -137,6 +137,9 @@ form.gist-import button {
 
 #recent .thumbnail .caption {
   text-align: left;
+  height: 46px;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 #recent .thumbnail .description {

@@ -13,14 +13,13 @@
           <div class="caption">
             <p>
               {{#if author}}
-                by <a href="{{author.url}}" target="_blank">{{author.name}}</a>
+                by&nbsp;<a href="{{author.url}}" target="_blank">{{author.name}}</a>
               {{else}}
-                by Anonymous
+                by&nbsp;Anonymous
               {{/if}}
               <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
-              <br>
               {{#if source}}
-                from <a href="{{source.url}}" target="_blank">{{source.name}}</a>
+                from&nbsp;<a href="{{source.url}}" target="_blank">{{source.name}}</a>
               {{else}}
                 no source
               {{/if}}
