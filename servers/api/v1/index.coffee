@@ -101,7 +101,7 @@ app.post "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
       else res.json(plunk, 200)
 
 # Delete
-app.delete "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
+app.del "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
   unless req.authorized then return apiError
     statusCode: 403 # Forbidden
     message: "Unauthorized"
