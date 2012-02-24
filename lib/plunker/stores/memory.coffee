@@ -65,7 +65,7 @@ class Store
   exists: (uid) -> !!@plunks[uid]
   _add: (json) ->
     @plunks[json.id] = json
-    @timeouts[json.id] = setTimeout(@createDestructor(json.id), json.ttl * 1000)
+    @timeouts[json.id] = setTimeout(@createDestructor(json.id), cromag.parse(json.expires) - cromag.now())
     @queue.unshift json.id
     @queue = _.first(@queue, 12)
 
@@ -101,7 +101,7 @@ class Store
 
     return cb(null, plunk)
 
-  destroy: (id, cb) ->
+  remove: (id, cb) ->
     if destructor = @destructors[id]
       destructor()
     cb(null)

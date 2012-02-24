@@ -171,7 +171,7 @@ class Interface
   create: (json, cb) -> @creater.create(json, cb)
   read: (id, cb) -> @store.fetch(id, cb)
   update: (plunk, json, cb) -> @updater.update(plunk, json, cb)
-  delete: (id, cb) -> @store.delete(id, cb)
+  remove: (id, cb) -> @store.remove(id, cb)
 
 module.exports = do ->
   middleware = null

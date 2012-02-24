@@ -102,11 +102,11 @@ app.post "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
 
 # Delete
 app.del "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
-  unless req.authorized then return apiError
+  unless req.authorized then return apiError res,
     statusCode: 403 # Forbidden
     message: "Unauthorized"
   else
-    req.plunker.delete req.params.id, (err) ->
+    req.plunker.remove req.params.id, (err) ->
       if err then return apiError(res, err)
       else
         res.clearCookie req.params.id, { path: "/api/v1/plunks" }
