@@ -138,7 +138,7 @@ class Updater
             new_file.mime ||= mime.lookup(filename)
             new_file.content ||= old_file.content
             old_files[new_file.filename] = new_file
-        plunk.files = old_files
+      plunk.files = old_files
           
     if errors.length then next(errors)
     else next(null, plunk)
