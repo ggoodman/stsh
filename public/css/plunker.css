@@ -1,5 +1,18 @@
 body {
   padding-top: 60px;
+  position: relative;
+}
+
+@media (max-width: 980px) {
+  body {
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 499px) {
+  .span3.plunk {
+    width: auto;
+  }
 }
 
 .quick-links {

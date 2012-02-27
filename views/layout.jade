@@ -29,24 +29,23 @@ html
           var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
         })();
   body
-    header
-      nav.navbar.navbar-fixed-top
-        div.navbar-inner
-          div.container
-            a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
+    nav.navbar.navbar-fixed-top
+      div.navbar-inner
+        div.container
+          a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
+            span.icon-bar
+            span.icon-bar
+            span.icon-bar
 
-            a.brand(href="/") Plunker
+          a.brand(href="/") Plunker
 
-            div.nav-collapse
-              ul.nav
-                each text, url in pages
-                  if url == page
-                    li(class="active"): a(href=url)= text
-                  else
-                    li: a(href=url)= text
+          div.nav-collapse
+            ul.nav
+              each text, url in pages
+                if url == page
+                  li(class="active"): a(href=url)= text
+                else
+                  li: a(href=url)= text
     div.container
       block content
       hr
