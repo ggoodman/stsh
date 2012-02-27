@@ -136,11 +136,21 @@ class Updater
         #  3) Update the mime type
         else if former
           # Houston, we have a rename!
-          if new_name = file.filename and new_name != filename
+          if (new_name = file.filename) and new_name != filename
+            console.log filename, file
+            console.log "new_files", new_files
             if new_files[new_name] then errors.push
               message: "Impossible to rename a file to a filename that already exists"
               field: "files['#{filename}'].filename"
-            #else if old_files[new_name] and not json.files[file.filename]?.filename
+            else new_files[new_name] =
+              filename: new_name
+              content: file.content or former.content
+              mime: file.mime || mime.lookup(filename)
+          # Not a rename, but change to existing file
+          else new_files[new_name] =
+            filename: filename
+            content: file.content or former.content
+            mime: file.mime or former.mime
         
         # This is a new file, therefore requires content
         else
@@ -155,7 +165,15 @@ class Updater
       plunk.files = new_files
     
     # Update index
-    plunk.index = json.index or plunk.index
+    plunk.files[plunk.index] or plunk.index = do ->
+      filenames = _.keys(plunk.files)
+
+      if "index.html" in filenames then "index.html"
+      else
+        html = _.filter filenames, (filename) -> /.html?$/.test(filename)
+
+        if html.length then html[0]
+        else filenames[0]
 
           
     if errors.length then next(errors)
@@ -171,7 +189,7 @@ class Updater
       if err then cb(err)
       else self.handleFileChanges plunk, json, (err, json) ->
         if err then cb(err)
-        else self.store.update json, cb
+        else self.store.update plunk, json, cb
 
 class Interface
   constructor: (config = {}) ->

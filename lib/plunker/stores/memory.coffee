@@ -25,8 +25,13 @@ class Store
   constructor: (options = {}) ->
     self = @
     
-    @filename = options.filename or "/tmp/plunker.json"
-    @frequency = options.interval or 1000 * 20
+    options = _.defaults options,
+      filename: "/tmp/plunker.json"
+      interval: 1000 * 20
+      backup: true
+    
+    @filename = options.filename
+    @frequency = options.interval
     
     @plunks = new Collection
     @timeouts = {}
@@ -35,9 +40,10 @@ class Store
     @plunks.on "add", self.setExpiry
     @plunks.on "remove", self.clearExpiry
     
-    setInterval(@backup, @frequency)
-
-    @restore()
+    if options.backup
+      setInterval(@backup, @frequency)
+  
+      @restore()
   
   backup: =>
     self = @
@@ -69,7 +75,7 @@ class Store
   reserveId: (cb) -> cb null, uid(6) # OH GOD THE CHILDREN
   create: (json, cb) -> cb null, @plunks.add(json).get(json.id).toJSON()
   fetch: (id, cb) -> cb null, @plunks.get(id).toJSON()
-  update: (json, cb) -> cb null, @plunks.get(id).set(json).toJSON()
+  update: (plunk, json, cb) -> cb null, @plunks.get(plunk.id).set(json).toJSON()
   remove: (id, cb) -> cb null, @plunks.remove(id)
   
 store = null
