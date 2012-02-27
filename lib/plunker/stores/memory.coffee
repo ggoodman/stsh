@@ -1,5 +1,6 @@
 fs = require("fs")
-cromag = require("cromag")
+Cromag = require("cromag")
+Backbone = require("backbone")
 _ = require("underscore")._
 
 
@@ -13,18 +14,65 @@ uid = (len = 6) ->
 
   key
 
-deepClone = (obj) ->
-  if _.isArray(obj)
-    clone = _.map obj, (elem) -> deepClone(elem)
-  else if typeof obj == 'object'
-    clone = {}
 
-    _.each obj, (val, key) -> clone[key] = deepClone(val)
-  else
-    clone = obj
+delay = (timeout, callback) -> setTimeout(callback, timeout)
 
-  clone
+class Collection extends Backbone.Collection
+  comparator: (model) -> -Cromag.parse(model.get("updated_at") or model.get("created_at"))
+  
+  
+class Store
+  constructor: (options = {}) ->
+    self = @
+    
+    @filename = options.filename or "/tmp/plunker.json"
+    @frequency = options.interval or 1000 * 20
+    
+    @plunks = new Collection
+    @timeouts = {}
+    
+    @plunks.on "reset", (coll) -> coll.each(self.setExpiry)
+    @plunks.on "add", self.setExpiry
+    
+    setInterval(@backup, @frequency)
 
+    @restore()
+  
+  backup: =>
+    self = @
+    
+    fs.writeFile @filename, JSON.stringify(@plunks.toJSON()), (err) ->
+      if err then console.log "Backup failed to: #{self.filename}"
+      else console.log "Backup completed to: #{self.filename}"
+
+  restore: =>
+    self = @
+    
+    console.log "Attempting to restore data from: #{@filename}"
+    fs.readFile @filename, "utf8", (err, data) ->
+      if err then console.log "Failed to restore data: #{self.filename}"
+      else self.plunks.reset(JSON.parse(data)) and console.log "Restore succeeded from: #{self.filename}"
+
+  setExpiry: (model) =>
+    self = @
+    
+    @timeouts[model.id] = delay Cromag.parse(model.expires) - Cromag.now(), ->
+      self.remove(model)
+    @
+
+  list: (start, end, cb) -> cb null, @plunks.toJSON().slice(start, end)
+  reserveId: (cb) -> cb null, uid(6) # OH GOD THE CHILDREN
+  create: (json, cb) -> cb null, @plunks.add(json).get(json.id).toJSON()
+  fetch: (id, cb) -> cb null, @plunks.get(id).toJSON()
+  update: (json, cb) -> cb null, @plunks.get(id).set(json).toJSON()
+  remove: (id, cb) -> cb null, @plunks.remove(id)
+  
+store = null
+
+exports.createStore = (config) ->
+  store ||= new Store(config)
+
+###
 class Store
   constructor: ({@ttl, @server, @queueSize} = {ttl: 60 * 60 * 24 * 2, server: "", queueSize: 12})->
     @plunks = {}
@@ -42,7 +90,7 @@ class Store
         self._add(plunk) for id, plunk of JSON.parse(data)
         console.log "Restore completed"
 
-        self.queue = _.sortBy self.queue, (id) -> -new cromag(self.plunks[id].created_at).valueOf()
+        self.queue = _.sortBy self.queue, (id) -> -new Cromag(self.plunks[id].created_at).valueOf()
 
     setInterval @backup, 1000 * 30 # Every 30s
 
@@ -65,7 +113,7 @@ class Store
   exists: (uid) -> !!@plunks[uid]
   _add: (json) ->
     @plunks[json.id] = json
-    @timeouts[json.id] = setTimeout(@createDestructor(json.id), cromag.parse(json.expires) - cromag.now())
+    @timeouts[json.id] = setTimeout(@createDestructor(json.id), Cromag.parse(json.expires) - Cromag.now())
     @queue.unshift json.id
     @queue = _.first(@queue, 12)
 
@@ -91,7 +139,7 @@ class Store
 
     self = @
     
-    return cb null, _.chain(self.plunks).sortBy((plunk) -> new cromag(plunk.created_at).valueOf()).value()
+    return cb null, _.chain(self.plunks).sortBy((plunk) -> new Cromag(plunk.created_at).valueOf()).value()
 
     cb null, _.map self.queue, (id) -> deepClone(self.plunks[id])
 

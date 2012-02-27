@@ -40,7 +40,7 @@ checkToken = (req, res, next) ->
     else if auth = req.header("Authorization")
       [token] = auth.match(/^token (\S+)$/i)
       token
-    else if req.cookies[req.params.id.toLowerCase()]? then req.cookies[req.params.id.toLowerCase()]
+    else if req.params.id and req.cookies[req.params.id.toLowerCase()]? then req.cookies[req.params.id.toLowerCase()]
   if req.plunk
     req.authorized = (req.token == req.plunk.token)
 

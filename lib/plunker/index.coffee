@@ -98,47 +98,65 @@ class Updater
     next null, json
 
   handleFileChanges: (plunk, json, next) ->
-    old_files = {}
-    old_files[filename] = _.clone(file) for filename, file of plunk.files
-
     errors = []
     
+    # Update description
     plunk.description = json.description or plunk.description
-    plunk.index = json.index or plunk.index
 
     if json.files
-      for filename, new_file of json.files
-        old_file = _.clone(plunk.files[filename])
-        
-        # new_file is null so we're trying to delete
-        if _.isNull(new_file)
-          unless old_file then errors.push
-            message: "Cannot delete a file that does not exist"
-            property: "files['#{filename}']"
-          else delete old_files[filename]
+      changed = _.keys(json.files)
+      old_files = {}
+      new_files = {}
+      
+      # Pre-populate the new_files hash with files that should be unaffected
+      # Also create a hash of old files
+      for filename, file of plunk.files
+        new_files[filename] = file unless filename in changed
+        old_files[filename] = _.clone(file)
 
-        # new_file is a string so we're changing contents or adding a new file
-        else if _.isString(new_file) then old_files[filename] =
-          content: new_file
+      for filename, file of json.files
+        former = old_files[filename]
+        
+        # Normalize file structure to hash
+        if _.isString(file) then file =
           filename: filename
+          content: file
           mime: mime.lookup(filename)
         
+        # The file is being deleted; don't put it in new_files. Make sure to
+        # check against index
+        if _.isNull(file)
+          unless former then errors.push
+            message: "Impossible to delete a file that did not exist"
+            field: "files['#{filename}']"
+        
+        # The file already exists. We may need to
+        #  1) Rename the file
+        #  2) Update the contents
+        #  3) Update the mime type
+        else if former
+          # Houston, we have a rename!
+          if new_name = file.filename and new_name != filename
+            if new_files[new_name] then errors.push
+              message: "Impossible to rename a file to a filename that already exists"
+              field: "files['#{filename}'].filename"
+            #else if old_files[new_name] and not json.files[file.filename]?.filename
+        
+        # This is a new file, therefore requires content
         else
-          # File existed, therefore fields populated
-          if old_file
-            new_file.mime ||= if new_file.filename then mime.lookup(new_file.filename) else old_file.mime
-            new_file.filename ||= old_file.filename
-            new_file.content ||= old_file.content
-            old_files[new_file.filename] = new_file
-          else if new_file.filename? and new_file.filename != filename then errors.push
-            message: "The filename key and filename attribute must match"
-            property: "files['#{filename}'].filename"
-          else
-            new_file.filename = filename
-            new_file.mime ||= mime.lookup(filename)
-            new_file.content ||= old_file.content
-            old_files[new_file.filename] = new_file
-      plunk.files = old_files
+          unless file.content then errors.push
+            message: "Content is a required field"
+            field: "files['#{filename}'].content"
+          else new_files[filename] =
+            filename: filename
+            content: file.content
+            mime: file.mime || mime.lookup(filename)
+            
+      plunk.files = new_files
+    
+    # Update index
+    plunk.index = json.index or plunk.index
+
           
     if errors.length then next(errors)
     else next(null, plunk)
@@ -167,7 +185,7 @@ class Interface
     @creater = new Creater(@store, config)
     @updater = new Updater(@store, config)
 
-  index: (cb) -> @store.list(cb)
+  index: (cb) -> @store.list(0, 8, cb)
   create: (json, cb) -> @creater.create(json, cb)
   read: (id, cb) -> @store.fetch(id, cb)
   update: (plunk, json, cb) -> @updater.update(plunk, json, cb)
