@@ -33,6 +33,7 @@ class Store
     
     @plunks.on "reset", (coll) -> coll.each(self.setExpiry)
     @plunks.on "add", self.setExpiry
+    @plunks.on "remove", self.clearExpiry
     
     setInterval(@backup, @frequency)
 
@@ -58,6 +59,10 @@ class Store
     
     @timeouts[model.id] = delay Cromag.parse(model.expires) - Cromag.now(), ->
       self.remove(model)
+    @
+
+  clearExpiry: (model) =>
+    clearTimeout(@timeouts[model.id]) if model.id
     @
 
   list: (start, end, cb) -> cb null, @plunks.toJSON().slice(start, end)
