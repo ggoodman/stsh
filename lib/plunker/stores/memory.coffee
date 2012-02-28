@@ -25,13 +25,14 @@ class Store
   constructor: (options = {}) ->
     self = @
     
-    options = _.defaults options,
+    @options = _.defaults options,
       filename: "/tmp/plunker.json"
+      size: 1000
       interval: 1000 * 20
       backup: true
     
-    @filename = options.filename
-    @frequency = options.interval
+    @filename = @options.filename
+    @frequency = @options.interval
     
     @plunks = new Collection
     @timeouts = {}
@@ -40,9 +41,15 @@ class Store
     @plunks.on "add", self.setExpiry
     @plunks.on "remove", self.clearExpiry
     
-    if options.backup
-      setInterval(@backup, @frequency)
-  
+    @plunks.on "reset add", ->
+      # Defer to next tick or something around then
+      delay 1, ->
+        if self.plunks.length > self.options.size
+          self.plunks.remove self.plunks.at(self.plunks.length - 1)
+
+    
+    if @options.backup
+      @plunks.on "add remove", _.throttle(@backup, @options.interval)
       @restore()
   
   backup: =>
@@ -59,16 +66,22 @@ class Store
     fs.readFile @filename, "utf8", (err, data) ->
       if err then console.log "Failed to restore data: #{self.filename}"
       else self.plunks.reset(JSON.parse(data)) and console.log "Restore succeeded from: #{self.filename}"
+  
+  shrink: =>
+    if @plunks.length > @options.size
+      @plunks.remove @plunks.at(@plunks.length - 1)
+      
 
   setExpiry: (model) =>
     self = @
     
-    @timeouts[model.id] = delay Cromag.parse(model.expires) - Cromag.now(), ->
-      self.remove(model)
+    if model.get("expires")
+      @timeouts[model.id] = delay Cromag.parse(model.expires) - Cromag.now(), ->
+        self.plunks.remove(model)
     @
 
   clearExpiry: (model) =>
-    clearTimeout(@timeouts[model.id]) if model.id
+    clearTimeout(@timeouts[model.id]) if model.id and model.get("expires")
     @
 
   list: (start, end, cb) -> cb null, @plunks.toJSON().slice(start, end)

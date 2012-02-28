@@ -6,6 +6,8 @@ module.exports =
       type: "string"
     index:
       type: "string"
+    expires:
+      type: "string"
     source:
       type: "object"
       properties:
