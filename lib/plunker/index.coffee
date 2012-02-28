@@ -164,19 +164,24 @@ class Updater
             
       plunk.files = new_files
     
-    # Update index
-    plunk.files[plunk.index] or plunk.index = do ->
-      filenames = _.keys(plunk.files)
-
-      if "index.html" in filenames then "index.html"
-      else
-        html = _.filter filenames, (filename) -> /.html?$/.test(filename)
-
-        if html.length then html[0]
-        else filenames[0]
+    if _.keys(plunk.files).length <= 0 then errors.push
+      message: "Minimum of 1 file required"
+      field: "files"
+    
+    else
+      # Update index
+      plunk.files[plunk.index] or plunk.index = do ->
+        filenames = _.keys(plunk.files)
+  
+        if "index.html" in filenames then "index.html"
+        else
+          html = _.filter filenames, (filename) -> /.html?$/.test(filename)
+  
+          if html.length then html[0]
+          else filenames[0]
 
           
-    if errors.length then next(errors)
+    if errors.length then next {message: "Validation failed", errors: errors}
     else next(null, plunk)
 
 
