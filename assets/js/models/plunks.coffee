@@ -25,7 +25,8 @@
           params.type = "get"
 
         #when "update"
-        #when "delete"
+        when "delete"
+          params.type = "delete"
 
       $.ajax(params)
 

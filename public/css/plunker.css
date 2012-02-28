@@ -135,6 +135,7 @@ form.gist-import button {
 
 #recent .thumbnail {
   text-align: center;
+  position: relative;
 }
 
 #recent .thumbnail a {
@@ -175,6 +176,16 @@ form.gist-import button {
   box-shadow: 0 1px 4px rgba(0, 105, 214, 0.25);
 }
 
+#recent .operations {
+  display: none;
+}
+
+#recent .thumbnail:hover .operations {
+  display: block;
+  position: absolute;
+  right: 8px;
+  bottom: 0;
+}
 
 iframe.preview {
   border: none;
