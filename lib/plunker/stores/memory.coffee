@@ -44,7 +44,7 @@ class Store
     @plunks.on "reset add", ->
       # Defer to next tick or something around then
       delay 1, ->
-        if self.plunks.length > self.options.size
+        while self.plunks.length > self.options.size
           self.plunks.remove self.plunks.at(self.plunks.length - 1)
 
     
