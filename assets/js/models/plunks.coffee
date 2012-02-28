@@ -32,7 +32,7 @@
     import: (source) ->
       self = @
 
-      if matches = source.match(/^(?:(?:https?\:\/\/)?gist\.github\.com\/)?(\d+)(?:#.+)?$/)
+      if matches = source.match(/^(?:(?:https?\:\/\/)?gist\.github\.com\/)?([0-9a-z]+)(?:#.+)?$/)
         self.trigger "import:start"
         promise = $.ajax "https://api.github.com/gists/#{matches[1]}",
           timeout: 8000
