@@ -12,6 +12,7 @@ body {
 @media (max-width: 499px) {
   .span3.plunk {
     width: auto;
+    display: block;
   }
 }
 
