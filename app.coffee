@@ -24,6 +24,9 @@ app.get "/", (req, res) ->
 app.get "/documentation", (req, res) ->
   res.render("documentation", page: "/documentation")
 
+app.get "/about", (req, res) ->
+  res.render("about", page: "/about")
+
 app.get "/preview/:id", (req, res) ->
   res.render("preview", id: req.params.id)
 

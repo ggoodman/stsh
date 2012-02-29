@@ -1,0 +1,50 @@
+extends layout
+
+prepend title
+  page_title = "About Plunker"
+
+append content
+  div.page-header
+    h1 About Plunker
+  div.row
+    div.span12
+      h2 Why was Plunker created?
+
+      p.
+        I was working on a project called gister which was to be a multi-file
+        online editor for creating and previewing webapps on the client side.
+        The project was designed to be run without a server which introduced
+        some important issues.
+
+      p.
+        Typically, this sort of problem would be resolved through a number of
+        common and/or uncommon techniques:
+
+      ol
+        li.
+          Restrict webapps to a finite number of known source files like 
+          jsFiddle, jsbin, tinker.io, dabblet, etc..
+        li.
+          Perform some compile-time (preview-time) rewriting of source files
+          to tweak file references and/or to directly embed source files.
+        li.
+          Use bleeding edge browser features like the Filesystem API to run the
+          webapp off of a virtual filesystem in another protocol.
+
+      p.
+        What I realized is that all of these approaches either restrict 
+        creativity, usefulness or versatility. At the same time, the different
+        techniques introduce unneeded complexity and edge-cases that prevent
+        webapps from working in their expected fashion.
+
+      p.
+        Figuring that this was a problem that someone else had encountered, I
+        hunted for a free web API that addressed this problem. Alas, I couldn't
+        find anything that would serve my purpose.
+
+      p.
+        I realized that I would need to create something myself!
+
+      p.
+        Plunker is the result of a long while of brainstorming and a blitz of
+        learning node.js and coding. I hope you find it as useful as I do.
