@@ -1,20 +1,22 @@
-pages = { "/preview": "Preview" }
-page = "/preview"
-
 !!! 5
 html
   head
     meta(charset="utf-8")
     meta(name="viewport",content="width=device-width, initial-scale=1.0")
+    link(rel="stylesheet",href="/css/preview.css")
     title Plunker
-    link(rel="stylesheet",href="/style/bootstrap.min.css")
-    link(rel="stylesheet",href="/style/preview.css")
     // if lt IE 9
       script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
-    script(type="text/javascript",src="/lib/jquery.min.js")
-    script(type="text/javascript",src="/lib/bootstrap.min.js")
-    script(type="text/javascript",src="/lib/ace/ace.js")
-    script(type="text/javascript",src="/lib/preview/preview.js")
+    script(type="text/javascript",src="/js/jquery.min.js")
+
+    != js("preview")
+
+  body
+    div#container
+      div#operations
+        a(href="/edit/#{plunk_id}",title="Edit this page in Plunker") Tweak
+      iframe#plunk(frameborder="0",height="100%",width="100%",src=raw_url)
+
     script
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-28929036-1']);
@@ -25,31 +27,3 @@ html
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
-  body.fluid
-    header
-      nav.navbar.navbar-fixed-top
-        div.navbar-inner
-          div.container
-            a.btn.btn-navbar(data-toggle="collapse",data-target=".nav-collapse")
-              span.icon-bar
-              span.icon-bar
-              span.icon-bar
-
-            a.brand(href="/") Plunker
-
-            div.nav-collapse
-              ul.nav
-                each text, url in pages
-                  if url == page
-                    li(class="preview"): a(href=url)= text
-                  else
-                    li: a(href=url)= text
-    section#body
-      div#masthead
-        h3 Untitled
-          a.edit: i.icon-pencil.icon-white
-      div#sidebar
-        form
-          label
-      div#container
-        div#canvas

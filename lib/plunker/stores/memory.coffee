@@ -87,8 +87,12 @@ class Store
   list: (start, end, cb) -> cb null, @plunks.toJSON().slice(start, end)
   reserveId: (cb) -> cb null, uid(6) # OH GOD THE CHILDREN
   create: (json, cb) -> cb null, @plunks.add(json).get(json.id).toJSON()
-  fetch: (id, cb) -> cb null, @plunks.get(id).toJSON()
-  update: (plunk, json, cb) -> cb null, @plunks.get(plunk.id).set(json).toJSON()
+  fetch: (id, cb) ->
+    if plunk = @plunks.get(id) then cb null, plunk.toJSON()
+    else cb()
+  update: (plunk, json, cb) ->
+    if plunk = @plunks.get(plunk.id) then cb null, plunk.set(json).toJSON()
+    else cb(message: "No such plunk")
   remove: (id, cb) -> cb null, @plunks.remove(id)
   
 store = null

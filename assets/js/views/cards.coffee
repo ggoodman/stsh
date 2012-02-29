@@ -5,13 +5,14 @@
     
     events:
       "click .delete": "handleDelete"
+      "click .refresh": "handleRefresh"
 
     template: """
       <li class="span3 plunk">
         <div class="thumbnail">
           <h5 class="description" title="{{description}}">{{description}}</h5>
           <a href="{{html_url}}">
-             <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{html_url}}" class="lazy" />
+            <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{raw_url}}" class="lazy" />
           </a>
           <div class="caption">
             <p>
@@ -31,10 +32,16 @@
           {{#if token}}
             <div class="operations">
               <div class="btn-toolbar">
+                {{#if source}}
+                  <button class="btn btn-mini btn-success refresh" title="Refresh from source">
+                    <i class="icon-refresh icon-white"></i>
+                  </button>
+                {{/if}}
                 <button class="btn btn-mini btn-danger delete" title="Delete">
                   <i class="icon-trash icon-white"></i>
                 </button>
               </div>
+              <div class="edge"></div>
             </div>
           {{/if}}
         </div>
@@ -50,7 +57,33 @@
     
     handleDelete: ->
       @model.destroy() if confirm "Are you sure that you would like to delete this plunk?"
-
+    
+    handleRefresh: ->
+      unless @model.get("source")?.url then alert "Unable to refresh a plunk without a source" 
+      else if confirm "Are you sure that you would like to refresh this plunk from its source?"
+        self = @
+        source = @model.get("source").url
+        
+        for matcher in plunkSources
+          if strategy = matcher(source) then break
+        
+        if strategy then strategy source, (error, json) ->
+          if error then alert error
+          else            
+            # Remove fields that can not be updated
+            delete json.source
+            delete json.author
+            
+            
+            self.model.set json # Need to break this into two operations.. thanks Backbone silent: true on wait: true saves
+            console.log "CHANGES", self.model.changes
+            unless _.isEmpty(self.model.changes)
+              self.model.save {},
+                wait: true
+                silent: false
+                success: -> alert "SUCCESS"
+                error: -> alert "FAIL"        
+          
 
   class exports.RecentPlunks extends Backbone.View
     initialize: ->

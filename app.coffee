@@ -5,18 +5,21 @@ assets = require("connect-assets")
 
 app = module.exports = express.createServer()
 
+app.use gzippo.staticGzip("#{__dirname}/public")
+app.use gzippo.compress()
+app.use assets()
+app.use express.static("#{__dirname}/public")
+
+app.use "/api", require("./servers/api")
+app.use "/raw", require("./servers/plunks")
+
 app.configure ->
   app.set "views", "#{__dirname}/views"
   app.set "view engine", "jade"
   app.set "view options", layout: false
 
   app.use express.logger()
-  app.use assets()
-  app.use gzippo.staticGzip("#{__dirname}/public")
-  app.use gzippo.compress()
-  app.use express.static("#{__dirname}/public")
   app.use express.errorHandler({ dumpExceptions: true, showStack: true })
-
 
 app.get "/", (req, res) ->
   res.render("index", page: "/")
@@ -27,11 +30,17 @@ app.get "/documentation", (req, res) ->
 app.get "/about", (req, res) ->
   res.render("about", page: "/about")
 
-app.get "/preview/:id", (req, res) ->
-  res.render("preview", id: req.params.id)
 
-app.use "/api", require("./servers/api")
-app.use "/", require("./servers/plunks")
+app.get /^\/([a-zA-Z0-9]{6})\/(.*)$/, (req, res) ->
+  res.local "raw_url", "/raw" + req.url
+  res.local "plunk_id", req.params[0]
+  res.render "preview"
+  
+app.get /^\/([a-zA-Z0-9]{6})$/, (req, res) -> res.redirect("/#{req.params[0]}/", 301)
+
+
+app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?$)?/, (req, res) ->
+  res.render("editor", page: "/edit")
 
 
 if require.main == module
