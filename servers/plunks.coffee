@@ -18,6 +18,11 @@ loadPlunk = (req, res, next) ->
     else
       req.plunk = plunk
       next()
+      
+# Add header to prevent hosting raw plunks in a frame outside of Plunker
+app.use (req, res, next) ->
+  res.header "X-Frame-Options", "SAMEORIGIN"
+  next()
 
 # Serve up a plunk
 app.get "/:id/", loadPlunk, (req, res) ->
