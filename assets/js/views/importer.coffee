@@ -35,11 +35,24 @@
 
       @collection.on "error", showError
       @collection.on "add", showSuccess
+      
+      @$(".btn").popover
+        placement: "top"
+        title: "Import a plunk"
+        content: """
+          Click here to import a plunk from the source to the left. Supported sources are:
+          <ul>
+            <li>Github gists</li>
+            <li>More to come...</li>
+          </ul>
+          """
 
     doImport: (e) =>
       e.preventDefault()
 
       plunks.import @$("#importer-input").val()
+      
+      @$("#importer-input").val("")
 
       false
 

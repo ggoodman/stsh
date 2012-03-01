@@ -2,7 +2,8 @@
   class exports.Card extends Backbone.View
     initialize: ->
       @model.on "change", @render
-      @model.on "sync", @flash
+      @model.on "sync", @flash("Updated")
+      @model.on "error", @flash("Error", "warning")
     
     events:
       "click .delete": "handleDelete"
@@ -57,13 +58,14 @@
       @$("img.lazy").lazyload()
       @
     
-    flash: =>
-      @$(".thumbnail").animate {"background-color": "#f5e5e5"},
-        duration: "fast"
-        queue: true
-      @$(".thumbnail").animate {"background-color": "#ffffff"},
-        duration: "slow"
-        queue: true
+    flash: (message, type = "success") =>
+      self = @
+      ->
+        $tag = $("<span>#{message}</span>").addClass("label label-#{type}")
+        self.$(".caption p").prepend($tag)
+        
+        setTimeout((-> $tag.fadeOut()), 3000)
+
     
     handleDelete: ->
       @model.destroy() if confirm "Are you sure that you would like to delete this plunk?"
@@ -117,8 +119,12 @@
       @cards[plunk.id] = card
       
     removeCard: (plunk, coll) =>
+      self = @
+      
       card = @cards[plunk.id]
-      card.$el.fadeOut "slow", -> card.remove()
+      card.$el.fadeOut "slow", ->
+        card.remove()
+        self.addCard(self.collection.at(7), self.collection, 7) if self.collection.length >= 7
       delete @cards[plunk.id]
 
 )(window)

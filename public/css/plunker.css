@@ -129,10 +129,6 @@ form.gist-import button {
   display: block;
 }
 
-#recent .plunk.authorized .thumbnail {
-  background-color: #efe;
-}
-
 #recent .thumbnail {
   text-align: center;
   position: relative;
