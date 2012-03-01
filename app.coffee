@@ -5,9 +5,9 @@ assets = require("connect-assets")
 
 app = module.exports = express.createServer()
 
+app.use assets()
 app.use gzippo.staticGzip("#{__dirname}/public")
 app.use gzippo.compress()
-app.use assets()
 app.use express.static("#{__dirname}/public")
 
 app.use "/api", require("./servers/api")

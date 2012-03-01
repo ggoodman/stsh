@@ -1,59 +1,69 @@
 ((exports) ->
   class exports.Card extends Backbone.View
     initialize: ->
-      @on "change", @render
+      @model.on "change", @render
+      @model.on "sync", @flash
     
     events:
       "click .delete": "handleDelete"
       "click .refresh": "handleRefresh"
+    
+    tagName: "li"
+    className: "span3 plunk"
 
     template: """
-      <li class="span3 plunk">
-        <div class="thumbnail">
-          <h5 class="description" title="{{description}}">{{description}}</h5>
-          <a href="{{html_url}}">
-            <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{raw_url}}" class="lazy" />
-          </a>
-          <div class="caption">
-            <p>
-              {{#if author}}
-                by&nbsp;<a href="{{author.url}}" target="_blank">{{author.name}}</a>
-              {{else}}
-                by&nbsp;Anonymous
-              {{/if}}
-              <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
-              {{#if source}}
-                from&nbsp;<a href="{{source.url}}" target="_blank">{{source.name}}</a>
-              {{else}}
-                no source
-              {{/if}}
-            </p>
-          </div>
-          {{#if token}}
-            <div class="operations">
-              <div class="btn-toolbar">
-                {{#if source}}
-                  <button class="btn btn-mini btn-success refresh" title="Refresh from source">
-                    <i class="icon-refresh icon-white"></i>
-                  </button>
-                {{/if}}
-                <button class="btn btn-mini btn-danger delete" title="Delete">
-                  <i class="icon-trash icon-white"></i>
-                </button>
-              </div>
-              <div class="edge"></div>
-            </div>
-          {{/if}}
+      <div class="thumbnail">
+        <h5 class="description" title="{{description}}">{{description}}</h5>
+        <a href="{{html_url}}">
+          <img src="http://placehold.it/205x154&text=Loading..." data-original="http://immediatenet.com/t/l3?Size=1024x768&URL={{raw_url}}" class="lazy" />
+        </a>
+        <div class="caption">
+          <p>
+            {{#if author}}
+              by&nbsp;<a href="{{author.url}}" target="_blank">{{author.name}}</a>
+            {{else}}
+              by&nbsp;Anonymous
+            {{/if}}
+            <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
+            {{#if source}}
+              from&nbsp;<a href="{{source.url}}" target="_blank">{{source.name}}</a>
+            {{else}}
+              no source
+            {{/if}}
+          </p>
         </div>
-      </li>
+        {{#if token}}
+          <div class="operations">
+            <div class="btn-toolbar">
+              {{#if source}}
+                <button class="btn btn-mini btn-success refresh" title="Refresh from source">
+                  <i class="icon-refresh icon-white"></i>
+                </button>
+              {{/if}}
+              <button class="btn btn-mini btn-danger delete" title="Delete">
+                <i class="icon-trash icon-white"></i>
+              </button>
+            </div>
+            <div class="edge"></div>
+          </div>
+        {{/if}}
+      </div>
     """
     
     render: =>
       compiled = Handlebars.compile(@template)
-      @setElement $(compiled(@model.toJSON()))
+      @$el.html $(compiled(@model.toJSON()))
       @$(".timeago").timeago()
       @$("img.lazy").lazyload()
       @
+    
+    flash: =>
+      @$(".thumbnail").animate {"background-color": "#f5e5e5"},
+        duration: "fast"
+        queue: true
+      @$(".thumbnail").animate {"background-color": "#ffffff"},
+        duration: "slow"
+        queue: true
     
     handleDelete: ->
       @model.destroy() if confirm "Are you sure that you would like to delete this plunk?"
@@ -76,13 +86,12 @@
             
             
             self.model.set json # Need to break this into two operations.. thanks Backbone silent: true on wait: true saves
-            console.log "CHANGES", self.model.changes
             unless _.isEmpty(self.model.changes)
               self.model.save {},
                 wait: true
                 silent: false
-                success: -> alert "SUCCESS"
-                error: -> alert "FAIL"        
+                #success: -> alert "SUCCESS"
+                #error: -> alert "FAIL"        
           
 
   class exports.RecentPlunks extends Backbone.View
@@ -108,7 +117,8 @@
       @cards[plunk.id] = card
       
     removeCard: (plunk, coll) =>
-      @cards[plunk.id].remove()
+      card = @cards[plunk.id]
+      card.$el.fadeOut "slow", -> card.remove()
       delete @cards[plunk.id]
 
 )(window)

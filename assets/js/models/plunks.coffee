@@ -11,11 +11,13 @@
     switch method
       when "create"
         params.type = "post"
+        params.headers = "Content-Type": "application/json"
+        params.data = JSON.stringify(model.toJSON())
       when "read"
         params.type = "get"
       when "update"
-        params.headers = "Content-Type": "application/json"
         params.type = "post"
+        params.headers = "Content-Type": "application/json"
         params.data = JSON.stringify(model.changes)
       when "delete"
         params.type = "delete"
