@@ -75,10 +75,12 @@ class Creater
         created_at: now.toISOString()
         url: "#{self.config.url}/api/v1/plunks/#{id}"
         html_url: "#{self.config.url}/#{id}/"
+        raw_url: "#{self.config.url}/raw/#{id}/"
 
       for filename, file of json.files
         file.url = "#{json.url}/#{filename}"
         file.html_url = "#{json.html_url}#{filename}"
+        file.raw_url = "#{json.raw_url}#{filename}"
 
       next(null, json)
 
