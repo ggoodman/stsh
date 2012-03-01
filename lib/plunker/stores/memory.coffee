@@ -17,8 +17,18 @@ uid = (len = 6) ->
 
 delay = (timeout, callback) -> setTimeout(callback, timeout)
 
+class Model extends Backbone.Model
+
 class Collection extends Backbone.Collection
   comparator: (model) -> -Cromag.parse(model.get("updated_at") or model.get("created_at"))
+  parse: (data) ->
+    _.map json, (json) ->
+      if matches = json.http_url.match(/^(http:\/\/[^\/]+)(.+)$/)
+        json.raw_url = "#{matches[0]}/raw#{matches[1]}"
+        
+        for filename, file of json.files
+          file.raw_url = json.raw_url + filename
+      json
   
   
 class Store
