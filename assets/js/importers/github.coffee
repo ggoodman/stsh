@@ -1,9 +1,9 @@
 githubRegex = /^(?:(?:https?\:\/\/)?gist\.github\.com\/)?([0-9a-z]+)(?:#.+)?$/
 
-window.plunkSources ?= []
-window.plunkSources.push (source) ->
-  if githubRegex.test(source) then (source, callback) ->
-    
+window.importers ?= {}
+window.importers.github = 
+  test: (source) -> githubRegex.test(source)
+  import: (source, callback) ->
     if matches = source.match(githubRegex)
       promise = $.ajax "https://api.github.com/gists/#{matches[1]}",
         timeout: 8000
@@ -24,7 +24,12 @@ window.plunkSources.push (source) ->
             if gist.user then json.author =
               name: gist.user.login
               url: "https://github.com/#{gist.user.login}"
-    
-            json.files[filename] = file.content for filename, file of gist.files
+            
+            for filename, file of gist.files
+              json.files[filename] =
+                filename: filename
+                content: file.content 
+                mime: file.type
             
             callback(null, json)
+    else callback("Impossible error")

@@ -51,12 +51,14 @@
     import: (source) ->
       self = @
       
-      for matcher in plunkSources
-        if strategy = matcher(source) then break
+      for name, matcher of importers
+        if matcher.test(source)
+          strategy = matcher
+          break;
       
       if strategy
         self.trigger "import:start"
-        strategy source, (error, json) ->
+        strategy.import source, (error, json) ->
           if error then self.trigger "import:fail"
           else self.create json,
             wait: true

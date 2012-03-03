@@ -1,14 +1,39 @@
-extends layout
+!!! 5
+html
+  head
+    meta(charset="utf-8")
+    meta(name="viewport",content="width=device-width, initial-scale=1.0")
+    title Plunker - Editor
+    link(rel="stylesheet",href="/css/bootstrap.min.css")
+    link(rel="stylesheet",href="/css/editor.css")
+    // if lt IE 9
+      script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
+    script(type="text/javascript",src="/js/jquery.min.js")
+    script(type="text/javascript",src="/js/bootstrap.min.js")
+    script(type="text/javascript",src="/js/cromag.min.js")
+    script(type="text/javascript",src="/js/underscore.min.js")
+    script(type="text/javascript",src="/js/backbone.min.js")
+    script(type="text/javascript",src="/js/handlebars.js")
+    script(type="text/javascript",src="/js/ace/ace.js")
 
-prepend title
-  page_title = "Editor"
+    script(src="/js/ace/mode-html.js")
+    script(src="/js/ace/mode-javascript.js")
+    script(src="/js/ace/mode-css.js")
 
-append scripts
-  script(type="text/javascript",src="/js/cromag.min.js")
-  script(type="text/javascript",src="/js/underscore.min.js")
-  script(type="text/javascript",src="/js/backbone.min.js")
-  script(type="text/javascript",src="/js/handlebars.js")
+    != js("views/toolbar")
+    != js("views/sidebar")
+    != js("views/previewer")
+    != js("views/editor")
+    != js("editor")
 
-
-append content
-  h1 Coming soon!
+  body
+    nav.navbar.navbar-fixed-top
+      div.navbar-inner
+        div.container-fluid
+          a.brand(href="/") Plunker
+          div#toolbar
+    div#content
+      div#sidebar
+      div#editor
+      div#preview
+        iframe
