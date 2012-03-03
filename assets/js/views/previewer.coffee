@@ -1,18 +1,19 @@
 class window.Previewer extends Backbone.View
-  id: "preview"
   initialize: ->
     self = @
     
     @plunks = new PlunkCollection
     
-    render = _.throttle(@render, 1000)
+    render = _.debounce(@render, 1000)
     
     @model.on "change", render
+    @model.buffers.on "all", render
   
   render: =>
-    $iframe = @$("iframe")
+    $iframe = @$el.find("iframe")
     
     json = @model.toJSON()
+    json.expires = new Cromag(30000 + Cromag.now()).toISOString()
     delete json.active
     
     plunk = @plunks.create(json)

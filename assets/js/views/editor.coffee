@@ -1,8 +1,5 @@
 ((exports) ->
   
-  
-  HtmlMode = require("ace/mode/html").Mode
-
   class exports.Editor extends Backbone.View
     id: "editor"
     initialize: ->
@@ -10,9 +7,8 @@
       
       @ace = ace.edit(@id)
       
-      @model.on "change:active", ->
-        active = self.model.get("active")
-        self.ace.setSession self.model.buffers.get(active).session
+      plunker.on "activate", (filename) ->
+        self.ace.setSession self.model.buffers.get(filename).session
       
 
 )(window)

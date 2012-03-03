@@ -1,9 +1,10 @@
 ((exports) ->
   
-  modes =
-    "text/html": require("ace/mode/html").Mode
-    #"text/javascript": require("ace/mode/javascript").Mode
-    #"text/css": require("ace/mode/css").Mode
+  modes = {}
+  modes["text/html"] = require("ace/mode/html").Mode
+  modes["text/javascript"] = require("ace/mode/javascript").Mode
+  modes["text/css"] = require("ace/mode/css").Mode
+  modes["application/javascript"] = modes["text/javascript"]
   
   EditSession = require("ace/edit_session").EditSession
   
@@ -19,11 +20,10 @@
       
       if mode = modes[@get("mime")]
         @session.setMode new mode()
-      #@session.setMode(new modes[@get("mime")])
-      
-      @on "change:content", -> self.session.setValue(self.get("content"))
-      #@on "change:mime", -> self.session.setMode(new modes[self.get("mode")])
-  
+        
+      @session.on "change", ->
+        self.set "content", self.session.getValue()
+        
   class exports.BufferCollection extends Backbone.Collection
     model: exports.Buffer
   
@@ -33,8 +33,10 @@
     
     toJSON: ->
       json = super()
-      json.files = @buffers.toJSON()
-      console.log "KSON", _.clone(json)
+      json.files = {}
+      @buffers.each (buffer) ->
+        json.files[buffer.id] = buffer.toJSON()
+        delete json.files[buffer.id].filename
       json
 
 )(window)

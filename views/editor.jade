@@ -14,6 +14,7 @@ html
     script(type="text/javascript",src="/js/underscore.min.js")
     script(type="text/javascript",src="/js/backbone.min.js")
     script(type="text/javascript",src="/js/handlebars.js")
+
     script(type="text/javascript",src="/js/ace/ace.js")
 
     script(src="/js/ace/mode-html.js")
@@ -34,6 +35,13 @@ html
           div#toolbar
     div#content
       div#sidebar
+        h2.header Files
+        ul.files
+        div.operations
+          button.btn.btn-mini.add
+            i.icon-plus
+          button.btn.btn-mini.remove
+            i.icon-minus
       div#editor
       div#preview
         iframe

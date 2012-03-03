@@ -7,6 +7,8 @@
 
 #= require importers/github
 
+window.plunker = _.extend({}, Backbone.Events)
+
 $ ->
   session = new EditSession
   
@@ -21,12 +23,13 @@ $ ->
     model: session
     
   preview = new Previewer
+    el: document.getElementById("preview")
     model: session
-  
+    
   importers.github.import "https://gist.github.com/1961272", (error, json) ->
     if error then alert("Unable to fetch default template")
     else
       session.set(json)
       session.buffers.reset(_.values(json.files))
-      session.set
-        active: "index.html"
+      
+      plunker.trigger "activate", "index.html"

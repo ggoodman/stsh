@@ -86,7 +86,7 @@ class Store
     self = @
     
     if model.get("expires")
-      @timeouts[model.id] = delay Cromag.parse(model.expires) - Cromag.now(), ->
+      @timeouts[model.id] = delay Cromag.parse(model.get("expires")) - Cromag.now(), ->
         self.plunks.remove(model)
     @
 

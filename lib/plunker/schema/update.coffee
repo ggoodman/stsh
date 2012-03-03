@@ -9,6 +9,8 @@ module.exports =
       type: "string"
     index:
       type: "string"
+    expires:
+      type: "string"
     files:
       type: "object"
       additionalProperties:
