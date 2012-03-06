@@ -61,6 +61,7 @@ $ ->
             plunk.unset("html_url")
             plunk.unset("created_at")
             plunk.unset("updated_at")
+            plunk.unset("source")
             plunk.unset("author")
 
             router.navigate "/edit",

@@ -95,6 +95,8 @@ modes = _.map mappings, ([name, title, extensions]) ->
 
     toJSON: ->
       json = super()
+      delete json.source
+      delete json.author
       json.files = {}
       @buffers.each (buffer) ->
         json.files[buffer.id] = buffer.toJSON()
