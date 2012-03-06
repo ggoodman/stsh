@@ -79,6 +79,11 @@ class Creater
         url: "#{self.config.url}/api/v1/plunks/#{id}"
         html_url: "#{self.config.url}/#{id}/"
         raw_url: "#{self.config.url}/raw/#{id}/"
+      
+      unless json.source
+        json.source =
+          url: json.html_url
+          name: "Plunker"
 
       for filename, file of json.files
         file.url = "#{json.url}/#{filename}"

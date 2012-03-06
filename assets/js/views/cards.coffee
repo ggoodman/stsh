@@ -27,9 +27,7 @@
             {{/if}}
             <abbr class="timeago created_at" title="{{created_at}}">{{dateToLocaleString created_at}}</abbr>
             {{#if source}}
-              from&nbsp;<a href="{{source.url}}" target="_blank">{{source.name}}</a>
-            {{else}}
-              no source
+              on&nbsp;<a href="{{source.url}}" target="_blank">{{source.name}}</a>
             {{/if}}
           </p>
         </div>
