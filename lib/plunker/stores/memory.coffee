@@ -94,7 +94,7 @@ class Store
     clearTimeout(@timeouts[model.id]) if model.id and model.get("expires")
     @
 
-  list: (start, end, cb) -> cb null, @plunks.toJSON().slice(start, end)
+  list: (start, end, cb) -> cb null, _.reject(@plunks.toJSON(), (plunk) -> !!plunk.expires).slice(start, end)
   reserveId: (cb) -> cb null, uid(6) # OH GOD THE CHILDREN
   create: (json, cb) -> cb null, @plunks.add(json).get(json.id).toJSON()
   fetch: (id, cb) ->
