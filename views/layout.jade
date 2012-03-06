@@ -18,6 +18,16 @@ html
     block scripts
       script(type="text/javascript",src="/js/jquery.min.js")
       script(type="text/javascript",src="/js/bootstrap.min.js")
+    script
+      var _gaq = _gaq || [];
+      _gaq.push(['_setAccount', 'UA-28929036-1']);
+      _gaq.push(['_trackPageview']);
+  
+      (function() {
+        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      })();
   body
     nav.navbar.navbar-fixed-top
       div.navbar-inner
@@ -42,14 +52,3 @@ html
       footer
         p Built by <a href="https://github.com/ggoodman">Geoff Goodman</a> (<a href="http://twitter.com/g_goodman">@g_goodman</a>)
         p &copy; Filearts (2012) (<a href="http://twitter.com/filearts">@filearts</a>)
-
-    script
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-28929036-1']);
-      _gaq.push(['_trackPageview']);
-  
-      (function() {
-        var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-        ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-        var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
