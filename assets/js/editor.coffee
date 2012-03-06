@@ -22,31 +22,30 @@ $ ->
 
   router = new class extends Backbone.Router
     routes:
-      "":     "loadDefault"
-      ":id":  "loadPlunk"
-
+      "edit":     "loadPlunk"
+      "edit/:id": "loadPlunk"
 
     loadPlunk: (id) ->
       self = @
-
-      plunk = new Plunk(id: id)
-      plunk.fetch
-        success: ->
-          session.buffers.reset _.map plunk.get("files"), (file) ->
-            filename: file.filename
-            content: file.content
-          session.set
-            description: plunk.get("description")
-
-          plunker.trigger "intent:activate", plunk.get("index")
-        error: ->
-          router.navigate "",
-            trigger: true
-            replace: true
-
-  plunker.trigger "intent:fileAdd", "index.html"
+      
+      if id
+        plunk = new Plunk(id: id)
+        plunk.fetch
+          success: ->
+            session.buffers.reset _.map plunk.get("files"), (file) ->
+              filename: file.filename
+              content: file.content
+            session.set
+              description: plunk.get("description")
+  
+            plunker.trigger "intent:activate", plunk.get("index")
+          error: ->
+            router.navigate "",
+              trigger: true
+              replace: true
+      else
+        plunker.trigger "intent:fileAdd", "index.html"
 
 
   Backbone.history.start
     pushState: true
-    root: "/edit/"

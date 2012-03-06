@@ -4,6 +4,12 @@
     template: Handlebars.compile """
       <div class="btn-toolbar pull-right">
         <div class="btn-group">
+          <a class="btn btn-inverse new" href="/edit">
+            <i class="icon-file icon-white" />
+            New plunk
+          </a>
+        </div>
+        <div class="btn-group">
           <select class="input-medium view">
             <option value="sidebar editor preview">All panels</option>
             <option value="sidebar editor">Sidebar and editor</option>
