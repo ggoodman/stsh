@@ -17,14 +17,18 @@ html
 
     script(type="text/javascript",src="/js/ace/ace.js")
 
-    script(src="/js/ace/mode-html.js")
-    script(src="/js/ace/mode-javascript.js")
-    script(src="/js/ace/mode-css.js")
+    script(src="/js/script.min.js")
 
-    != js("views/toolbar")
-    != js("views/sidebar")
-    != js("views/previewer")
+    != js("importers/github")
+
+    != js("models/plunks")
+    != js("models/edit_session")
+
     != js("views/editor")
+    != js("views/previewer")
+    != js("views/sidebar")
+    != js("views/toolbar")
+
     != js("editor")
 
   body
@@ -33,7 +37,7 @@ html
         div.container-fluid
           a.brand(href="/") Plunker
           div#toolbar
-    div#content
+    div#content(class=views)
       div#sidebar
         h2.header Files
         ul.files
@@ -42,6 +46,9 @@ html
             i.icon-plus
           button.btn.btn-mini.remove
             i.icon-minus
-      div#editor
-      div#preview
-        iframe
+          button.btn.btn-mini.pull-right.config
+            i.icon-cog
+      div#edit-preview
+        div#editor
+        div#preview
+          iframe(frameborder="0",marginheight="0",marginwidth="0",width="100%",height="100%")

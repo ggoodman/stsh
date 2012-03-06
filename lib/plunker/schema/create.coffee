@@ -39,11 +39,12 @@ module.exports =
           type: "object"
           additionalProperties: false
           properties:
+            filename:
+              type: "string"
             content:
               type: "string"
               required: true
             mime:
               type: "string"
-            encoding:
-              type: "string"
+
         ]

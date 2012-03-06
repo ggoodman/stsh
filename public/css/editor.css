@@ -1,9 +1,20 @@
+#toolbar .btn-toolbar {
+  margin: 0; padding: 0;
+}
+
+#toolbar select {
+  margin: 0;
+  float: left;
+}
+
 #content {
   position: absolute;
   left: 0; top: 40px; right: 0; bottom: 0;
+  overflow: hidden;
 }
 
 #sidebar {
+  display: none;
   position: absolute;
   left: 0; top: 0; bottom: 0;
   width: 160px;
@@ -13,6 +24,10 @@
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   padding: 0 14px;
+}
+
+.sidebar #sidebar {
+  display: block;
 }
 
 #sidebar .header {
@@ -64,27 +79,55 @@
 }
 
 #sidebar .operations button.btn {
-  border-left: 0;
-  border-top: 0;
+  margin-left: -1px;
   -webkit-border-radius: 0;
   -moz-border-radius: 0;
   border-radius: 0;
 }
 
+#edit-preview {
+  position: absolute;
+  left: 0; top: 0; right: 0px; bottom: 0;
+}
+
+.sidebar #edit-preview {
+  left: 160px;
+}
+
+
 #editor {
+  display: none;
   box-sizing: border-box;
   position: absolute;
-  left: 160px; top: 0; right: 400px; bottom: 0;
+  left: 0; top: 0; right: 0; bottom: 0;
   border-left: 4px solid #9B9B9B;
   border-right: 4px solid #9B9B9B;
 }
 
+.editor #editor {
+  display: block;
+}
+
+.preview #editor {
+  right: 50%;
+}
+
+
 #preview {
+  display: none;
   box-sizing: border-box;
   position: absolute;
-  top: 0; right: 0; bottom: 0;
-  width: 400px;
+  top: 0; right: 0; bottom: 0; left: 0;
 }
+
+.preview #preview {
+  display: block;
+}
+
+.editor #preview {
+  left: 50%;
+}
+
 #preview iframe {
   width: 100%;
   height: 100%;

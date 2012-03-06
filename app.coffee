@@ -10,7 +10,7 @@ app.use gzippo.staticGzip("#{__dirname}/public")
 app.use gzippo.compress()
 app.use express.static("#{__dirname}/public")
 
-app.use "/api", require("./servers/api")
+app.use "/api/v1", require("./servers/api/v1")
 app.use "/raw", require("./servers/plunks")
 
 app.configure ->
@@ -40,7 +40,7 @@ app.get /^\/([a-zA-Z0-9]{6})$/, (req, res) -> res.redirect("/#{req.params[0]}/",
 
 
 app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?$)?/, (req, res) ->
-  res.render("editor", page: "/edit")
+  res.render("editor", page: "/edit", views: req.param("views", "sidebar editor preview").split(/[ \.,]/).join(" "))
 
 
 if require.main == module

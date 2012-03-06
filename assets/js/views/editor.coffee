@@ -6,9 +6,13 @@
       self = @
       
       @ace = ace.edit(@id)
-      
-      plunker.on "activate", (filename) ->
-        self.ace.setSession self.model.buffers.get(filename).session
+
+      plunker.on "intent:activate", (filename) ->
+        if buffer = self.model.buffers.get(filename)
+          self.ace.setSession buffer.session
+          plunker.trigger "event:activate", filename
+
+      plunker.on "event:resize", -> self.ace.resize()
       
 
 )(window)

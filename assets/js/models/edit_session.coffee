@@ -1,10 +1,23 @@
+mappings = [
+  ["coffee", "CoffeeScript", ["coffee"]]
+  ["css", "CSS", ["css"]]
+  ["html", "HTML", ["html", "htm"]]
+  ["javascript", "JavaScript", ["js"]]
+  ["json", "JSON", ["json"]]
+  ["markdown", "Markdown", ["md", "markdown"]]
+  ["scss", "SCSS", ["scss"]]
+  ["text", "Text", ["txt"]]
+  ["textile", "Textile", ["textile"]]
+  ["xml", "XML", ["xml"]]
+]
+
+modes = _.map mappings, ([name, title, extensions]) ->
+  name: name
+  title: title
+  regex: new RegExp("^.*\\.(" + extensions.join("|") + ")$", "g")
+
+
 ((exports) ->
-  
-  modes = {}
-  modes["text/html"] = require("ace/mode/html").Mode
-  modes["text/javascript"] = require("ace/mode/javascript").Mode
-  modes["text/css"] = require("ace/mode/css").Mode
-  modes["application/javascript"] = modes["text/javascript"]
   
   EditSession = require("ace/edit_session").EditSession
   
@@ -17,20 +30,61 @@
       
       @session.setTabSize(2)
       @session.setUseSoftTabs(true)
-      
-      if mode = modes[@get("mime")]
-        @session.setMode new mode()
+
+      @setMode()
         
-      @session.on "change", ->
-        self.set "content", self.session.getValue()
-        
+      @session.on "change", -> self.set "content", self.session.getValue()
+
+    setMode: ->
+      self = @
+
+      if filename = @get("filename")
+        _.each modes, (mode) ->
+          if mode.regex.test(filename)
+            $script "/js/ace/mode-#{mode.name}.js", mode.name
+            $script.ready mode.name, ->
+              mode.Mode ?= require("ace/mode/#{mode.name}").Mode
+              mode.mode ?= new mode.Mode
+              self.session.setMode mode.mode
+
+
+
   class exports.BufferCollection extends Backbone.Collection
     model: exports.Buffer
   
   class exports.EditSession extends Backbone.Model
     initialize: ->
+      self = @
+
       @buffers = new BufferCollection
-    
+      @queue = []
+
+      @buffers.on "add", (model) -> self.queue.unshift model.get("filename")
+      @buffers.on "remove", (model) -> self.queue = _.without self.queue, model.get("filename")
+      @buffers.on "reset", (coll) -> self.queue = coll.pluck("filename")
+
+      plunker.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
+
+      plunker.on "intent:fileAdd", (filename) ->
+        if filename ?= prompt("Filename?")
+          unless self.buffers.get(filename)
+            buffer = self.buffers.add
+              filename: filename
+              content: ""
+            plunker.trigger "event:addFile", filename
+            plunker.trigger "intent:activate", filename
+          else alert "A file named #{filename} already exists."
+
+      plunker.on "intent:fileRemove", (filename = _.first(self.queue)) ->
+        if self.buffers.length > 1
+          if buffer = self.buffers.get(filename)
+            self.buffers.remove buffer
+            plunker.trigger "event:removeFile", 
+            plunker.trigger "intent:activate", _.first(self.queue)
+          else alert "No such file #{filename}."
+        else alert "Cannot remove all files from the plunk"
+
+
     toJSON: ->
       json = super()
       json.files = {}
@@ -40,3 +94,4 @@
       json
 
 )(window)
+

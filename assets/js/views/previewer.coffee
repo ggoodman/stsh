@@ -1,21 +1,22 @@
 class window.Previewer extends Backbone.View
   initialize: ->
     self = @
+
+    update = _.debounce(@updatePlunk, 1000)
     
-    @plunks = new PlunkCollection
-    
-    render = _.debounce(@render, 1000)
-    
-    @model.on "change", render
-    @model.buffers.on "all", render
+    @model.on "change:index", update
+    @model.buffers.on "reset change:content change:filename", update
+
+    plunker.on "intent:refresh", update
   
-  render: =>
-    $iframe = @$el.find("iframe")
-    
+  updatePlunk: =>
+    self = @
+
     json = @model.toJSON()
-    json.expires = new Cromag(30000 + Cromag.now()).toISOString()
-    delete json.active
-    
-    plunk = @plunks.create(json)
+    json.expires = new Cromag(Cromag.now() + 30 * 1000).toISOString()
+
+    plunk = new Plunk(json)
     plunk.on "sync", ->
-      $iframe.attr "src", plunk.get("raw_url")
+      self.$("iframe").attr "src", plunk.get("raw_url")
+      plunker.trigger "event:refresh", plunk
+    plunk.save()

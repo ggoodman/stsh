@@ -1,7 +1,5 @@
 ((exports) ->
   
-  #= require_tree ../importers
-  
   sync = (method, model, options) ->
     params = _.extend {}, options,
       url: model.url()
@@ -26,12 +24,13 @@
   
   class exports.Plunk extends Backbone.Model
     sync: sync
-    url: -> @get("url") or "/api/v1/plunks"
+    url: -> @get("url") or "/api/v1/plunks" + if @id then "/#{@id}" else ""
     initialize: ->
       self = @
       @changes = {}
       @on "sync", -> self.changes = {}
       @on "change:description", -> self.changes.description = @get("description")
+      @on "change:expires", -> self.changes.expires = @get("expires")
       @on "change:files", ->
         self.changes.files = {}
         self.changes.files[filename] = null for filename, file of self.previous("files")
@@ -51,7 +50,7 @@
     import: (source) ->
       self = @
       
-      for name, matcher of importers
+      for name, matcher of plunker.importers
         if matcher.test(source)
           strategy = matcher
           break;

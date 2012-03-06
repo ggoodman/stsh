@@ -4,12 +4,12 @@ _ = require("underscore")._
 
 app = module.exports = express.createServer()
 
-config = _.defaults require("../../../config"),
+config = _.defaults require("../../config"),
   store: "memory"
   ttl: 60 * 60 * 24 * 2 # 2 days
 
 app.configure ->
-  app.use require("../../../lib/plunker").middleware(config)
+  app.use require("../../lib/plunker").middleware(config)
 
   app.use express.methodOverride()
   app.use express.bodyParser()

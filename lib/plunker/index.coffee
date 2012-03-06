@@ -105,7 +105,7 @@ class Updater
   validate: (json, next) =>
     {@valid, @errors} = validator.validate(json, require("./schema/update"))
     
-    plunk.updated_at = new Cromag().toISOString()
+    json.updated_at = new Cromag().toISOString()
 
     if json.expires
       try
@@ -142,6 +142,10 @@ class Updater
 
       for filename, file of json.files
         former = old_files[filename]
+
+        console.log ""
+        console.log "Handling", filename, file
+        console.log ""
         
         # Normalize file structure to hash
         if _.isString(file) then file =
@@ -173,7 +177,7 @@ class Updater
               content: file.content or former.content
               mime: file.mime || mime.lookup(filename)
           # Not a rename, but change to existing file
-          else new_files[new_name] =
+          else new_files[filename] =
             filename: filename
             content: file.content or former.content
             mime: file.mime or former.mime
