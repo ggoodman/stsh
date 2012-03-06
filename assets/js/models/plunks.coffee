@@ -47,7 +47,7 @@
     comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
     sync: sync
 
-    import: (source) ->
+    import: (source, options = {}) ->
       self = @
       
       for name, matcher of plunker.importers
@@ -59,7 +59,7 @@
         self.trigger "import:start"
         strategy.import source, (error, json) ->
           if error then self.trigger "import:fail"
-          else self.create json,
+          else self.create json, _.defaults options,
             wait: true
             silent: false
             success: -> self.trigger "import:success"

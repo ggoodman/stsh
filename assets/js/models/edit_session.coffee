@@ -6,7 +6,6 @@ mappings = [
   ["json", "JSON", ["json"]]
   ["markdown", "Markdown", ["md", "markdown"]]
   ["scss", "SCSS", ["scss"]]
-  ["text", "Text", ["txt"]]
   ["textile", "Textile", ["textile"]]
   ["xml", "XML", ["xml"]]
 ]
@@ -56,14 +55,23 @@ modes = _.map mappings, ([name, title, extensions]) ->
     initialize: ->
       self = @
 
+      @plunk = new Plunk
       @buffers = new BufferCollection
       @queue = []
-
+      
       @buffers.on "add", (model) -> self.queue.unshift model.get("filename")
       @buffers.on "remove", (model) -> self.queue = _.without self.queue, model.get("filename")
       @buffers.on "reset", (coll) -> self.queue = coll.pluck("filename")
 
       plunker.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
+      
+      plunker.on "intent:save", ->
+        json = self.toJSON()
+        
+        self.plunk.set self.toJSON()
+        self.plunk.save {},
+          success: (plunk) -> plunker.trigger "event:save", plunk
+          error: -> alert("Failed to save plunk")
 
       plunker.on "intent:fileAdd", (filename) ->
         if filename ?= prompt("Filename?")
