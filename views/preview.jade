@@ -11,12 +11,6 @@ html
 
     != js("preview")
 
-  body
-    div#container
-      div#operations
-        a(href="/edit/#{plunk_id}",title="Edit this page in Plunker") Tweak
-      iframe#plunk(frameborder="0",height="100%",width="100%",src=raw_url)
-
     script
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-28929036-1']);
@@ -27,3 +21,10 @@ html
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
+
+  body
+    div#container
+      div#operations
+        a(href="/edit/#{plunk_id}",title="Edit this page in Plunker") Tweak
+      iframe#plunk(frameborder="0",height="100%",width="100%",src=raw_url)
+
