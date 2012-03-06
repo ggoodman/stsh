@@ -30,6 +30,9 @@ $ ->
   preview = new Previewer
     el: document.getElementById("preview")
     model: session
+  
+  plunker.trigger "intent:fileAdd", "index.html"
+
 
   router = new class extends Backbone.Router
     routes:
@@ -75,13 +78,9 @@ $ ->
             replace: true
 
     loadPlunk: (id) ->
-      console.log "loadPlunk", arguments...
       if id
         session.plunk.set(id: id)
         session.plunk.fetch @getOptions()
-
-      else
-        plunker.trigger "intent:fileAdd", "index.html"
     
     importPlunk: (source) ->
       options = @getOptions()
@@ -91,8 +90,9 @@ $ ->
         replace: true
       
       if source
-        coll = new PlunkCollection()
-        coll.import source, options
+        coll = new PlunkCollection
+        coll.import source, _.defaults options,
+          expires: new Cromag(Cromag.now() + 30 * 1000).toISOString()
       else options.error()
 
 

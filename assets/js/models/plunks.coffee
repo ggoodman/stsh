@@ -58,6 +58,8 @@
       if strategy
         self.trigger "import:start"
         strategy.import source, (error, json) ->
+          json.expires = options.expires if options.expires
+          
           if error then self.trigger "import:fail"
           else self.create json, _.defaults options,
             wait: true

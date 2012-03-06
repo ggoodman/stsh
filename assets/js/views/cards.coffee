@@ -33,10 +33,10 @@
         </div>
           <div class="operations">
             <div class="btn-toolbar">
-              <a class="btn btn-mini btn-primary edit" title="Edit in Plunker" href="/edit/{{id}}">
-                <i class="icon-pencil icon-white"></i>
-              </a>
               {{#if token}}
+                <a class="btn btn-mini btn-primary edit" title="Edit in Plunker" href="/edit/{{id}}">
+                  <i class="icon-pencil icon-white"></i>
+                </a>
                 {{#if source}}
                   <button class="btn btn-mini btn-success refresh" title="Refresh from source">
                     <i class="icon-refresh icon-white"></i>
@@ -45,6 +45,10 @@
                 <button class="btn btn-mini btn-danger delete" title="Delete">
                   <i class="icon-trash icon-white"></i>
                 </button>
+              {{else}}
+                <a class="btn btn-mini btn-primary edit" title="Fork and edit in Plunker" href="/edit/{{id}}">
+                  <i class="icon-pencil icon-white"></i>
+                </a>              
               {{/if}}
             </div>
           </div>
