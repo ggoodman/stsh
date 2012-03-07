@@ -13,10 +13,16 @@
           </a>
           <ul class="dropdown-menu">
             <li>
-              <a href="/edit/from:1961272">Base html5 page</a>
+              <a href="/edit/from:1961272">Basic html</a>
             </li>
             <li>
-              <a href="/edit/from:1986619">Base + jQuery</a>
+              <a href="/edit/from:1986619">jQuery</a>
+            </li>
+            <li>
+              <a href="/edit/from:1992850">jQuery + Coffee</a>
+            </li>
+            <li>
+              <a href="/edit/from:1990582">YUI</a>
             </li>
           </ul>
         </div>
