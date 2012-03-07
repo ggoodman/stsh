@@ -29,11 +29,11 @@ mappings = [
   ["xml", "XML", ["xml"]]
 ]
 
-modes = _.map mappings, ([name, title, extensions]) ->
+modes = _.map mappings, ([name, title, extensions, dependencies]) ->
   name: name
   title: title
-  regex: new RegExp("^.*\\.(" + extensions.join("|") + ")$", "g")
-
+  regex: new RegExp("\\.(" + extensions.join("|") + ")$", "gi")
+  dependencies: dependencies or []
 
 ((exports) ->
   
@@ -52,20 +52,25 @@ modes = _.map mappings, ([name, title, extensions]) ->
       @setMode()
         
       @session.on "change", -> self.set "content", self.session.getValue()
+      
+    loadMode: (mode, cb) ->
+      $script("/js/ace/mode-#{mode.name}.js", mode.name)
+      $script("/js/ace/mode-#{name}.js", name) for name in mode.dependencies
+      
+      $script.ready [mode.name].concat(mode.dependencies), ->
+        mode.Mode ?= require("ace/mode/#{mode.name}").Mode
+        mode.mode ?= new mode.Mode
+        
+        cb mode.mode
 
     setMode: ->
       self = @
-
-      if filename = @get("filename")
-        _.each modes, (mode) ->
-          if mode.regex.test(filename)
-            $script "/js/ace/mode-#{mode.name}.js", mode.name
-            $script.ready mode.name, ->
-              mode.Mode ?= require("ace/mode/#{mode.name}").Mode
-              mode.mode ?= new mode.Mode
-              self.session.setMode mode.mode
-
-
+      
+      filename = @get("filename")
+      mode = _.find modes, (mode) -> filename.match(mode.regex)
+      
+      if filename and mode
+        self.loadMode mode, (inst) -> self.session.setMode(inst)
 
   class exports.BufferCollection extends Backbone.Collection
     model: exports.Buffer
