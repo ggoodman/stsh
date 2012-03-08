@@ -31,6 +31,7 @@ class window.LivePreview extends Backbone.View
   """
   
   compile: Handlebars.compile """
+    <div class="compiled"></div>
   """
   
   # Do nothing
@@ -83,15 +84,15 @@ class window.LivePreview extends Backbone.View
   
   updateCompile: =>
     self = @
+    
+    $compiled = @$(".compiled")
 
     if @mode == "compile"
       if (filename = @model.getActive()) and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
         
         rerender = (body, mode) ->
-          console.log "rerender", arguments...
-
           highlighted = staticHighlight(body, mode)
-          self.$el.html(highlighted.html)
+          $compiled.html(highlighted.html)
       
         if compiler = plunker.compilers[buffer.mode.name]
           compiler code, (err, res) ->
@@ -102,7 +103,7 @@ class window.LivePreview extends Backbone.View
                 buffer.loadMode buffer.getMode(res.lang), (mode) ->
                   rerender(res.body, mode)
               else
-                self.$el.html res.body
+                $compiled.html res.body
         else rerender({body: code}, buffer.mode.mode)
       
   enable: (@mode) =>
