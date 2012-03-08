@@ -66,16 +66,19 @@ class Store
     fs.readFile @filename, "utf8", (err, data) ->
       if err then console.log "Failed to restore data: #{self.filename}"
       else
-        plunks = JSON.parse(data)
-        plunks = _.map plunks, (json) ->
-          if matches = json.html_url.match(/^(http:\/\/[^\/]+)(.+)$/)
-            json.raw_url = "#{matches[1]}/raw#{matches[2]}"
-            
-            for filename, file of json.files
-              file.raw_url = json.raw_url + filename
-          json
-
-        self.plunks.reset(plunks) and console.log "Restore succeeded from: #{self.filename}"
+        try
+          plunks = JSON.parse(data)
+          plunks = _.map plunks, (json) ->
+            if matches = json.html_url.match(/^(http:\/\/[^\/]+)(.+)$/)
+              json.raw_url = "#{matches[1]}/raw#{matches[2]}"
+              
+              for filename, file of json.files
+                file.raw_url = json.raw_url + filename
+            json
+  
+          self.plunks.reset(plunks) and console.log "Restore succeeded from: #{self.filename}"
+        catch error
+          console.log "Error parsing restore data: #{self.filename}"
   
   shrink: =>
     if @plunks.length > @options.size

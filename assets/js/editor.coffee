@@ -13,7 +13,7 @@ do ->
     urlParams[d(e[1])] = d(e[2])
     
 $ ->
-  session = new EditSession
+  session = new PlunkerSession
   
   toolbar = new Toolbar
     el: document.getElementById("toolbar")
@@ -27,11 +27,12 @@ $ ->
     el: document.getElementById("editor")
     model: session
     
-  preview = new Previewer
-    el: document.getElementById("preview")
+  preview = new LivePreview
+    el: document.getElementById("live")
     model: session
   
   plunker.trigger "intent:fileAdd", "index.html"
+      
 
 
   router = new class extends Backbone.Router

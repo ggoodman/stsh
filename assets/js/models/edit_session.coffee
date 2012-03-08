@@ -29,11 +29,10 @@ mappings = [
   ["xml", "XML", ["xml"]]
 ]
 
-modes = _.map mappings, ([name, title, extensions, dependencies]) ->
+modes = _.map mappings, ([name, title, extensions]) ->
   name: name
   title: title
   regex: new RegExp("\\.(" + extensions.join("|") + ")$", "gi")
-  dependencies: dependencies or []
 
 ((exports) ->
   
@@ -53,29 +52,32 @@ modes = _.map mappings, ([name, title, extensions, dependencies]) ->
         
       @session.on "change", -> self.set "content", self.session.getValue()
       
-    loadMode: (mode, cb) ->
-      $script("/js/ace/mode-#{mode.name}.js", mode.name)
-      $script("/js/ace/mode-#{name}.js", name) for name in mode.dependencies
+    matchMode: (filename) ->
+      _.find modes, (mode) -> filename.match(mode.regex)
       
-      $script.ready [mode.name].concat(mode.dependencies), ->
-        mode.Mode ?= require("ace/mode/#{mode.name}").Mode
-        mode.mode ?= new mode.Mode
+    getMode: (modeName) ->
+      _.find modes, (mode) -> mode.name == modeName
+      
+    loadMode: (mode, cb) ->
+      if mode
+        $script("/js/ace/mode-#{mode.name}.js", mode.name)
         
-        cb mode.mode
+        $script.ready mode.name, ->
+          mode.Mode ?= require("ace/mode/#{mode.name}").Mode
+          mode.mode ?= new mode.Mode
+          
+          cb mode.mode
 
     setMode: ->
       self = @
       
-      filename = @get("filename")
-      mode = _.find modes, (mode) -> filename.match(mode.regex)
-      
-      if filename and mode
-        self.loadMode mode, (inst) -> self.session.setMode(inst)
+      @mode = @matchMode @get("filename")
+      @loadMode @mode, (mode) -> self.session.setMode(mode)
 
   class exports.BufferCollection extends Backbone.Collection
     model: exports.Buffer
   
-  class exports.EditSession extends Backbone.Model
+  class exports.PlunkerSession extends Backbone.Model
     initialize: ->
       self = @
 
@@ -116,6 +118,7 @@ modes = _.map mappings, ([name, title, extensions, dependencies]) ->
           else alert "No such file #{filename}."
         else alert "Cannot remove all files from the plunk"
 
+    getActive: -> _.first(@queue)
 
     toJSON: ->
       json = super()

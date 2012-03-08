@@ -17,6 +17,8 @@ html
 
     script(type="text/javascript",src="/js/ace/ace.js")
 
+    script(type="text/javascript",src="/js/ace.highlight.js")
+
     script(src="/js/script.min.js")
 
     != js("importers/github")
@@ -47,8 +49,8 @@ html
       div.navbar-inner
         div.container-fluid
           a.brand(href="/") Plunker
-          div#toolbar
-    div#content(class=views)
+          div#toolbar.pull-right
+    div#content.sidebar.editor
       div#sidebar
         h2.header Files
         ul.files
@@ -59,7 +61,6 @@ html
             i.icon-minus
           button.btn.btn-mini.pull-right.config
             i.icon-cog
-      div#edit-preview
+      div#edit-live
         div#editor
-        div#preview
-          iframe(frameborder="0",marginheight="0",marginwidth="0",width="100%",height="100%")
+        div#live

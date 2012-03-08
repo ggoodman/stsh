@@ -2,11 +2,11 @@
 
   class exports.Toolbar extends Backbone.View
     template: Handlebars.compile """
-      <div class="btn-toolbar pull-right">
+      <div class="btn-toolbar">
         <div class="btn-group">
           <a class="btn btn-success new" href="/edit">
             <i class="icon-file icon-white" />
-            Create
+            New
           </a>
           <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
             <span class="caret"></span>
@@ -31,38 +31,57 @@
             <i class="icon-share icon-white" />
             Save
           </button>
-        </div>        <div class="btn-group">
-          <button class="btn btn-info refresh">
-            <i class="icon-refresh icon-white" />
-            Refresh
+        </div>
+        <div class="btn-group">
+          <button class="btn btn-danger save" disabled>
+            <i class="icon-trash icon-white" />
+            Delete
           </button>
         </div>
-
+      </div>
+      <div class="btn-toolbar">
         <div class="btn-group">
-          <select class="input-medium view">
-            <option value="sidebar editor preview">All panels</option>
-            <option value="sidebar editor">Sidebar and editor</option>
-            <option value="editor preview">Editor and preview</option>
-            <option value="editor">Editor only</option>
-            <option value="preview">Preview only</option>
-          </select>
+          <button class="btn btn-info run" data-toggle="button">
+            <span class="run-start">
+              <i class="icon-play icon-white" />
+              Run
+            </span>
+            <span class="run-stop">
+              <i class="icon-stop icon-white" />
+              Stop
+            </span>
+          </button>
+        </div>
+      </div>
+      <div class="btn-toolbar">
+        <div class="btn-group" data-toggle="buttons-radio">
+          <button class="btn edit-only active live-off" title="No live preview">
+            <i class="icon-off" />
+          </button>
+          <button class="btn edit-only live-compile" title="Live code compilation and preview">
+            <i class="icon-list" />
+          </button>
+          <button class="btn edit-only live-preview" title="Live preview">
+            <i class="icon-eye-open" />
+          </button>
         </div>
       </div>
     """
 
     events:
-      "click .refresh": (e) -> plunker.trigger "intent:refresh"
+      "click .run.active": (e) -> plunker.trigger "intent:preview-disable"
+      "click .run:not(.active)": (e) -> plunker.trigger "intent:preview-enable"
       "click .save": (e) -> plunker.trigger "intent:save"
-      "change .view": (e) ->
-        $("#content").removeClass("sidebar editor preview").addClass($(e.target).val())
-        plunker.trigger "event:resize"
+      "click .live-off": (e) -> plunker.trigger "intent:live-off"
+      "click .live-compile": (e) -> plunker.trigger "intent:live-compile"
+      "click .live-preview": (e) -> plunker.trigger "intent:live-preview"
     
     initialize: ->
       @render()
       @$(".view").val($("#content").attr("class"))
       
     render: =>
-      @$el.html $(@template())
+      @$el.html @template()
       @
 
 )(window)
