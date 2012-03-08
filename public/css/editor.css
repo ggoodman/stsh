@@ -21,6 +21,10 @@
   display: none;
 }
 
+#toolbar .btn-toolbar .dropdown-menu {
+  display: none !important;
+}
+
 #content {
   position: absolute;
   left: 0; top: 40px; right: 0; bottom: 0;
