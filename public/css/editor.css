@@ -1,3 +1,16 @@
+
+#wrap {
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
+  min-width: 475px;
+  overflow: auto;
+}
+
+#wrap .navbar-fixed-top {
+  position: absolute;
+}
+
+
 #toolbar .btn-toolbar {
   margin: 0 0 0 16px; padding: 0;
   display: inline-block;
@@ -21,8 +34,10 @@
   display: none;
 }
 
-#toolbar .btn-toolbar .dropdown-menu {
-  display: none !important;
+@media (max-width: 606px) {
+  #toolbar .btn span.text {
+    display: none;
+  }
 }
 
 #content {

@@ -35,7 +35,7 @@ $ ->
       
 
 
-  router = new class extends Backbone.Router
+  router = plunker.router = new class extends Backbone.Router
     routes:
       "edit":                 "loadPlunk"
       "edit/from::source":  "importPlunk"

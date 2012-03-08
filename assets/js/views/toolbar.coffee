@@ -6,12 +6,12 @@
         <div class="btn-group">
           <a class="btn btn-success new" href="/edit">
             <i class="icon-file icon-white" />
-            New
+            <span class="text">New</span>
           </a>
           <a class="btn btn-success dropdown-toggle" data-toggle="dropdown" href="javascript:void(0)">
             <span class="caret"></span>
           </a>
-          <ul class="dropdown-menu">
+          <ul class="dropdown-menu templates">
             <li>
               <a href="/edit/from:1961272">Basic html</a>
             </li>
@@ -29,13 +29,13 @@
         <div class="btn-group">
           <button class="btn btn-primary save">
             <i class="icon-share icon-white" />
-            Save
+            <span class="text">Save</span>
           </button>
         </div>
         <div class="btn-group">
           <button class="btn btn-danger save" disabled>
             <i class="icon-trash icon-white" />
-            Delete
+            <span class="text">Delete</span>
           </button>
         </div>
       </div>
@@ -44,11 +44,11 @@
           <button class="btn btn-info run" data-toggle="button">
             <span class="run-start">
               <i class="icon-play icon-white" />
-              Run
+              <span class="text">Run</span>
             </span>
             <span class="run-stop">
               <i class="icon-stop icon-white" />
-              Stop
+              <span class="text">Stop</span>
             </span>
           </button>
         </div>
@@ -75,6 +75,11 @@
       "click .live-off": (e) -> plunker.trigger "intent:live-off"
       "click .live-compile": (e) -> plunker.trigger "intent:live-compile"
       "click .live-preview": (e) -> plunker.trigger "intent:live-preview"
+      "click .templates a": (e) ->       
+        e.preventDefault()
+        plunker.router.navigate $(e.target).attr("href"),
+          trigger: true
+          replace: false
     
     initialize: ->
       @render()
