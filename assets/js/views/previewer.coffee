@@ -5,12 +5,24 @@
       try
         compiled = CoffeeScript.compile(code, bare: true)
         return cb null,
-          code: compiled
+          type: "code"
+          body: compiled
           lang: "javascript"
       catch error
         return cb error
     return
-      
+  markdown: (code, cb) ->
+    $script "/js/compilers/showdown.js", "compiler-showdown"
+    $script.ready "compiler-showdown", ->
+      converter = new Showdown.converter()
+      try
+        compiled = converter.makeHtml(code)
+        return cb null,
+          type: "html"
+          body: compiled
+      catch error
+        return cb error
+      return      
 
 
 class window.LivePreview extends Backbone.View
@@ -75,18 +87,23 @@ class window.LivePreview extends Backbone.View
     if @mode == "compile"
       if (filename = @model.getActive()) and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
         
-        rerender = (code, mode) ->
-          highlighted = staticHighlight(code, mode)
+        rerender = (body, mode) ->
+          console.log "rerender", arguments...
+
+          highlighted = staticHighlight(body, mode)
           self.$el.html(highlighted.html)
       
         if compiler = plunker.compilers[buffer.mode.name]
           compiler code, (err, res) ->
             if err
-              rerender(err.toString())
-            else
-              buffer.loadMode buffer.getMode(res.lang), (mode) ->
-                rerender(res.code, mode)
-        else rerender(code, buffer.mode.mode)
+              return rerender(body: err.toString())
+            switch res.mode
+              when "code"
+                buffer.loadMode buffer.getMode(res.lang), (mode) ->
+                  rerender(res.body, mode)
+              else
+                self.$el.html res.body
+        else rerender({body: code}, buffer.mode.mode)
       
   enable: (@mode) =>
     self = @
