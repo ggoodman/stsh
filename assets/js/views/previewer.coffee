@@ -97,14 +97,14 @@ class window.LivePreview extends Backbone.View
         if compiler = plunker.compilers[buffer.mode.name]
           compiler code, (err, res) ->
             if err
-              return rerender(body: err.toString())
-            switch res.mode
+              return rerender(err.toString())
+            switch res.type
               when "code"
                 buffer.loadMode buffer.getMode(res.lang), (mode) ->
                   rerender(res.body, mode)
               else
                 $compiled.html res.body
-        else rerender({body: code}, buffer.mode.mode)
+        else rerender(code, buffer.mode.mode)
       
   enable: (@mode) =>
     self = @
