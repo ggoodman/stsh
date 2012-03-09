@@ -30,6 +30,19 @@
   
       plunker.mediator.on "intent:refresh", @updatePreview
       plunker.mediator.on "event:activate", @updateCompile
+
+      # Full-screen preview stuff
+      plunker.mediator.on "intent:preview-enable", ->
+        self.oldmode = self.mode
+        
+        $("#content").removeClass("editor").removeClass("sidebar")
+        
+        self.enable "preview"
+      
+      plunker.mediator.on "intent:preview-disable", ->
+        $("#content").addClass("editor").addClass("sidebar")
+        
+        self.enable self.oldmode
     
     updatePreview: =>
       self = @
