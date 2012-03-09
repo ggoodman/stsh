@@ -1,7 +1,7 @@
-githubRegex = /^(?:(?:https?\:\/\/)?gist\.github\.com\/)?([0-9a-z]+)(?:#.+)?$/
-
-
 ((plunker) ->
+  
+  githubRegex = /^(?:(?:https?\:\/\/)?gist\.github\.com\/)?([0-9a-z]+)(?:#.+)?$/
+
   plunker.importers ?= {}
   plunker.importers.github = 
     test: (source) -> githubRegex.test(source)
@@ -35,4 +35,4 @@ githubRegex = /^(?:(?:https?\:\/\/)?gist\.github\.com\/)?([0-9a-z]+)(?:#.+)?$/
               
               callback(null, json)
       else callback("Impossible error")
-)(plunker ?= {})
+)(@plunker ||= {})

@@ -12,13 +12,17 @@
 
 #toolbar {
   position: absolute;
-  right: 0; top: 0; bottom: 0;
+  right: 8px; top: 0; bottom: 0;
   width: auto;
 }
 
 #toolbar .btn-toolbar {
-  margin: 0 0 0 16px; padding: 0;
+  margin: 0 0 0 8px; padding: 0;
   display: inline-block;
+}
+
+#toolbar .btn-group+.btn-group {
+  margin-left: 2px;
 }
 
 
@@ -49,6 +53,18 @@
   position: absolute;
   left: 0; top: 40px; right: 0; bottom: 0;
   overflow: hidden;
+}
+
+#loading {
+  display: none;
+  position: absolute;
+  left: 0; top: 0px; right: 0; bottom: 0;
+  z-index: 100;
+  background-color: rgba(0, 0, 0, 0.3)
+}
+
+.loading #loading {
+  display: block;
 }
 
 #sidebar {
@@ -123,6 +139,10 @@
   border-radius: 0;
 }
 
+#sidebar .description {
+  width: 122px;
+}
+
 #edit-live {
   position: absolute;
   left: 0; top: 0; right: 0px; bottom: 0;
@@ -133,7 +153,7 @@
 }
 
 
-#editor {
+#textarea {
   display: none;
   box-sizing: border-box;
   position: absolute;
@@ -142,11 +162,11 @@
   border-right: 4px solid #9B9B9B;
 }
 
-.editor #editor {
+.editor #textarea {
   display: block;
 }
 
-.live #editor {
+.live #textarea {
   right: 50%;
 }
 

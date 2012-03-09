@@ -1,6 +1,6 @@
-((exports) ->
+((plunker) ->
   
-  sync = (method, model, options) ->
+  sync = (method, model, options = {}) ->
     params = _.extend {}, options,
       url: model.url()
       cache: false
@@ -19,14 +19,18 @@
         params.data = JSON.stringify(model.changes)
       when "delete"
         params.type = "delete"
-
+        
     $.ajax(params)
   
-  class exports.Plunk extends Backbone.Model
+  class plunker.Plunk extends Backbone.Model
     sync: sync
     url: -> @get("url") or "/api/v1/plunks" + if @id then "/#{@id}" else ""
     initialize: ->
       self = @
+      
+      @set "description", "" unless @get("description")
+      @set "files", {} unless @get("files")
+      
       @changes = {}
       @on "sync", -> self.changes = {}
       @on "change:description", -> self.changes.description = @get("description")
@@ -35,15 +39,21 @@
         self.changes.files = {}
         self.changes.files[filename] = null for filename, file of self.previous("files")
         
-        _.extend self.changes.files, self.get("files")
-    toJSON: ->
-      json = super()
-      json.description ||= "Untitled"
-      json
+        _.each self.get("files"), (file, filename) -> self.changes.files[filename] ||= file.content or ""
+    
+    fork: ->
+      json =
+        description: @get("description")
+        files: {}
+      
+      _.each @get("files"), (file) -> json.files[file.filename] = file.content
+      
+      @clear()
+      @set(json)
 
-  class exports.PlunkCollection extends Backbone.Collection
+  class plunker.PlunkCollection extends Backbone.Collection
     url: -> "/api/v1/plunks"
-    model: Plunk
+    model: plunker.Plunk
     comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
     sync: sync
 
@@ -69,4 +79,5 @@
       else
         @trigger "error", "Import error", "The source you provided is not a recognized source."
       @
-)(window)
+      
+)(@plunker ||= {})
