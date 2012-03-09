@@ -45,6 +45,7 @@
       json =
         description: @get("description")
         files: {}
+        index: @get("index")
       
       _.each @get("files"), (file) -> json.files[file.filename] = file.content
       

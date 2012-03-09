@@ -34,19 +34,17 @@
       
               if html.length then html[0]
               else filenames[0]
-          
+              
+
           options.plunk.set
             description: json.description
             files: files
+            index: json.index
+            #expires: new Cromag(Cromag.now() + 1000).toISOString()
           
-          console.log "Plunk", options.success, options.plunk
-          
-          options.plunk.save({}, options)
+          console.log "Plunk", _.clone(options.plunk.attributes)
           
           options.success(options.plunk)
-          
-          #coll = new plunker.PlunkCollection
-          #coll.create _.defaults(json, options.defaults), options
     else
       options.error("Import error", "The source you provided is not a recognized source.")
     @

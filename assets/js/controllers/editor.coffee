@@ -32,6 +32,11 @@
        model: plunker.models.session
 
 
+      plunker.mediator.on "event:reset", ->
+        plunker.controller.navigate "/edit",
+          trigger: false
+          replace: false
+
       plunker.mediator.on "event:save", (plunk) ->
         plunker.controller.navigate "/edit/#{plunk.id}",
           trigger: false

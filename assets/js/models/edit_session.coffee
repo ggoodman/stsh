@@ -120,6 +120,9 @@
     reset: =>
       @plunk.clear()
       @buffers.reset()
+      
+      plunker.mediator.trigger "event:reset"
+      
       plunker.mediator.trigger "intent:fileAdd", "index.html"
 
     _fetchOptions: (options = {}) ->
