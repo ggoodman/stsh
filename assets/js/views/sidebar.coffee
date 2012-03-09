@@ -1,38 +1,41 @@
-((exports) ->
+((plunker) ->
   
   class Filename extends Backbone.View
     tagName: "li"
     className: "file"
     
     events:
-      "click":    "onClick"
+      "click": -> plunker.mediator.trigger "intent:activate", @model.get("filename")
     
     initialize: ->
       self = @
       
-      plunker.on "event:activate", (filename) ->
-        if self.model.get("filename") == filename
-          self.$el.addClass("active")
-        else
-          self.$el.removeClass("active")
+      plunker.mediator.on "event:activate", @onEventActivate
+      
+      @model.on "change:filename", @render
+
+    onEventActivate: (filename) =>
+      if @model.get("filename") == filename
+        @$el.addClass("active")
+      else
+        @$el.removeClass("active")
     
     render: =>
       @$el.text(@model.get("filename"))
       @
     
-    onClick: -> plunker.trigger "intent:activate", @model.get("filename")
 
-  class exports.Sidebar extends Backbone.View
+  class plunker.Sidebar extends Backbone.View
     events:
-      "click .add":     -> plunker.trigger "intent:fileAdd"
-      "click .remove":  -> plunker.trigger "intent:fileRemove"
+      "click .add":     -> plunker.mediator.trigger "intent:fileAdd"
+      "click .remove":  -> plunker.mediator.trigger "intent:fileRemove"
+      
+      "change .description": (e) -> @model.plunk.set("description", @$(e.target).val(), silent: true)
 
     initialize: ->
       self = @
       @views = {}
       $files = @$(".files")
-
-      plunker.on "action:activate", (filename) -> self.active = filename
 
       addBuffer = (buffer) ->
         view = new Filename(model: buffer)
@@ -50,8 +53,11 @@
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
       
+      @model.plunk.on "change:description", @render
+      
     render: =>
+      @$(".description").val(@model.plunk.get("description"))
       @
       
     
-)(window)
+)(@plunker ||= {})

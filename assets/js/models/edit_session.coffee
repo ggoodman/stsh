@@ -1,44 +1,10 @@
-mappings = [
-  ["c_cpp", "C/C++", ["c", "cpp", "cxx", "h", "hpp"]]
-  ["clojure", "Clojure", ["clj"]]
-  ["coffee", "CoffeeScript", ["coffee"]]
-  ["coldfusion", "ColdFusion", ["cfm"]]
-  ["csharp", "C#", ["cs"]]
-  ["css", "CSS", ["css"]]
-  ["groovy", "Groovy", ["groovy"]]
-  ["haxe", "haXe", ["hx"]]
-  ["html", "HTML", ["html", "htm"]]
-  ["java", "Java", ["java"]]
-  ["javascript", "JavaScript", ["js"]]
-  ["json", "JSON", ["json"]]
-  ["latex", "LaTeX", ["tex"]]
-  ["lua", "Lua", ["lua"]]
-  ["markdown", "Markdown", ["md", "markdown"]]
-  ["ocaml", "OCaml", ["ml", "mli"]]
-  ["perl", "Perl", ["pl", "pm"]]
-  ["pgsql", "pgSQL", ["pgsql", "sql"]]
-  ["php", "PHP", ["php"]]
-  ["powershell", "Powershell", ["ps1"]]
-  ["python", "Python", ["py"]]
-  ["scala", "Scala", ["scala"]]
-  ["scss", "SCSS", ["scss"]]
-  ["ruby", "Ruby", ["rb"]]
-  ["sql", "SQL", ["sql"]]
-  ["svg", "SVG", ["svg"]]
-  ["textile", "Textile", ["textile"]]
-  ["xml", "XML", ["xml"]]
-]
-
-modes = _.map mappings, ([name, title, extensions]) ->
-  name: name
-  title: title
-  regex: new RegExp("\\.(" + extensions.join("|") + ")$", "gi")
-
-((exports) ->
-  
+((plunker) ->
+  # Ace editor session
   EditSession = require("ace/edit_session").EditSession
   
-  class exports.Buffer extends Backbone.Model
+
+  # Model to represent a text buffer in a Plunker session
+  class plunker.Buffer extends Backbone.Model
     idAttribute: "filename"
     initialize: ->
       self = @
@@ -47,88 +13,139 @@ modes = _.map mappings, ([name, title, extensions]) ->
       
       @session.setTabSize(2)
       @session.setUseSoftTabs(true)
+      
+      @set("filename", "Untitled-#{@cid}.txt") unless @id
 
       @setMode()
         
-      @session.on "change", -> self.set "content", self.session.getValue()
+      @on "change:filename", @setMode
       
-    matchMode: (filename) ->
-      _.find modes, (mode) -> filename.match(mode.regex)
-      
-    getMode: (modeName) ->
-      _.find modes, (mode) -> mode.name == modeName
-      
-    loadMode: (mode, cb) ->
-      if mode
-        $script("/js/ace/mode-#{mode.name}.js", mode.name)
-        
-        $script.ready mode.name, ->
-          mode.Mode ?= require("ace/mode/#{mode.name}").Mode
-          mode.mode ?= new mode.Mode
-          
-          cb mode.mode
+      @session.on "change", -> self.set "content", self.session.getValue()       
+    
+    toJSON: ->
+      filename: @get("filename")
+      content: @session.getValue() or ""
 
-    setMode: ->
+    setMode: =>
       self = @
-      
-      @mode = @matchMode @get("filename")
-      @loadMode @mode, (mode) -> self.session.setMode(mode)
-
-  class exports.BufferCollection extends Backbone.Collection
-    model: exports.Buffer
+      plunker.modes.loadByFilename @get("filename"), (mode) ->
+        if mode
+          self.mode = mode
+          self.session.setMode(mode.mode)
   
-  class exports.PlunkerSession extends Backbone.Model
+  class plunker.BufferCollection extends Backbone.Collection
+    model: plunker.Buffer
+    toJSON: ->
+      json = {}
+      
+      @each (buffer) -> json[buffer.id] = buffer.toJSON()
+      
+      
+  class plunker.Session extends Backbone.Model
     initialize: ->
       self = @
 
-      @plunk = new Plunk
-      @buffers = new BufferCollection
+      @plunk = new plunker.Plunk
+      @buffers = new plunker.BufferCollection
       @queue = []
       
       @buffers.on "add", (model) -> self.queue.unshift model.get("filename")
       @buffers.on "remove", (model) -> self.queue = _.without self.queue, model.get("filename")
       @buffers.on "reset", (coll) -> self.queue = coll.pluck("filename")
 
-      plunker.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
+      plunker.mediator.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
+      plunker.mediator.on "event:load:start", -> $("#wrap").addClass("loading")
+      plunker.mediator.on "event:load:end", -> $("#wrap").removeClass("loading")
       
-      plunker.on "intent:save", ->
-        json = self.toJSON()
+      plunker.mediator.on "intent:save", @onIntentSave
+      plunker.mediator.on "intent:fileAdd", @onIntentFileAdd
+      plunker.mediator.on "intent:fileRemove", @onIntentFileRemove
+      plunker.mediator.on "intent:reset", @reset
+
+    
+    last: -> _.first(@queue)
         
-        self.plunk.set self.toJSON()
-        self.plunk.save {},
-          success: (plunk) -> plunker.trigger "event:save", plunk
-          error: -> alert("Failed to save plunk")
+    onIntentSave: =>
+      #@plunk.set @toJSON()
+      @plunk.save {},
+        success: (plunk) -> plunker.mediator.trigger "event:save", plunk
+        error: -> alert("Failed to save plunk")
 
-      plunker.on "intent:fileAdd", (filename) ->
-        if filename ?= prompt("Filename?")
-          unless self.buffers.get(filename)
-            buffer = self.buffers.add
-              filename: filename
-              content: ""
-            plunker.trigger "event:addFile", filename
-            plunker.trigger "intent:activate", filename
-          else alert "A file named #{filename} already exists."
+    
+    onIntentFileAdd: (filename) =>
+      if filename ?= prompt("Filename?")
+        unless @buffers.get(filename)
+          buffer = @buffers.add
+            filename: filename
+            content: ""
+          plunker.mediator.trigger "event:addFile", filename
+          plunker.mediator.trigger "intent:activate", filename
+        else alert "A file named #{filename} already exists."
 
-      plunker.on "intent:fileRemove", (filename = _.first(self.queue)) ->
-        if self.buffers.length > 1
-          if buffer = self.buffers.get(filename)
-            self.buffers.remove buffer
-            plunker.trigger "event:removeFile", 
-            plunker.trigger "intent:activate", _.first(self.queue)
-          else alert "No such file #{filename}."
-        else alert "Cannot remove all files from the plunk"
+    onIntentFileRemove: (filename) =>
+      if @buffers.length > 1
+        filename ||= @last()
+        if buffer = @buffers.get(filename)
+          if confirm "Are you sure that you want to delete the file #{filename}?"
+            @buffers.remove buffer
+            plunker.mediator.trigger "event:removeFile", 
+            plunker.mediator.trigger "intent:activate", @last()
+        else alert "No such file #{filename}."
+      else alert "Cannot remove all files from the plunk"
+      
+    
+    import: (source) ->
+      options = @_fetchOptions
+        plunk: @plunk
+      
+      plunker.mediator.trigger "event:load:start"
+      
+      # Make sure that this is a temporary Plunk
+      options.defaults.expires = new Cromag(Cromag.now() + 1000).toISOString()
+      
+      plunker.controller.navigate "/edit",
+        trigger: false
+        replace: true
+      
+      if source then plunker.import source, options
+      else options.error()
 
-    getActive: -> _.first(@queue)
+    load: (id) ->
+      plunker.mediator.trigger "event:load:start"
+      
+      if id then @plunk
+        .set("id", id)
+        .fetch @_fetchOptions()
+    
+    reset: =>
+      @plunk.clear()
+      @buffers.reset()
+      plunker.mediator.trigger "intent:fileAdd", "index.html"
 
-    toJSON: ->
-      json = super()
-      delete json.source
-      delete json.author
-      json.files = {}
-      @buffers.each (buffer) ->
-        json.files[buffer.id] = buffer.toJSON()
-        delete json.files[buffer.id].filename
-      json
+    _fetchOptions: (options = {}) ->
+      session = @
+      
+      _.defaults options,
+        defaults: {}
+        success: (plunk) ->
+          session.buffers.reset _.map plunk.get("files"), (file) ->
+            filename: file.filename
+            content: file.content
+                      
+          unless plunk.get("token")
+            plunk.fork()
+            
+            plunker.controller.navigate "/edit",
+              trigger: false
+              replace: true
+              
+          plunker.mediator.trigger "event:load:end"
+          plunker.mediator.trigger "intent:activate", plunk.get("index")
+        error: ->
+          alert "Failed to fetch plunk"
+          plunker.controller.navigate "/edit",
+            trigger: true
+            replace: true
+          plunker.mediator.trigger "event:load:end"
 
-)(window)
-
+)(@plunker ||= {})

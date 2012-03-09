@@ -8,7 +8,7 @@ Handlebars.registerHelper "arrayJoinSpace", (array) ->
 
 $ ->
 
-  window.plunks = new PlunkCollection()
+  window.plunks = new plunker.PlunkCollection()
 
   recent = new RecentPlunks
     collection: plunks
