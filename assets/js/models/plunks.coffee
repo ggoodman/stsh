@@ -39,7 +39,7 @@
         self.changes.files = {}
         self.changes.files[filename] = null for filename, file of self.previous("files")
         
-        _.each self.get("files"), (file, filename) -> self.changes.files[filename] ||= file.content or ""
+        _.each self.get("files"), (file, filename) -> if file then self.changes.files[filename] ||= file.content or ""
     
     fork: ->
       json =
@@ -47,7 +47,9 @@
         files: {}
         index: @get("index")
       
-      _.each @get("files"), (file) -> json.files[file.filename] = file.content
+      _.each @get("files"), (file, filename) -> json.files[filename] = file.content or file
+      
+      
       
       @clear()
       @set(json)

@@ -49,6 +49,8 @@
   
       if @mode == "preview"
         plunk = @model.plunk.clone().fork()
+        
+        console.log "plunk", plunk
         plunk.set "expires", new Cromag(Cromag.now() + 30 * 1000).toISOString()
         plunk.on "sync", ->
           self.$("iframe").attr "src", plunk.get("raw_url")
@@ -67,8 +69,6 @@
           $title.text(buffer.mode.title or "")
           
           rerender = (body, mode = buffer.mode) ->
-            console.log "RERENDER", arguments...
-
             $title.text(mode.title)
             
             highlighted = staticHighlight(body, mode.mode)

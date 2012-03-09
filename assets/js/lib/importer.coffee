@@ -42,8 +42,6 @@
             index: json.index
             #expires: new Cromag(Cromag.now() + 1000).toISOString()
           
-          console.log "Plunk", _.clone(options.plunk.attributes)
-          
           options.success(options.plunk)
     else
       options.error("Import error", "The source you provided is not a recognized source.")
