@@ -10,6 +10,11 @@
   position: absolute;
 }
 
+#toolbar {
+  position: absolute;
+  right: 0; top: 0; bottom: 0;
+  width: auto;
+}
 
 #toolbar .btn-toolbar {
   margin: 0 0 0 16px; padding: 0;
@@ -161,10 +166,18 @@
   left: 50%;
 }
 
+#live .title {
+  position: absolute;
+  top: 0; right: 0;
+  background-color: #ccc;
+  z-index: 2;
+}
+
 #live .compiled {
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
   overflow: auto;
+  background-color: #eeeeee;
 }
 
 #live iframe {

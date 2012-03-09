@@ -31,6 +31,7 @@ class window.LivePreview extends Backbone.View
   """
   
   compile: Handlebars.compile """
+    <div class="format"></div>
     <div class="compiled"></div>
   """
   
@@ -85,12 +86,17 @@ class window.LivePreview extends Backbone.View
   updateCompile: =>
     self = @
     
+    $title = @$(".title").text("")
     $compiled = @$(".compiled")
 
     if @mode == "compile"
       if (filename = @model.getActive()) and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
+      
+        $title.text(buffer.mode.title or "")
         
         rerender = (body, mode) ->
+          $title.text(mode.title)
+          
           highlighted = staticHighlight(body, mode)
           $compiled.html(highlighted.html)
       

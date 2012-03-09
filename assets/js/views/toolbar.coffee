@@ -15,12 +15,17 @@
             <li>
               <a href="/edit/from:1961272">Basic html</a>
             </li>
+            <li class="divider"></li>
             <li>
               <a href="/edit/from:1986619">jQuery</a>
             </li>
             <li>
+              <a href="/edit/from:2006604">jQuery + jQuery UI</a>
+            </li>
+            <li>
               <a href="/edit/from:1992850">jQuery + Coffee</a>
             </li>
+            <li class="divider"></li>
             <li>
               <a href="/edit/from:1990582">YUI</a>
             </li>
@@ -32,12 +37,14 @@
             <span class="text">Save</span>
           </button>
         </div>
-        <div class="btn-group">
-          <button class="btn btn-danger save" disabled>
-            <i class="icon-trash icon-white" />
-            <span class="text">Delete</span>
-          </button>
-        </div>
+        {{#if plunk.token}}
+          <div class="btn-group">
+            <button class="btn btn-danger save" disabled>
+              <i class="icon-trash icon-white" />
+              <span class="text">Delete</span>
+            </button>
+          </div>
+        {{/if}}
       </div>
       <div class="btn-toolbar">
         <div class="btn-group">
@@ -55,13 +62,13 @@
       </div>
       <div class="btn-toolbar">
         <div class="btn-group" data-toggle="buttons-radio">
-          <button class="btn edit-only active live-off" title="No live preview">
+          <button class="btn edit-only active live-off" title="Hide preview pane">
             <i class="icon-off" />
           </button>
-          <button class="btn edit-only live-compile" title="Live code compilation and preview">
+          <button class="btn edit-only live-compile" title="Show live compilation pane">
             <i class="icon-list" />
           </button>
-          <button class="btn edit-only live-preview" title="Live preview">
+          <button class="btn edit-only live-preview" title="Show live preview pane">
             <i class="icon-eye-open" />
           </button>
         </div>
@@ -83,10 +90,45 @@
     
     initialize: ->
       @render()
-      @$(".view").val($("#content").attr("class"))
-      
+
     render: =>
-      @$el.html @template()
+      console.log @model.plunk.toJSON()
+      console.log "session", @model.toJSON()
+      
+      @$el.html @template
+        session: @model.toJSON()
+        plunk: @model.plunk.toJSON()
+      
+      ###
+      @$(".live-off").popover
+        placement: -> console.log "Placement", arguments...
+        content: """
+          This will hide the right-most pane and disable the automatic
+          compilation and/or preview. Do this if the page is slowing down or
+          to get more screen real-estate.
+        """
+      @$(".live-compile").popover
+        placement: "bottom"
+        content: """
+          This will enable automatic compilation and preview for certain
+          languages.
+          
+          For example:
+          <ul>
+            <li>Coffee-Script</li>
+            <li>Markdown</li>
+            <li>More to come</li>
+          </ul>
+        """
+      @$(".live-preview").popover
+        placement: "bottom"
+        content: """
+          This will enable the real-time preview of your plunk as it will appear
+          on the web. The iframe will be updated after you stop typing for at
+          least one second.
+        """
+      ###
+
       @
 
 )(window)
