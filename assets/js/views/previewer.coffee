@@ -48,24 +48,24 @@
       self = @
   
       if @mode == "preview"
-        plunk = @model.plunk.clone().fork()
+        plunk = new plunker.Plunk _.defaults @model.toJSON(),
+          expires: new Cromag(Cromag.now() + 30 * 1000).toISOString()
         
-        console.log "plunk", plunk
-        plunk.set "expires", new Cromag(Cromag.now() + 30 * 1000).toISOString()
         plunk.on "sync", ->
           self.$("iframe").attr "src", plunk.get("raw_url")
           plunker.mediator.trigger "event:refresh", plunk
           
         plunk.save()
     
-    updateCompile: =>
+    updateCompile: (filename) =>
       self = @
       
       $title = @$(".title").text("")
       $compiled = @$(".compiled")
   
       if @mode == "compile"
-        if (filename = @model.last()) and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
+        filename ||= @model.last()
+        if filename and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
           $title.text(buffer.mode.title or "")
           
           rerender = (body, mode = buffer.mode) ->

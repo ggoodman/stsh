@@ -64,9 +64,21 @@
 
     
     last: -> _.first(@queue)
+    
+    toJSON: ->
+      json =
+        description: @get("description")
+        index: @get("index")
+        files: {}
+        
+      @buffers.each (buffer) -> json.files[buffer.id] =
+        filename: buffer.id
+        content: buffer.get("content")
+        
+      json
         
     onIntentSave: =>
-      #@plunk.set @toJSON()
+      @plunk.set @toJSON()
       @plunk.save {},
         success: (plunk) -> plunker.mediator.trigger "event:save", plunk
         error: -> alert("Failed to save plunk")
@@ -95,27 +107,60 @@
       
     
     import: (source) ->
-      options = @_fetchOptions
-        plunk: @plunk
-      
+      session = @
+
       plunker.mediator.trigger "event:load:start"
-      
-      # Make sure that this is a temporary Plunk
-      options.defaults.expires = new Cromag(Cromag.now() + 1000).toISOString()
-      
+
       plunker.controller.navigate "/edit",
         trigger: false
         replace: true
-      
-      if source then plunker.import source, options
-      else options.error()
+
+      plunker.import source,
+        success: (json) ->
+          session.buffers.reset _.values(json.files)
+          
+          session.set
+            index: json.index
+            description: json.description
+            
+          plunker.mediator.trigger "event:load:end"
+          plunker.mediator.trigger "intent:activate", json.index
+        error: ->
+          alert "Failed to fetch plunk"
+          plunker.controller.navigate "/edit",
+            trigger: true
+            replace: true
+          plunker.mediator.trigger "event:load:end"                      
 
     load: (id) ->
+      session = @
+      
       plunker.mediator.trigger "event:load:start"
       
       if id then @plunk
         .set("id", id)
-        .fetch @_fetchOptions()
+        .fetch
+          success: (plunk) ->
+            session.buffers.reset _.values(plunk.get("files"))
+            session.set
+              index: plunk.get("index")
+              description: plunk.get("description")
+                        
+            unless plunk.get("token")
+              plunk.fork()
+              
+              plunker.controller.navigate "/edit",
+                trigger: false
+                replace: true
+                
+            plunker.mediator.trigger "event:load:end"
+            plunker.mediator.trigger "intent:activate", plunk.get("index")
+          error: ->
+            alert "Failed to fetch plunk"
+            plunker.controller.navigate "/edit",
+              trigger: true
+              replace: true
+            plunker.mediator.trigger "event:load:end"
     
     reset: =>
       @plunk.clear()

@@ -30,7 +30,7 @@
       "click .add":     -> plunker.mediator.trigger "intent:fileAdd"
       "click .remove":  -> plunker.mediator.trigger "intent:fileRemove"
       
-      "change .description": (e) -> @model.plunk.set("description", @$(e.target).val(), silent: true)
+      "keyup .description": (e) -> @model.set("description", @$(e.target).val(), silent: true)
 
     initialize: ->
       self = @
@@ -53,10 +53,10 @@
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
       
-      @model.plunk.on "change:description", @render
+      @model.on "change:description", @render
       
     render: =>
-      @$(".description").val(@model.plunk.get("description"))
+      @$(".description").val(@model.get("description"))
       @
       
     

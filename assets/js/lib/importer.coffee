@@ -6,8 +6,6 @@
     options = _.defaults options,
       wait: true
       silent: false
-      defaults: {}
-      plunk: new plunker.Plunk
       success: ->
       error: ->
     
@@ -19,12 +17,7 @@
     if strategy
       strategy.import source, (error, json) ->
         if error then options.error(error)
-        else
-          files = {}
-          _.each json.files, (file) -> files[file.filename] =
-            filename: file.filename
-            content: file.content
-            
+        else            
           json.index ||= do ->
             filenames = _.keys(json.files)
       
@@ -34,15 +27,7 @@
       
               if html.length then html[0]
               else filenames[0]
-              
-
-          options.plunk.set
-            description: json.description
-            files: files
-            index: json.index
-            #expires: new Cromag(Cromag.now() + 1000).toISOString()
-          
-          options.success(options.plunk)
+          options.success(json)
     else
       options.error("Import error", "The source you provided is not a recognized source.")
     @
