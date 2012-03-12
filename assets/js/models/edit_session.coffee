@@ -170,7 +170,6 @@
             plunker.mediator.trigger "event:load:end"
     
     reset: =>
-      console.log "reset"
       @plunk.clear()
       @buffers.reset()
       @clear()

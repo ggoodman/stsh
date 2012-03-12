@@ -112,6 +112,8 @@
       @collection.on "destroy", (plunk, coll, options) -> self.removeCard(plunk, coll)
 
     addCard: (plunk, coll, index) =>
+      return unless plunk
+      
       card = new Card(model: plunk)
 
       if index

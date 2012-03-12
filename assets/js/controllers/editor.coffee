@@ -1,13 +1,7 @@
 ((plunker) ->
 
   class plunker.EditorController extends Backbone.Router
-    #routes:
-    #  "edit":               "newPlunk"
-    #  "edit/from::source":  "importPlunk"
-    #  "edit/:id":           "loadPlunk"
-    
     initialize: ->
-      #@route /^edit$/, "newPlunk"
       @route /^edit\/from\:(.+)$/, "importPlunk"
       @route /^edit\/([a-zA-Z0-9]{6})$/, "loadPlunk"
       
@@ -44,15 +38,10 @@
         plunker.controller.navigate "/edit/#{plunk.id}",
           replace: true
 
-    newPlunk: ->
-      @session.reset()
+    newPlunk: -> @session.reset()
     
-    loadPlunk: (id) ->
-      #@session.reset()
-      @session.load(id)
+    loadPlunk: (id) -> @session.load(id)
     
-    importPlunk: (source) ->
-      #@session.reset()
-      @session.import(source)
+    importPlunk: (source) -> @session.import(source)
       
 )(@plunker ||= {})
