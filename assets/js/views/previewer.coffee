@@ -6,12 +6,19 @@
     """
     
     compile: Handlebars.compile """
-      <div class="format"></div>
+      <div class="title"></div>
       <div class="compiled"></div>
     """
     
     # Do nothing by default
     template: -> ""
+    
+    events:
+      "click .lineno"     : (e) ->
+        line = $(e.target).attr("data-line")
+        char = $(e.target).attr("data-char")
+        
+        plunker.views.textarea.ace.gotoLine(line, char)
     
     initialize: ->
       self = @
@@ -60,23 +67,24 @@
     updateCompile: (filename) =>
       self = @
       
-      $title = @$(".title").text("")
-      $compiled = @$(".compiled")
-  
       if @mode == "compile"
         filename ||= @model.last()
         if filename and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
+          $title = @$(".title").text("").hide()
+          $compiled = @$(".compiled")
+  
           $title.text(buffer.mode.title or "")
           
           rerender = (body, mode = buffer.mode) ->
-            $title.text(mode.title)
-            
             highlighted = staticHighlight(body, mode.mode)
             $compiled.html(highlighted.html)
         
           if compiler = plunker.compilers[buffer.mode.name]
             compiler code, (err, res) ->
               if err then return rerender(err.toString())
+
+              $title.text(res.title).show() if res.title
+              
               switch res.type
                 when "code"
                   plunker.modes.loadByName res.lang, (mode) ->
