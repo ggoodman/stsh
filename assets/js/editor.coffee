@@ -4,6 +4,10 @@
   else @[name] = definition()
 ) "plunker", ->
   
+  
+  $.extend $.gritter.options,
+    position: "bottom-right"
+  
   plunker = _.defaults (@plunker or {}),
     mediator: _.extend {}, Backbone.Events
     models: {}
@@ -15,7 +19,7 @@
     # Controller for the editor environment
     plunker.controller = new plunker.EditorController
     
-    plunker.models.session.reset()
+    plunker.mediator.trigger "intent:reset"
     
     Backbone.history.start
       pushState: true

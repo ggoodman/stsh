@@ -23,6 +23,8 @@
     $.ajax(params)
   
   class plunker.Plunk extends Backbone.Model
+    defaults:
+      description: "Untitled"
     sync: sync
     url: -> @get("url") or "/api/v1/plunks" + if @id then "/#{@id}" else ""
     initialize: ->

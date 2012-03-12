@@ -30,15 +30,6 @@
        el: document.getElementById("live")
        model: plunker.models.session
 
-      plunker.mediator.on "event:reset", ->
-        plunker.controller.navigate "/edit",
-          replace: false
-
-      plunker.mediator.on "event:save", (plunk) ->
-        plunker.controller.navigate "/edit/#{plunk.id}",
-          replace: true
-
-    newPlunk: -> @session.reset()
     
     loadPlunk: (id) -> @session.load(id)
     

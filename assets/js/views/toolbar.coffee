@@ -39,7 +39,7 @@
         </div>
         {{#if plunk.token}}
           <div class="btn-group">
-            <button class="btn btn-danger save" disabled>
+            <button class="btn btn-danger delete">
               <i class="icon-trash icon-white" />
               <span class="text">Delete</span>
             </button>
@@ -79,6 +79,7 @@
       "click .run.active": (e) -> plunker.mediator.trigger "intent:preview-disable"
       "click .run:not(.active)": (e) -> plunker.mediator.trigger "intent:preview-enable"
       "click .save": (e) -> plunker.mediator.trigger "intent:save"
+      "click .delete": (e) -> plunker.mediator.trigger "intent:delete"
       "click .live-off": (e) -> plunker.mediator.trigger "intent:live-off"
       "click .live-compile": (e) -> plunker.mediator.trigger "intent:live-compile"
       "click .live-preview": (e) -> plunker.mediator.trigger "intent:live-preview"
@@ -89,9 +90,12 @@
       "click .new": (e) ->
         e.preventDefault()
         plunker.mediator.trigger "intent:reset"
+      
     
     initialize: ->
       @render()
+      
+      @model.plunk.on "change:token", @render
 
     render: =>
       @$el.html @template

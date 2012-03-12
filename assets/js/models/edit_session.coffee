@@ -56,12 +56,38 @@
       plunker.mediator.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
       plunker.mediator.on "event:load:start", -> $("#wrap").addClass("loading")
       plunker.mediator.on "event:load:end", -> $("#wrap").removeClass("loading")
-      
+
+      plunker.mediator.on "event:reset", ->
+        plunker.controller.navigate "/edit",
+          replace: false
+
+      plunker.mediator.on "event:save", (plunk) ->
+        $.gritter.add
+          title: "Plunk saved"
+          text: """
+            The plunk '#{plunk.get("description")}' has been saved.
+            <ul>
+              <li><a href="#{plunk.get("html_url")}">Fullscreen URL</a></li>
+              <li><a href="#{document.location}">Edit URL</a></li>
+            </ul>
+          """
+        plunker.controller.navigate "/edit/#{plunk.id}",
+          replace: true
+
+      plunker.mediator.on "event:delete", (plunk) ->
+        $.gritter.add
+          title: "Plunk deleted"
+          text: """
+            The plunk '#{plunk.get("description")}' has been deleted.
+          """
+        
+        plunker.mediator.trigger "intent:reset"
+
       plunker.mediator.on "intent:save", @onIntentSave
+      plunker.mediator.on "intent:delete", @onIntentDelete
+      plunker.mediator.on "intent:reset", @onIntentReset
       plunker.mediator.on "intent:fileAdd", @onIntentFileAdd
       plunker.mediator.on "intent:fileRemove", @onIntentFileRemove
-      plunker.mediator.on "intent:reset", @reset
-
     
     last: -> _.first(@queue)
     
@@ -81,18 +107,36 @@
       @plunk.set @toJSON()
       @plunk.save {},
         success: (plunk) -> plunker.mediator.trigger "event:save", plunk
-        error: -> alert("Failed to save plunk")
+        error: -> $.gritter.add
+          title: "Save failed"
+          text: """
+            Failed to save the plunk. Please try again.
+            If the problem persists, please <a href="https://twitter.com/intent/tweet?url=plunker.no.de&hashtags=Bug">report</a> the problem.
+          """
+        
+    onIntentDelete: =>
+      if confirm "Are you sure that you want to delete this plunk?"
+        @plunk.destroy
+          success: (plunk) -> plunker.mediator.trigger "event:delete", plunk
+          error: -> $.gritter.add
+            title: "Delete failed"
+            text: """
+              Failed to delete the plunk. Please try again.
+              If the problem persists, please <a href="https://twitter.com/intent/tweet?url=plunker.no.de&hashtags=Bug">report</a> the problem.
+            """
 
     
     onIntentFileAdd: (filename) =>
-      if filename ?= prompt("Filename?")
+      if filename ||= prompt("Filename?")
         unless @buffers.get(filename)
           buffer = @buffers.add
             filename: filename
             content: ""
           plunker.mediator.trigger "event:addFile", filename
           plunker.mediator.trigger "intent:activate", filename
-        else alert "A file named #{filename} already exists."
+        else $.gritter.add
+          title: "File add failed"
+          text: "A file named #{filename} already exists."
 
     onIntentFileRemove: (filename) =>
       if @buffers.length > 1
@@ -102,9 +146,24 @@
             @buffers.remove buffer
             plunker.mediator.trigger "event:removeFile", 
             plunker.mediator.trigger "intent:activate", @last()
-        else alert "No such file #{filename}."
-      else alert "Cannot remove all files from the plunk"
+        else $.gritter.add
+          title: "Remove failed"
+          text: "No such file #{filename}."
+      else $.gritter.add
+        title: "Remove failed"
+        text: "Unabled to remove all files from a plunk. Please add a second file before removing this one."
       
+    onIntentReset: =>
+      @plunk.clear()
+      @buffers.reset()
+      @clear()
+      
+      @set
+        description: "Untitled"
+      
+      plunker.mediator.trigger "event:reset"
+      
+      plunker.mediator.trigger "intent:fileAdd", "index.html"
     
     import: (source) ->
       session = @
@@ -127,8 +186,9 @@
             index: json.index
             description: json.description
             
-          plunker.mediator.trigger "event:load:end"
           plunker.mediator.trigger "intent:activate", json.index
+          plunker.mediator.trigger "event:load:end"
+          plunker.mediator.trigger "event:import", json
         error: ->
           alert "Failed to fetch plunk"
           plunker.controller.navigate "/edit",
@@ -160,8 +220,9 @@
               plunker.controller.navigate "/edit",
                 replace: true
                 
-            plunker.mediator.trigger "event:load:end"
             plunker.mediator.trigger "intent:activate", plunk.get("index")
+            plunker.mediator.trigger "event:load:end"
+            plunker.mediator.trigger "event:load"
           error: ->
             alert "Failed to fetch plunk"
             plunker.controller.navigate "/edit",
@@ -169,13 +230,5 @@
               replace: true
             plunker.mediator.trigger "event:load:end"
     
-    reset: =>
-      @plunk.clear()
-      @buffers.reset()
-      @clear()
-      
-      plunker.mediator.trigger "event:reset"
-      
-      plunker.mediator.trigger "intent:fileAdd", "index.html"
 
 )(@plunker ||= {})
