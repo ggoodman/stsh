@@ -27,8 +27,13 @@
 
   class plunker.Sidebar extends Backbone.View
     events:
-      "click .add":     -> plunker.mediator.trigger "intent:fileAdd"
-      "click .remove":  -> plunker.mediator.trigger "intent:fileRemove"
+      "click .add":         (e) -> plunker.mediator.trigger "intent:fileAdd"
+      "click .remove":      (e)-> plunker.mediator.trigger "intent:fileRemove"
+      
+      "click .wordwrap":    (e) ->
+        if buffer = @model.getActiveBuffer()
+          buffer.session.setUseWrapMode($(e.target).prop("checked"))
+          buffer.session.setWrapLimitRange(80, 80)
       
       "keyup .description": (e) -> @model.set("description", @$(e.target).val(), silent: true)
 
@@ -53,10 +58,14 @@
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
       
-      @model.on "change:description", @render
+      @model.on "change:description", -> self.$(".description").val(self.model.get("description"))
+      
+      plunker.mediator.on "event:activate", (filename) ->
+        buffer = self.model.getActiveBuffer()
+        self.$(".wordwrap").prop("checked", buffer.session.getUseWrapMode())
       
     render: =>
-      @$(".description").val(@model.get("description"))
+      
       @
       
     

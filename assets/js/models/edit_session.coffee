@@ -90,6 +90,7 @@
       plunker.mediator.on "intent:fileRemove", @onIntentFileRemove
     
     last: -> _.first(@queue)
+    getActiveBuffer: -> @buffers.get(@last())
     
     toJSON: ->
       json =
