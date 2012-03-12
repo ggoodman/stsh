@@ -44,7 +44,7 @@
             return cb null,
               type: "code"
               body: compiled
-              lang: "html"
+              lang: "javascript"
               title: "Beautified js"
         else
           $wrap = $("<div></div>")
