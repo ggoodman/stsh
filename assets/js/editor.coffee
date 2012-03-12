@@ -15,6 +15,8 @@
     # Controller for the editor environment
     plunker.controller = new plunker.EditorController
     
+    plunker.models.session.reset()
+    
     Backbone.history.start
       pushState: true
 

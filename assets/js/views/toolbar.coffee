@@ -86,7 +86,6 @@
         e.preventDefault()
         plunker.controller.navigate $(e.target).attr("href"),
           trigger: true
-          replace: false
       "click .new": (e) ->
         e.preventDefault()
         plunker.mediator.trigger "intent:reset"

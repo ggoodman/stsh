@@ -111,9 +111,13 @@
 
       plunker.mediator.trigger "event:load:start"
 
+      @plunk.clear()
+      @buffers.reset()
+      @clear()
+
       plunker.controller.navigate "/edit",
-        trigger: false
         replace: true
+        trigger: false
 
       plunker.import source,
         success: (json) ->
@@ -134,6 +138,10 @@
 
     load: (id) ->
       session = @
+
+      @plunk.clear()
+      @buffers.reset()
+      @clear()
       
       plunker.mediator.trigger "event:load:start"
       
@@ -150,7 +158,6 @@
               plunk.fork()
               
               plunker.controller.navigate "/edit",
-                trigger: false
                 replace: true
                 
             plunker.mediator.trigger "event:load:end"
@@ -163,37 +170,13 @@
             plunker.mediator.trigger "event:load:end"
     
     reset: =>
+      console.log "reset"
       @plunk.clear()
       @buffers.reset()
+      @clear()
       
       plunker.mediator.trigger "event:reset"
       
       plunker.mediator.trigger "intent:fileAdd", "index.html"
-
-    _fetchOptions: (options = {}) ->
-      session = @
-      
-      _.defaults options,
-        defaults: {}
-        success: (plunk) ->
-          session.buffers.reset _.map plunk.get("files"), (file) ->
-            filename: file.filename
-            content: file.content
-                      
-          unless plunk.get("token")
-            plunk.fork()
-            
-            plunker.controller.navigate "/edit",
-              trigger: false
-              replace: true
-              
-          plunker.mediator.trigger "event:load:end"
-          plunker.mediator.trigger "intent:activate", plunk.get("index")
-        error: ->
-          alert "Failed to fetch plunk"
-          plunker.controller.navigate "/edit",
-            trigger: true
-            replace: true
-          plunker.mediator.trigger "event:load:end"
 
 )(@plunker ||= {})

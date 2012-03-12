@@ -1,12 +1,17 @@
 ((plunker) ->
 
   class plunker.EditorController extends Backbone.Router
-    routes:
-      "edit":               "newPlunk"
-      "edit/from::source":  "importPlunk"
-      "edit/:id":           "loadPlunk"
+    #routes:
+    #  "edit":               "newPlunk"
+    #  "edit/from::source":  "importPlunk"
+    #  "edit/:id":           "loadPlunk"
     
     initialize: ->
+      #@route /^edit$/, "newPlunk"
+      @route /^edit\/from\:(.+)$/, "importPlunk"
+      @route /^edit\/([a-zA-Z0-9]{6})$/, "loadPlunk"
+      
+      
       # Model defining the editing session that is taking place on Plunker
       plunker.models.session = @session = new plunker.Session
   
@@ -31,22 +36,23 @@
        el: document.getElementById("live")
        model: plunker.models.session
 
-
       plunker.mediator.on "event:reset", ->
         plunker.controller.navigate "/edit",
-          trigger: false
           replace: false
 
       plunker.mediator.on "event:save", (plunk) ->
         plunker.controller.navigate "/edit/#{plunk.id}",
-          trigger: false
           replace: true
 
-
-    newPlunk: -> @session.reset()
+    newPlunk: ->
+      @session.reset()
     
-    loadPlunk: (id) -> @session.load(id)
+    loadPlunk: (id) ->
+      #@session.reset()
+      @session.load(id)
     
-    importPlunk: (source) -> @session.import(source)
+    importPlunk: (source) ->
+      #@session.reset()
+      @session.import(source)
       
 )(@plunker ||= {})
