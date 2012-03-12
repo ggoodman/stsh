@@ -45,4 +45,4 @@ app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?$)?/, (req, res) ->
 
 if require.main == module
   app.listen process.env.PORT || 8080
-  conso
+  console.log "Listening on port %d", process.env.PORT || 8080
