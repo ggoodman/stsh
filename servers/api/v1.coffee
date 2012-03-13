@@ -75,7 +75,9 @@ app.post "/plunks", (req, res) ->
   req.plunker.create req.body, (err, plunk) ->
     if err then return apiError(res, err)
     else
-      res.cookie plunk.id, plunk.token, { expires: new Date(plunk.expires), httpOnly: true, path: "/api/v1/" }
+      expiry = plunk.expires or +new Date() + 1000 * 60 * 60 * 24 * 365 # 1 year
+
+      res.cookie plunk.id, plunk.token, { expires: new Date(expiry), httpOnly: true, path: "/api/v1/" }
       res.json(plunk, 201) # Created
 
 # Read
@@ -98,7 +100,11 @@ app.post "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
   else
     req.plunker.update req.plunk, req.body, (err, plunk) ->
       if err then return apiError(res, err)
-      else res.json(plunk, 200)
+      else
+        expiry = plunk.expires or +new Date() + 1000 * 60 * 60 * 24 * 365 # 1 year
+  
+        res.cookie plunk.id, plunk.token, { expires: new Date(expiry), httpOnly: true, path: "/api/v1/" }
+        res.json(plunk, 200)
 
 # Delete
 app.del "/plunks/:id", fetchPlunk, checkToken, (req, res) ->
