@@ -18,12 +18,6 @@
           win: "Ctrl-Return"
           mac: "Command-Return"
         exec: (editor) -> plunker.mediator.trigger "intent:preview-enable"
-      @ace.commands.addCommand
-        name: "stop"
-        bindKey:
-          win: "Escape"
-          mac: "Escape"
-        exec: (editor) -> plunker.mediator.trigger "intent:preview-disable"
 
       plunker.mediator.on "intent:activate", @onIntentActivate
 

@@ -1,6 +1,7 @@
 ((plunker) ->
   # Ace editor session
   EditSession = require("ace/edit_session").EditSession
+  UndoManager = require("ace/undomanager").UndoManager
   
 
   # Model to represent a text buffer in a Plunker session
@@ -13,6 +14,7 @@
       
       @session.setTabSize(2)
       @session.setUseSoftTabs(true)
+      @session.setUndoManager(new UndoManager())
       
       @set("filename", "Untitled-#{@cid}.txt") unless @id
 
