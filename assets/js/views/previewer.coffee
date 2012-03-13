@@ -45,12 +45,16 @@
         $("#content").removeClass("editor").removeClass("sidebar")
         
         self.enable "preview"
+        
+        plunker.mediator.trigger "event:preview-enable"
       
       plunker.mediator.on "intent:preview-disable", ->
         $("#content").addClass("editor").addClass("sidebar")
         
         self.enable self.oldmode
-    
+
+        plunker.mediator.trigger "event:preview-disable"
+
     updatePreview: =>
       self = @
   
@@ -104,7 +108,9 @@
           @render()
           
           @updatePreview()
-  
+          
+          plunker.mediator.trigger "event:live-preview"
+
         when "compile"
           $("#content").addClass("live")
           
@@ -112,12 +118,16 @@
           @render()
   
           @updateCompile()
+          
+          plunker.mediator.trigger "event:live-compile"
   
         else
           $("#content").removeClass("live")
           
           @template = -> ""
           @render()
+          
+          plunker.mediator.trigger "event:live-off"
       
       plunker.mediator.trigger "event:resize"
   

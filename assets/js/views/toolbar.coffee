@@ -48,7 +48,7 @@
       </div>
       <div class="btn-toolbar">
         <div class="btn-group">
-          <button class="btn btn-info run" data-toggle="button">
+          <button class="btn btn-info run">
             <span class="run-start">
               <i class="icon-play icon-white" />
               <span class="text">Run</span>
@@ -61,7 +61,7 @@
         </div>
       </div>
       <div class="btn-toolbar">
-        <div class="btn-group" data-toggle="buttons-radio">
+        <div class="btn-group live">
           <button class="btn edit-only active live-off" title="Hide preview pane">
             <i class="icon-off" />
           </button>
@@ -93,9 +93,21 @@
       
     
     initialize: ->
-      @render()
+      self = @
       
+      @render()
+
       @model.plunk.on "change:token", @render
+
+      plunker.mediator.on "event:preview-enable", ->
+        self.$(".run").addClass("active")
+        self.$(".live button").prop("disabled", true)
+      plunker.mediator.on "event:preview-disable", ->
+        self.$(".run").removeClass("active")
+        self.$(".live button").prop("disabled", false)
+      plunker.mediator.on "event:live-off", -> self.$(".live button").removeClass("active").filter(".live-off").addClass("active")
+      plunker.mediator.on "event:live-compile", -> self.$(".live button").removeClass("active").filter(".live-compile").addClass("active")
+      plunker.mediator.on "event:live-preview", -> self.$(".live button").removeClass("active").filter(".live-preview").addClass("active")
 
     render: =>
       @$el.html @template
