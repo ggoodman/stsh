@@ -28,8 +28,8 @@ Each file in the plunk can be presented to the API in either the short or long f
   ```json
   {
     "index.html": {
-      filename: "index.html",
-      content: "<html></html>"
+      "filename": "index.html",
+      "content": "<html></html>"
     }
   }
   ```
