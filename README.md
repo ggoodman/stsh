@@ -1,96 +1,57 @@
 # Plunker
 
-## API
+Plunker is a website and RESTful API for creating, previewing and sharing web snippets online.
 
-### Create a plunk
+## What is a plunk?
 
-`POST  /api/v1/plunk`
+A *plunk* is a web snippet that is composed of an arbitrary number of files that can be viewed online through the Plunker service. Each plunk has:
 
-Request body:
+* **description** (optional) This should be a short description of what the plunk represents
+* **index** (optional) This is the filename of the *main* file of the plunk. For  example, this would be 'index.html' for a typical web snippet.
+* **expires** (optional) This is the time (formatted per ISO 8601) that the plunk should expire. Plunks that expire are considered *private* and will not appear on the landing page. For example: the preview functionality of the editor uses plunks with short expiry times to run the previews.                                                                                                                 
+* **files** (required) This is a hash that maps filenames to their description.
 
-```json
-{
-  "description": "Optional description of the plunk", // Optional
-  "index": "index.html",  // Optional (if provided must have a corresponding file entry, otherwise must provide index.html)
-  "files": { // Required
-    // Inline format below for defining files (filename => content)
-    "index.html": "<html><head><link rel=\"stylesheet\" href=\"style/style.css\" /><script src=\"https://raw.github.com/JerrySievert/cromagjs/master/cromag.js\"></script></head><body><h1>Header</h1></body><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p></html>",
-    // Complete format below for defining files (filename => file description)
-    "style/style.css": {
-      "mime": "text/css", // Optional (will be guessed otherwise based on filename)
-      "encoding": "utf-8", // Optional (will be guessed otherwise based on mime type)
-      "content": "h1 { color: red }" // Required if using object format
+### Plunk files
+
+Each file in the plunk can be presented to the API in either the short or long form.
+
+* **short-form** In this form, the file entry is a mapping of the file to its contents. For example:
+
+  ```json
+  {
+    "index.html": "<html></html>"
+  }
+  ```
+
+* **long-form** In this form, the file entry is a mapping of the file to a hash representing the file. All file entries returned by the API will be in long-form.
+
+  ```json
+  {
+    "index.html": {
+      filename: "index.html",
+      content: "<html></html>"
     }
   }
-}
+  ```
+
+## What is so cool about Plunker?
+
+Many other amazing online services impose certain restrictions on the composition of their snippets. For example, services will typically enforce that each snippet has one html file, one css file and one javascript file. **What if you want two javascript files?!**
+
+Plunker is neat because it enables more creativity and flexibility in the definition of what can be in plunks.
+
+* Do you want a json file that's loaded over XHR? *OK, no problem!*
+* Do you want to load coffee-script, less, stylus or handlebars templates from the client-side? *Have at it!*
+
+## Running Plunker
+
+Running Plunker locally is really easy. You only need to have node.js and npm installed to get started.
+
+```
+git clone https://ggoodman@github.com/ggoodman/stsh.git
+cd stsh
+npm install
+node server.js
 ```
 
-Response:
-
-```json
-{
-  "ttl": 172774, // Time-to-live for the plunk in seconds
-  "expires": "2012-02-03T16:46:19.013Z", // The ISO 8601 timestamp of the expiry time
-  "token": "6ugRyNV8hC8MzYmG", // The _private_ token that should be retained to allow updating the plunk
-  "files": {
-    "style.css": {
-      "encoding": "UTF-8",
-      "filename": "style.css",
-      "content": "h1 { color: red }",
-      "mime": "text/css"
-    },
-    "index.html": {
-      "encoding": "UTF-8",
-      "filename": "index.html",
-      "content": "<html><head><link rel=\"stylesheet\" href=\"style.css\" /><script src=\"https://raw.github.com/JerrySievert/cromagjs/master/cromag.js\"></script></head><body><h1>Header</h1></body><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p></html>",
-      "mime": "text/html"
-    }
-  },
-  "url": "http://stsh.ggoodman.c9.io/6oNzNy/", // The public url that can be used to preview the plunk
-  "id": "6oNzNy", // The plunk's internal id (not guaranteed to map to the url)
-  "index": "index.html" // The default file to be served at the url
-}
-```
-
-### Retrieve a plunk
-
-`GET	/api/v1/plunk/:id`
-
-Response:
-
-```json
-{
-  "ttl": 172774, // Time-to-live for the plunk in seconds
-  "expires": "2012-02-03T16:46:19.013Z", // The ISO 8601 timestamp of the expiry time
-  "token": "6ugRyNV8hC8MzYmG", // This will only be returned if the correct token was provided in the query string or in the Authorization header
-  "files": {
-    "style.css": {
-      "encoding": "UTF-8",
-      "filename": "style.css",
-      "content": "h1 { color: red }",
-      "mime": "text/css"
-    },
-    "index.html": {
-      "encoding": "UTF-8",
-      "filename": "index.html",
-      "content": "<html><head><link rel=\"stylesheet\" href=\"style.css\" /><script src=\"https://raw.github.com/JerrySievert/cromagjs/master/cromag.js\"></script></head><body><h1>Header</h1></body><p>If the header above is red, that means that both this file (index.html) and the stylesheet (style.css) were property served by plunker.</p></html>",
-      "mime": "text/html"
-    }
-  },
-  "url": "http://stsh.ggoodman.c9.io/6oNzNy/", // The public url that can be used to preview the plunk
-  "id": "6oNzNy", // The plunk's internal id (not guaranteed to map to the url)
-  "index": "index.html" // The default file to be served at the url
-}
-```
-
-### Update a plunk
-
-`PATCH	/api/v1/plunk/:id`
-
-Not yet implemented
-
-### Destroy a plunk
-
-`DELETE	/api/v1/plunk/:id`
-
-Not yet implemented
+There is no configuration necessary and Plunker runs without any sort of backend database. Note that plunks will be saved to and restored from `/tmp/plunks.json`. For the save/restore feature to work, the user running Plunker must have read/write access to `/tmp`.
