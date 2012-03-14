@@ -28,6 +28,7 @@ html
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
+  
   body
     nav.navbar.navbar-fixed-top
       div.navbar-inner
@@ -52,3 +53,11 @@ html
       footer
         p Built by <a href="https://github.com/ggoodman">Geoff Goodman</a> (<a href="http://twitter.com/g_goodman">@g_goodman</a>)
         p &copy; Filearts (2012) (<a href="http://twitter.com/filearts">@filearts</a>)
+
+    script
+      var addthis_config = {
+        data_ga_property: 'UA-28929036-1',
+        data_ga_social : true
+      };
+    script(type="text/javascript",src="http://s7.addthis.com/js/250/addthis_widget.js#pubid=ra-4f60c7714e5b5629")
+
