@@ -56,6 +56,6 @@ html {
 }
 
 
-#operations.owned .btn-group.refresh, #operations.source .btn-group.delete {
+#operations.owned .btn-group.delete, #operations.source.owned .btn-group.refresh {
   display: inline-block;
 }
