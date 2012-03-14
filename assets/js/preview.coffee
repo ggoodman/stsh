@@ -30,5 +30,7 @@ $ ->
     $("button.delete").click (e) ->
       unless plunk.get("token") then alert "Unable to delete a plunk that you did not create" 
       else if confirm "Are you sure that you would like to delete this plunk?"
-        plunk.destroy()
-        document.location = document.location.origin
+        plunk.destroy
+          wait: true
+          success: -> document.location = document.location.origin
+          error: -> alert "Failed to delete the plunk. Please try again."
