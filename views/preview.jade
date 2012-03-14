@@ -3,11 +3,15 @@ html
   head
     meta(charset="utf-8")
     meta(name="viewport",content="width=device-width, initial-scale=1.0")
+
+    link(rel="stylesheet",href="/css/bootstrap.preview.min.css")
     link(rel="stylesheet",href="/css/preview.css")
     title Plunker
     // if lt IE 9
       script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
     script(type="text/javascript",src="/js/jquery.min.js")
+    script(type="text/javascript",src="/js/underscore.min.js")
+    script(type="text/javascript",src="/js/backbone.min.js")
 
     != js("preview")
 
@@ -25,6 +29,15 @@ html
   body
     div#container
       div#operations
-        a(href="/edit/#{plunk_id}",title="Edit this page in Plunker") Tweak
+        div.btn-toolbar
+          div.btn-group.save
+            a.btn.btn-mini.btn-primary.edit(href="/edit/#{plunk_id}",title="Edit this page in Plunker")
+              i.icon-pencil.icon-white
+          div.btn-group.refresh
+            button.btn.btn-mini.btn-success.refresh(title="Refresh this page from its source")
+              i.icon-refresh.icon-white
+          div.btn-group.delete
+            button.btn.btn-mini.btn-danger.delete(title="Refresh this page from its source")
+              i.icon-trash.icon-white
       iframe#plunk(frameborder="0",height="100%",width="100%",src=raw_url)
 

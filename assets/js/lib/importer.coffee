@@ -1,3 +1,5 @@
+#= require_tree ../importers
+
 ((plunker) ->
 
   plunker.import = (source, options = {}) ->
