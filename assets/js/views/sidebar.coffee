@@ -5,7 +5,8 @@
     className: "file"
     
     events:
-      "click": -> plunker.mediator.trigger "intent:activate", @model.get("filename")
+      "click":    -> plunker.mediator.trigger "intent:activate", @model.get("filename")
+      "dblclick": -> plunker.mediator.trigger "intent:fileRename", @model.get("filename")
     
     initialize: ->
       self = @

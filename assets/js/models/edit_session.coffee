@@ -54,7 +54,8 @@
       @buffers.on "add", (model) -> self.queue.unshift model.get("filename")
       @buffers.on "remove", (model) -> self.queue = _.without self.queue, model.get("filename")
       @buffers.on "reset", (coll) -> self.queue = coll.pluck("filename")
-
+      
+      #plunker.mediator.on "event:fileRename", (to, from) -> self.queue = _.map self.queue, (el) -> if el == from then to else el
       plunker.mediator.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
       plunker.mediator.on "event:load:start", -> $("#wrap").addClass("loading")
       plunker.mediator.on "event:load:end", -> $("#wrap").removeClass("loading")
@@ -90,6 +91,7 @@
       plunker.mediator.on "intent:reset", @onIntentReset
       plunker.mediator.on "intent:fileAdd", @onIntentFileAdd
       plunker.mediator.on "intent:fileRemove", @onIntentFileRemove
+      plunker.mediator.on "intent:fileRename", @onIntentFileRename
     
     last: -> _.first(@queue)
     getActiveBuffer: -> @buffers.get(@last())
@@ -155,7 +157,17 @@
       else $.gritter.add
         title: "Remove failed"
         text: "Unabled to remove all files from a plunk. Please add a second file before removing this one."
-      
+
+    onIntentFileRename: (filename, new_filename) =>
+      if buffer = @buffers.get(filename)
+        if new_filename ||= prompt("New filename?")
+          @queue = _.map @queue, (el) -> if el == filename then new_filename else filename
+          buffer.set "filename", new_filename
+          plunker.mediator.trigger "event:fileRename", new_filename, filename
+      else $.gritter.add
+        title: "Rename failed"
+        text: "The buffer being renamed couldn't be found"
+        
     onIntentReset: =>
       @plunk.clear()
       @buffers.reset()

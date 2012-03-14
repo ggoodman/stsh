@@ -33,10 +33,11 @@
       plunker.mediator.on "intent:live-compile", -> self.enable("compile")
       
       @model.plunk.on "change:index", update
-      @model.buffers.on "reset change:content change:filename", update
+      @model.buffers.on "reset change:content", update
   
       plunker.mediator.on "intent:refresh", @updatePreview
       plunker.mediator.on "event:activate", @updateCompile
+      plunker.mediator.on "event:fileRename", @updateCompile
 
       # Full-screen preview stuff
       plunker.mediator.on "intent:preview-enable", ->
@@ -73,7 +74,9 @@
       
       if @mode == "compile"
         filename ||= @model.last()
-        if filename and (buffer = @model.buffers.get(filename)) and (code = buffer.get("content") or "")
+        
+        if filename and (buffer = @model.buffers.get(filename))
+          code = buffer.get("content") or ""
           $title = @$(".title").text("").hide()
           $compiled = @$(".compiled")
   
@@ -83,19 +86,20 @@
             highlighted = staticHighlight(body, mode.mode)
             $compiled.html(highlighted.html)
         
-          if compiler = plunker.compilers[buffer.mode.name]
-            compiler code, (err, res) ->
-              if err then return rerender(err.toString())
-
-              $title.text(res.title).show() if res.title
-              
-              switch res.type
-                when "code"
-                  plunker.modes.loadByName res.lang, (mode) ->
-                    rerender(res.body, mode) if mode
-                else
-                  $compiled.html res.body
-          else rerender(code, buffer.mode)
+          plunker.modes.loadByFilename filename, (mode) ->
+            if mode and (compiler = plunker.compilers[mode.name])
+              compiler code, (err, res) ->
+                if err then return rerender(err.toString())
+  
+                $title.text(res.title).show() if res.title
+                
+                switch res.type
+                  when "code"
+                    plunker.modes.loadByName res.lang, (mode2) ->
+                      rerender(res.body, mode2) if mode2
+                  else
+                    $compiled.html res.body
+            else rerender(code, buffer.mode)
         
     enable: (@mode) =>
       self = @
