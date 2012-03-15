@@ -5,9 +5,14 @@
 
 ((plunker) ->
   jQuery.timeago.settings.strings.seconds = "seconds"
-  
-  Handlebars.registerHelper "dateToLocaleString", (isoString) ->
-    new Cromag(isoString).toLocaleString()
+
+  Handlebars.registerHelper "or", (arg1, arg2) -> arg1 or arg2
+
+  Handlebars.registerHelper "dateToLocaleString", (updated_at, created_at) ->
+    new Cromag(updated_at or created_at).toLocaleString()
+    
+  Handlebars.registerHelper "dateToTimestamp", (updated_at, created_at) ->
+    new Cromag(updated_at or created_at).valueOf()
   
   Handlebars.registerHelper "arrayJoinSpace", (array) ->
     array.join(" ")

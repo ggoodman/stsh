@@ -110,8 +110,6 @@ class Updater
   validate: (json, next) =>
     {@valid, @errors} = validator.validate(json, require("./schema/update"))
     
-    json.updated_at = new Cromag().toISOString()
-
     if json.expires
       try
         json.expires = new Cromag(json.expires).toISOString()
@@ -133,6 +131,7 @@ class Updater
     
     # Update description
     plunk.description = json.description or plunk.description
+    plunk.updated_at = new Cromag().toISOString()
 
     if json.files
       changed = _.keys(json.files)
