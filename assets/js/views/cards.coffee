@@ -106,12 +106,12 @@
     template: Handlebars.compile """
       {{#if prev}}
         <li class="previous">
-          <a href="{{prev}}">&larr; Older</a>
+          <a href="{{prev}}">&larr; Newer</a>
         </li>
       {{/if}}
       {{#if next}}
         <li class="next">
-          <a href="{{next}}">Newer &rarr;</a>
+          <a href="{{next}}">Older &rarr;</a>
         </li>
       {{/if}}      
     """
