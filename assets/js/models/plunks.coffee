@@ -59,7 +59,7 @@
   class plunker.PlunkCollection extends Backbone.Collection
     url: "/api/v1/plunks?page=#{@page}&per_page=#{@per_page}"
     model: plunker.Plunk
-    comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
+    comparator: (model) -> -new Cromag(model.get("updated_at") or model.get("created_at")).valueOf()
     sync: sync
     
     initialize: ->
