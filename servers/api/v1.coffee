@@ -61,13 +61,33 @@ app.all "*", (req, res, next) ->
 
 # Index
 app.get "/plunks", (req, res) ->
-  req.plunker.index (err, plunks) ->
+  # Pagination
+  page = parseInt(req.param("page", 1), 10) or 1
+  size = parseInt(req.param("per_page", 8), 10) or 8
+  
+  page = Math.max(page, 1)
+  size = Math.min(Math.max(size, 1), 8)
+  
+  req.plunker.index (page - 1) * size, page * size, (err, plunks, meta) ->
     if err then return apiError(res, err)
     else
       for plunk in plunks
+        delete plunk.files # Trim some fat
         # TODO: WTF Express, why are all cookies lowercase?
         unless req.cookies[plunk.id.toLowerCase()] == plunk.token
           delete plunk.token
+      
+      last = parseInt(meta.count / size, 10) + 1
+      
+      link = []
+      if meta.count > page * size
+        link.push "<#{req.plunker.config.url}/api/v1/plunks?page=#{page+1}&per_page=#{size}>; rel=\"next\""
+        link.push "<#{req.plunker.config.url}/api/v1/plunks?page=#{last}&per_page=#{size}>; rel=\"last\""
+      if page > 1
+        link.push "<#{req.plunker.config.url}/api/v1/plunks?page=#{Math.min(last, page-1)}&per_page=#{size}>; rel=\"prev\""
+        link.push "<#{req.plunker.config.url}/api/v1/plunks?page=1&per_page=#{size}>; rel=\"first\""
+      
+      res.header("Link", link.join(", ")) if link.length
       res.json(plunks, 200)
 
 # Create

@@ -2,7 +2,7 @@
   
   sync = (method, model, options = {}) ->
     params = _.extend {}, options,
-      url: model.url()
+      url: if _.isFunction(model.url) then model.url() else model.url
       cache: false
       dataType: "json"
 
@@ -57,10 +57,14 @@
       @set(json)
 
   class plunker.PlunkCollection extends Backbone.Collection
-    url: -> "/api/v1/plunks"
+    url: "/api/v1/plunks?page=#{@page}&per_page=#{@per_page}"
     model: plunker.Plunk
     comparator: (model) -> -new Cromag(model.get("created_at")).valueOf()
     sync: sync
+    
+    initialize: ->
+      @page = 1
+      @per_page = 8
 
     import: (source, options = {}) ->
       self = @

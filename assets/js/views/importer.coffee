@@ -1,4 +1,4 @@
-((exports) ->
+((plunker) ->
 
   messageTemplate = Handlebars.compile """
     <div class="alert fade in {{class}}">
@@ -8,21 +8,18 @@
   """
 
   showSuccess = (plunk, coll) ->
-    console.log "showSuccess", arguments...
     $("#importer").after $ messageTemplate
       title: "Import successful"
       message: "The plunk was successfully imported and created."
       class: "alert-success"
 
   showError = (title, message) ->
-    console.log "showError", arguments...
-
     $("#importer").after $ messageTemplate
       title: title
       message: message
       class: "alert-error"
 
-  class exports.Importer extends Backbone.View
+  class plunker.Importer extends Backbone.View
     events:
       "submit":     "doImport"
       "click .btn": "doImport"
@@ -56,4 +53,4 @@
 
       false
 
-)(window)
+)(@plunker ||= {})

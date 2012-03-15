@@ -242,7 +242,7 @@ class Interface
     @creater = new Creater(@store, config)
     @updater = new Updater(@store, config)
 
-  index: (cb) -> @store.list(0, 8, cb)
+  index: (start, end, cb) -> @store.list(start, end, cb)
   create: (json, cb) -> @creater.create(json, cb)
   read: (id, cb) -> @store.fetch(id, cb)
   update: (plunk, json, cb) -> @updater.update(plunk, json, cb)

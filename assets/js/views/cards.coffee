@@ -1,5 +1,5 @@
-((exports) ->
-  class exports.Card extends Backbone.View
+((plunker) ->
+  class plunker.Card extends Backbone.View
     initialize: ->
       @model.on "change", @render
       @model.on "sync", @flash("Updated")
@@ -99,29 +99,78 @@
                 wait: true
                 silent: false
             else self.flash("No changes", "warning")()
-          
 
-  class exports.RecentPlunks extends Backbone.View
+  class Page extends Backbone.Model
+  
+  class Pager extends Backbone.View
+    template: Handlebars.compile """
+      {{#if prev}}
+        <li class="previous">
+          <a href="{{prev}}">&larr; Older</a>
+        </li>
+      {{/if}}
+      {{#if next}}
+        <li class="next">
+          <a href="{{next}}">Newer &rarr;</a>
+        </li>
+      {{/if}}      
+    """
+    
+    events:
+      "click .next a":      -> @trigger "intent:next", arguments...
+      "click .previous a":  -> @trigger "intent:prev", arguments...
+    
+    initialize: ->
+      @model.on "change reset", @render
+    
+    render: =>
+      @$el.html @template(@model.toJSON())
+      @    
+
+  class plunker.RecentPlunks extends Backbone.View
     initialize: ->
       self = @
+
+      @size = 8
+      @page = new Page
+      @pager = new Pager
+        el: document.getElementById("pager")
+        model: @page
+      
+      @pager.on "intent:next intent:prev", (e) ->
+        e.preventDefault()
+        self.collection.url = $(e.target).attr("href")
+        self.collection.fetch()
+      
+      @collection.parse = _.wrap @collection.parse, (parse, json, xhr) ->
+        link = xhr.getResponseHeader("Link")
+        page = {}
+        
+        link.replace /<([^>]+)>;\s*rel="(next|prev|first|last)"/gi, (match, href, rel) ->
+          page[rel] = href
+        
+        self.page.clear(silent: true).set(page)
+
+        parse(json)
+      
       self.cards = {}
       @collection.on "reset", (coll) ->
         card.remove() for card in self.cards
-        coll.chain().first(8).each (plunk, index) -> self.addCard(plunk, coll, index)
+        coll.chain().first(self.size).each (plunk, index) -> self.addCard(plunk, coll, index)
       @collection.on "add", (plunk, coll, options) -> self.addCard(plunk, coll, options.index)
       @collection.on "destroy", (plunk, coll, options) -> self.removeCard(plunk, coll)
 
     addCard: (plunk, coll, index) =>
       return unless plunk
       
-      card = new Card(model: plunk)
+      card = new plunker.Card(model: plunk)
 
       if index
         @$el.children().eq(index - 1).after(card.render().$el)
       else
         @$el.prepend card.render().$el
 
-      @$el.children().slice(8).remove()
+      @$el.children().slice(@size).remove()
 
       @cards[plunk.id] = card
       
@@ -131,7 +180,7 @@
       card = @cards[plunk.id]
       card.$el.fadeOut "slow", ->
         card.remove()
-        self.addCard(self.collection.at(7), self.collection, 7) if self.collection.length >= 7
+        self.addCard(self.collection.at(self.size - 1), self.collection, self.size - 1) if self.collection.length >= self.size
       delete @cards[plunk.id]
 
-)(window)
+)(@plunker ||= {})
