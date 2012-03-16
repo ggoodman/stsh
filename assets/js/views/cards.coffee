@@ -143,13 +143,15 @@
         self.collection.fetch()
       
       @collection.parse = _.wrap @collection.parse, (parse, json, xhr) ->
-        link = xhr.getResponseHeader("Link")
-        page = {}
+        self.page.clear()
         
-        link.replace /<([^>]+)>;\s*rel="(next|prev|first|last)"/gi, (match, href, rel) ->
-          page[rel] = href
-        
-        self.page.clear(silent: true).set(page)
+        if link = xhr.getResponseHeader("Link")
+          page = {}
+          
+          link.replace /<([^>]+)>;\s*rel="(next|prev|first|last)"/gi, (match, href, rel) ->
+            page[rel] = href
+          
+          self.page.set(page)
 
         parse(json)
       
