@@ -51,7 +51,7 @@
         
         self.enable "preview"
         
-        plunker.mediator.trigger "event:preview-enable"
+        plunker.mediator.trigger "event:preview-enable", @model.plunk
       
       plunker.mediator.on "intent:preview-disable", ->
         $("#content").addClass("editor").addClass("sidebar")

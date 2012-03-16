@@ -203,7 +203,7 @@
             
           plunker.mediator.trigger "intent:activate", json.index
           plunker.mediator.trigger "event:load:end"
-          plunker.mediator.trigger "event:import", json
+          plunker.mediator.trigger "event:import", json, source
         error: ->
           alert "Failed to fetch plunk"
           plunker.controller.navigate "/edit",
@@ -237,7 +237,7 @@
                 
             plunker.mediator.trigger "intent:activate", plunk.get("index")
             plunker.mediator.trigger "event:load:end"
-            plunker.mediator.trigger "event:load"
+            plunker.mediator.trigger "event:load", plunk
           error: ->
             alert "Failed to fetch plunk"
             plunker.controller.navigate "/edit",

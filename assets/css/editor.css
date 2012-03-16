@@ -143,6 +143,10 @@
   width: 122px;
 }
 
+#sidebar .theme {
+  width: 122px;
+}
+
 #edit-live {
   position: absolute;
   left: 0; top: 0; right: 0px; bottom: 0;

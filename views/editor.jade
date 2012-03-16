@@ -61,12 +61,38 @@ html
           details.description(open="open")
             summary.header Description
             textarea.description(rows="4")
-          details.options
+          details.options(open="open")
             summary.header Options
-            form.form-vertical
-              label.checkbox
-                input.wordwrap(type="checkbox")
-                | Word wrap
+            label.checkbox
+              input.wordwrap(type="checkbox")
+              | Word wrap
+            label Theme
+            select.theme
+              option(value="chrome") Chrome
+              option(value="clouds") Clouds
+              option(value="clouds_midnight") Clouds Midnight
+              option(value="cobalt") Cobalt
+              option(value="crimson_editor") Crimson Editor
+              option(value="dawn") Dawn
+              option(value="dreamweaver") Dreamweaver
+              option(value="eclipse") Eclipse
+              option(value="idle_fingers") idleFingers
+              option(value="kr_theme") krTheme
+              option(value="merbivore") Merbivore
+              option(value="merbivore_soft") Merbivore Soft
+              option(value="mono_industrial") Mono Industrial
+              option(value="monokai") Monokai
+              option(value="pastel_on_dark") Pastel on dark
+              option(value="solarized_dark") Solarized Dark
+              option(value="solarized_light") Solarized Light
+              option(value="textmate",selected) TextMate
+              option(value="twilight") Twilight
+              option(value="tomorrow") Tomorrow
+              option(value="tomorrow_night") Tomorrow Night
+              option(value="tomorrow_night_blue") Tomorrow Night Blue
+              option(value="tomorrow_night_bright") Tomorrow Night Bright
+              option(value="tomorrow_night_eighties") Tomorrow Night 80s
+              option(value="vibrant_ink") Vibrant Ink
         div#edit-live
           div#textarea
           div#live

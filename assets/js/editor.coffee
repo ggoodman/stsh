@@ -1,5 +1,6 @@
 #= require_tree importers
 #= require lib/modes
+#= require lib/themes
 #= require lib/importer
 #= require lib/compilers
 #= require models/plunks
@@ -26,6 +27,13 @@
   $ ->
     # Controller for the editor environment
     plunker.controller = new plunker.EditorController
+    
+    window._gaq ||= []
+    plunker.mediator.on "event:import", (json, source) -> _gaq.push ["_trackEvent", "Editor", "Import", source]
+    plunker.mediator.on "event:load", (plunk, id) -> _gaq.push ["_trackEvent", "Editor", "Load", id]
+    plunker.mediator.on "event:save", (plunk) -> _gaq.push ["_trackEvent", "Editor", "Save", plunk.id]
+    plunker.mediator.on "event:delete", (plunk) -> _gaq.push ["_trackEvent", "Editor", "Delete", plunk.id]
+    plunker.mediator.on "event:preview-enable", (plunk) -> _gaq.push ["_trackEvent", "Previe", "Preview", plunk.id]
     
     plunker.mediator.trigger "intent:reset"
     

@@ -36,6 +36,10 @@
           buffer.session.setUseWrapMode($(e.target).prop("checked"))
           buffer.session.setWrapLimitRange(80, 80)
       
+      "change .theme":      (e) ->
+        plunker.themes.load $(e.target).attr("value"), (theme) ->
+          plunker.views.textarea.ace.setTheme(theme)
+      
       "keyup .description": (e) -> @model.set("description", @$(e.target).val(), silent: true)
 
     initialize: ->
@@ -64,6 +68,7 @@
       plunker.mediator.on "event:activate", (filename) ->
         buffer = self.model.getActiveBuffer()
         self.$(".wordwrap").prop("checked", buffer.session.getUseWrapMode())
+
       
     render: =>
       
