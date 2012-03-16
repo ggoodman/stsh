@@ -27,6 +27,20 @@
             </li>
             <li class="divider"></li>
             <li>
+              <a href="/edit/from:2016721">Bootstrap</a>
+            </li>
+            <li>
+              <a href="/edit/from:2016721">Bootstrap + Coffee</a>
+            </li>
+            <li class="divider"></li>
+            <li>
+              <a href="/edit/from:2050713">Backbone.js</a>
+            </li>
+            <li>
+              <a href="/edit/from:2050746">Backbone.js + Coffee</a>
+            </li>
+            <li class="divider"></li>
+            <li>
               <a href="/edit/from:1990582">YUI</a>
             </li>
           </ul>
