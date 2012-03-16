@@ -159,7 +159,7 @@
   position: absolute;
   left: 0; top: 0; right: 0; bottom: 0;
   border-left: 4px solid #9B9B9B;
-  border-right: 4px solid #9B9B9B;
+  border-right: 1px solid #9B9B9B;
 }
 
 .editor #textarea {
@@ -176,6 +176,7 @@
   box-sizing: border-box;
   position: absolute;
   top: 0; right: 0; bottom: 0; left: 0;
+  background-color: #eeeeee;
 }
 
 .live #live {
@@ -199,7 +200,7 @@
   border-bottom-left-radius: 3px;
   position: absolute;
   top: -1px;
-  right: 20px;
+  right: 30px;
   z-index: 20;
   background-color: #eee;
   font-family: sans-serif;
@@ -207,16 +208,24 @@
   padding: 0 4px;
 }
 
+#live .preview {
+  position: absolute;
+  top: 5px; right: 5px; bottom: 5px; left: 5px;
+  overflow: auto;
+  background-color: white;
+  -webkit-box-shadow: 0px 0px 15px rgba(50, 50, 50, 1);
+  -moz-box-shadow:    0px 0px 15px rgba(50, 50, 50, 1);
+  box-shadow:         0px 0px 15px rgba(50, 50, 50, 1);
+}
+
 #live .compiled {
   position: absolute;
-  top: 0; right: 0; bottom: 0; left: 0;
-  overflow: auto;
-  background-color: #eeeeee;
+  top: 5px; right: 5px; bottom: 5px; left: 5px;
 }
 
 #live iframe {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  left: 0; top: 0; right: 0; bottom: 0;
   margin: 0; padding: 0;
   border: 0;
 }

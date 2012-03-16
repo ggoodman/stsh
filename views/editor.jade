@@ -7,7 +7,8 @@ html
   
     link(rel="stylesheet",href="/css/bootstrap.fixed.min.css")
     link(rel="stylesheet",href="/css/jquery.gritter.css")
-    link(rel="stylesheet",href="/css/editor.css")
+
+    != css("editor")
 
     // if lt IE 9
       script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
@@ -25,21 +26,6 @@ html
 
     script(src="/js/script.min.js")
 
-    != js("importers/github")
-
-    != js("lib/modes")
-    != js("lib/importer")
-    != js("lib/compilers")
-
-    != js("models/plunks")
-    != js("models/edit_session")
-
-    != js("views/toolbar")
-    != js("views/sidebar")
-    != js("views/textarea")
-    != js("views/previewer")
-
-    != js("controllers/editor")
 
     != js("editor")
 

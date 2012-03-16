@@ -2,12 +2,16 @@
 
   class plunker.Previewer extends Backbone.View
     preview: Handlebars.compile """
-      <iframe frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%"></iframe>
+      <div class="preview">
+        <iframe frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%"></iframe>
+      </div>
     """
     
     compile: Handlebars.compile """
       <div class="title"></div>
-      <div class="compiled"></div>
+      <div class="preview">
+        <div class="compiled"></div>
+      </div>
     """
     
     # Do nothing by default

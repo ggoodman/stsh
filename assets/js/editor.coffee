@@ -1,8 +1,16 @@
-!((name, definition) ->
-  if typeof module != 'undefined' then module.exports = definition()
-  else if typeof define == "function" and define.amd then define name, definition
-  else @[name] = definition()
-) "plunker", ->
+#= require_tree importers
+#= require lib/modes
+#= require lib/importer
+#= require lib/compilers
+#= require models/plunks
+#= require models/edit_session
+#= require views/toolbar
+#= require views/sidebar
+#= require views/textarea
+#= require views/previewer
+#= require controllers/editor
+
+((plunker) ->
   
   
   $.extend $.gritter.options,
@@ -25,4 +33,4 @@
       pushState: true
 
   
-  return plunker
+)(@plunker ||= {})
