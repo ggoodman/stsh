@@ -3,8 +3,6 @@ extends layout
 prepend title
   page_title = "Welcome to Plunker!"
 
-append styles
-  != css("plunker")
 
 append scripts
   script(type="text/javascript",src="/js/jquery.lazyload.min.js")
@@ -69,6 +67,7 @@ append content
           li: a(href="http://dabblet.com",target="_blank") Dabblet
           li: a(href="http://gist.github.com",target="_blank") Github's Gist
           li: a(href="http://tinker.io",target="_blank") Tinker
+          li: a(href="http://bl.ocks.org/") bl.ocks.org
         
       div.span12
         ul.quick-links
