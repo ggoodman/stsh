@@ -68,7 +68,16 @@
           expires: new Cromag(Cromag.now() + 30 * 1000).toISOString()
         
         plunk.on "sync", ->
-          self.$("iframe").attr "src", plunk.get("raw_url")
+          $old = self.$("iframe")
+          $iframe = $('<iframe frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%"></iframe>')
+            .hide()
+            .attr("src", plunk.get("raw_url"))
+            .appendTo(self.$(".preview"))
+            .load (e) ->
+              $old.fadeOut "fast", ->
+                $old.remove()
+                $iframe.fadeIn "fast"
+
           plunker.mediator.trigger "event:refresh", plunk
           
         plunk.save()
