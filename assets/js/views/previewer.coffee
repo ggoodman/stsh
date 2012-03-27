@@ -93,7 +93,7 @@
           $title = @$(".title").text("").hide()
           $compiled = @$(".compiled")
   
-          $title.text(buffer.mode.title or "")
+          $title.text(buffer.mode?.title or "")
           
           rerender = (body, mode = buffer.mode) ->
             highlighted = staticHighlight(body, mode.mode)
