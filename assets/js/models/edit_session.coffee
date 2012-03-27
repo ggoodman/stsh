@@ -27,6 +27,14 @@
     toJSON: ->
       filename: @get("filename")
       content: @session.getValue() or ""
+    
+    enableShare: (id) ->
+      self = @
+      
+      sharejs.open "#{id}/#{@id}", "text", (err, doc) ->
+        if err then plunker.mediator.trigger "error", "ShareJS Error: #{err}"
+        else
+          doc.attach_ace self.session.getDocument()
 
     setMode: =>
       self = @
@@ -149,7 +157,7 @@
         if buffer = @buffers.get(filename)
           if confirm "Are you sure that you want to delete the file #{filename}?"
             @buffers.remove buffer
-            plunker.mediator.trigger "event:removeFile", 
+            plunker.mediator.trigger "event:removeFile", filename
             plunker.mediator.trigger "intent:activate", @last()
         else $.gritter.add
           title: "Remove failed"
@@ -168,17 +176,16 @@
         title: "Rename failed"
         text: "The buffer being renamed couldn't be found"
         
-    onIntentReset: =>
+    onIntentReset: (options = {}) =>
       @plunk.clear()
       @buffers.reset()
       @clear()
       
       @set
-        description: "Untitled"
+        description: options.description or "Untitled"
       
       plunker.mediator.trigger "event:reset"
-      
-      plunker.mediator.trigger "intent:fileAdd", "index.html"
+      plunker.mediator.trigger "intent:fileAdd", "index.html" unless options.leaveEmpty
     
     import: (source) ->
       session = @

@@ -43,6 +43,19 @@
   display: none;
 }
 
+
+#toolbar .stream-disable {
+  display: none;
+}
+
+#toolbar.streamed .stream-disable {
+  display: inline-block;
+}
+
+#toolbar.streamed .stream-enable {
+  display: none;
+}
+
 @media (max-width: 606px) {
   #toolbar .btn span.text {
     display: none;

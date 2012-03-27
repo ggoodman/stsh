@@ -1,3 +1,16 @@
+#= require_tree ../importers
+#= require ../lib/modes
+#= require ../lib/themes
+#= require ../lib/importer
+#= require ../lib/compilers
+#= require ../models/plunks
+#= require ../models/edit_session
+#= require ../models/stream
+#= require ../views/toolbar
+#= require ../views/sidebar
+#= require ../views/textarea
+#= require ../views/previewer
+
 ((plunker) ->
 
   class plunker.EditorController extends Backbone.Router
@@ -9,6 +22,7 @@
       # Model defining the editing session that is taking place on Plunker
       plunker.models.session = @session = new plunker.Session
   
+      plunker.models.stream = @stream = new plunker.Stream
       
       # View for the toolbar at the top of the page
       plunker.views.toolbar = new plunker.Toolbar
