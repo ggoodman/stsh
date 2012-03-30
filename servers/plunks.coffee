@@ -8,8 +8,7 @@ config = _.defaults require("../config"),
   ttl: 60 * 60 * 24 * 2 # 2 days
 
 
-app.configure ->
-  app.use require("../lib/plunker").middleware(config)
+app.use require("../lib/plunker").middleware(config)
 
 
 loadPlunk = (req, res, next) ->

@@ -178,7 +178,7 @@
         
     onIntentReset: (options = {}) =>
       @plunk.clear()
-      @buffers.reset()
+      @buffers.reset(options.buffers or [])
       @clear()
       
       @set

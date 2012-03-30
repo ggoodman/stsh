@@ -40,7 +40,7 @@
         plunker.themes.load $(e.target).attr("value"), (theme) ->
           plunker.views.textarea.ace.setTheme(theme)
       
-      "keyup .description": (e) -> @model.set("description", @$(e.target).val(), silent: true)
+      "keyup .description": (e) -> @model.set("description", @$(e.target).val(), handled: true)
 
     initialize: ->
       self = @
@@ -63,7 +63,9 @@
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
       
-      @model.on "change:description", -> self.$(".description").val(self.model.get("description"))
+      @model.on "change:description", (model, value, options) ->
+        unless options.handled is true
+          self.$(".description").val(self.model.get("description"))
       
       plunker.mediator.on "event:activate", (filename) ->
         buffer = self.model.getActiveBuffer()

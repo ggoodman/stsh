@@ -14,16 +14,9 @@ app.use express.static("#{__dirname}/public")
 app.use "/api/v1", require("./servers/api/v1")
 app.use "/raw", require("./servers/plunks")
 
-app.configure ->
-  app.set "views", "#{__dirname}/views"
-  app.set "view engine", "jade"
-  app.set "view options", layout: false
-
-  app.use express.logger()
-  app.use express.errorHandler({ dumpExceptions: true, showStack: true })
-  
-  
-
+app.set "views", "#{__dirname}/views"
+app.set "view engine", "jade"
+app.set "view options", layout: false
 
 
 app.get "/", (req, res) ->
@@ -36,6 +29,10 @@ app.get "/about", (req, res) ->
   res.render("about", page: "/about")
 
 
+# Start the sharejs server before variable routes
+sharejs.server.attach app,
+  db: { type: "none" }
+
 app.get /^\/([a-zA-Z0-9]{6})\/(.*)$/, (req, res) ->
   res.local "raw_url", "/raw" + req.url
   res.local "plunk_id", req.params[0]
@@ -44,12 +41,9 @@ app.get /^\/([a-zA-Z0-9]{6})\/(.*)$/, (req, res) ->
 app.get /^\/([a-zA-Z0-9]{6})$/, (req, res) -> res.redirect("/#{req.params[0]}/", 301)
 
 
-app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?$)?/, (req, res) ->
+app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?)?/, (req, res) ->
   res.render("editor", page: "/edit", views: req.param("views", "sidebar editor preview").split(/[ \.,]/).join(" "))
 
-# Start the sharejs server before variable routes
-sharejs.server.attach app,
-  db: { type: "none" }
 
 
 if require.main == module
