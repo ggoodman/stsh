@@ -43,6 +43,10 @@
             <li>
               <a href="/edit/from:1990582">YUI</a>
             </li>
+            <li class="divider"></li>
+            <li>
+              <a href="/edit/from:1961272">AngularJS</a>
+            </li>
           </ul>
         </div>
         <div class="btn-group">
