@@ -1,0 +1,119 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Stsh by ggoodman</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/respond.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <!--[if lt IE 8]>
+    <link rel="stylesheet" href="stylesheets/ie.css">
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <div id="header">
+        <nav>
+          <li class="fork"><a href="https://github.com/ggoodman/stsh">Fork On GitHub</a></li>
+          <li class="downloads"><a href="https://github.com/ggoodman/stsh/zipball/master">ZIP</a></li>
+          <li class="downloads"><a href="https://github.com/ggoodman/stsh/tarball/master">TAR</a></li>
+          <li class="title">DOWNLOADS</li>
+        </nav>
+      </div><!-- end header -->
+
+    <div class="wrapper">
+
+      <section>
+        <div id="title">
+          <h1>Stsh</h1>
+          <p>The client and server for plunker.no.de - a website to create, share and view web snippets online.</p>
+          <hr>
+          <span class="credits left">Project maintained by <a href="https://github.com/ggoodman">ggoodman</a></span>
+          <span class="credits right">Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/mattgraham">mattgraham</a></span>
+        </div>
+
+        <h1>Plunker</h1>
+
+<p>Plunker is a website and RESTful API for creating, previewing and sharing web snippets online.</p>
+
+<h2>What is a plunk?</h2>
+
+<p>A <em>plunk</em> is a web snippet that is composed of an arbitrary number of files that can be viewed online through the Plunker service. Each plunk has:</p>
+
+<ul>
+<li>
+<strong>description</strong> (optional) This should be a short description of what the plunk represents</li>
+<li>
+<strong>index</strong> (optional) This is the filename of the <em>main</em> file of the plunk. For  example, this would be 'index.html' for a typical web snippet.</li>
+<li>
+<strong>expires</strong> (optional) This is the time (formatted per ISO 8601) that the plunk should expire. Plunks that expire are considered <em>private</em> and will not appear on the landing page. For example: the preview functionality of the editor uses plunks with short expiry times to run the previews.<br>
+</li>
+<li>
+<strong>files</strong> (required) This is a hash that maps filenames to their description.</li>
+</ul><h3>Plunk files</h3>
+
+<p>Each file in the plunk can be presented to the API in either the short or long form.</p>
+
+<ul>
+<li>
+<strong>short-form</strong> In this form, the file entry is a mapping of the file to its contents. For example:</li>
+</ul><div class="highlight">
+<pre>  <span class="p">{</span>
+    <span class="nt">"index.html"</span><span class="p">:</span> <span class="s2">"&lt;html&gt;&lt;/html&gt;"</span>
+  <span class="p">}</span>
+</pre>
+</div>
+
+
+<ul>
+<li>
+<strong>long-form</strong> In this form, the file entry is a mapping of the file to a hash representing the file. All file entries returned by the API will be in long-form.</li>
+</ul><div class="highlight">
+<pre>  <span class="p">{</span>
+    <span class="nt">"index.html"</span><span class="p">:</span> <span class="p">{</span>
+      <span class="nt">"filename"</span><span class="p">:</span> <span class="s2">"index.html"</span><span class="p">,</span>
+      <span class="nt">"content"</span><span class="p">:</span> <span class="s2">"&lt;html&gt;&lt;/html&gt;"</span>
+    <span class="p">}</span>
+  <span class="p">}</span>
+</pre>
+</div>
+
+
+<h2>What is so cool about Plunker?</h2>
+
+<p>Many other amazing online services impose certain restrictions on the composition of their snippets. For example, services will typically enforce that each snippet has one html file, one css file and one javascript file. <strong>What if you want two javascript files?!</strong></p>
+
+<p>Plunker is neat because it enables more creativity and flexibility in the definition of what can be in plunks.</p>
+
+<ul>
+<li>Do you want a json file that's loaded over XHR? <em>OK, no problem!</em>
+</li>
+<li>Do you want to load coffee-script, less, stylus or handlebars templates from the client-side? <em>Have at it!</em>
+</li>
+</ul><h2>Running Plunker</h2>
+
+<p>Running Plunker locally is really easy. You only need to have node.js and npm installed to get started.</p>
+
+<div class="highlight">
+<pre>git clone https://ggoodman@github.com/ggoodman/stsh.git
+<span class="nb">cd </span>stsh
+npm install
+node server.js
+</pre>
+</div>
+
+
+<p>There is no configuration necessary and Plunker runs without any sort of backend database. Note that plunks will be saved to and restored from <code>/tmp/plunks.json</code>. For the save/restore feature to work, the user running Plunker must have read/write access to <code>/tmp</code>.</p>
+      </section>
+
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><!--<![endif]-->
+  </body>
+</html>
