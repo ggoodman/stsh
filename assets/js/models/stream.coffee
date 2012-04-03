@@ -65,12 +65,73 @@
       self = @
       console.log "Stream#start", arguments...
       
+      @session.buffers.on "add", @onLocalBufferAdd
+      @session.buffers.on "remove", @onLocalBufferRemove
+      @session.buffers.on "change:filename", @onLocalBufferRename
+      @session.buffers.on "reset", @onLocalBufferReset
+      
+      _.each doc.snapshot.channels, @watchChannel
+      
       ["change", "insert", "delete", "replace", "move", "add", "child op"].forEach (op) ->
-        self.doc.on op, -> console.log "REMOTE", op, arguments...
-        self.doc.at("description").on op, -> console.log "DESC", op, arguments...
+        self.doc.at("channels").on op, -> console.log "CHANNEL", op, arguments...
+      
+      self.doc.on "change", (events) ->
+        _.each events, (e) ->
+          path = e.p.join(".")
+          
+          switch path
+            when "description" then self.session.set "description", e.oi or "", remote: true
+      
+      self.doc.at("channels").on "child op", (p, op) ->
+        channel = self.channels.byId[p[0]]
+        buffer = self.session.buffers.get(channel.filename)
+        
+        buffer.set "filename", op.oi, remote: true
 
       plunker.models.session.on "change:description", @onLocalChangeDescription
     
+    watchChannel: (channel) =>
+      console.log "Watching channel", channel
+      
+      @channels.byId[channel.id] = channel
+      @channels.byFilename[channel.filename] = channel
+
+    onLocalBufferReset: (coll, options) =>
+      console.log arguments.callee.name, arguments...
+
+      unless options.remote is true
+        @doc.at(["channels"]).set @getLocalState().channels
+
+    onLocalBufferAdd: (model, coll, options) =>
+      console.log arguments.callee.name, arguments...
+
+      unless options.remote is true
+        id = uid(16)
+        
+        @doc.at(["channels", id]).set
+          filename: model.get("filename")
+          id: id
+        
+    onLocalBufferRemove: (model, coll, options) =>
+      console.log arguments.callee.name, arguments...
+
+      unless options.remote is true
+        ""
+        
+    onLocalBufferRename: (model, value, options) =>
+      console.log arguments.callee.name, arguments...
+
+      previous = model.previous("filename")
+      channel = @channels.byFilename[previous]
+      
+      console.log "previous", previous, "channel", channel
+      unless options.remote is true
+        channel.filename = value
+        @channels.byFilename[value] = channel
+        delete @channels.byFilename[previous]
+        
+        @doc.at(["channels", channel.id, "filename"]).set value
+        
     onLocalChangeDescription: (model, value, options) =>
       console.log arguments.callee.name, arguments...
       
@@ -97,8 +158,9 @@
           administrator.
         """
         
-        plunker.models.session.set "description", doc.snapshot.description, remote: true
-        plunker.models.session.buffers.reset _.values(_.clone(doc.snapshot.channels)), remote: true
+        self.session.set "description", doc.snapshot.description, remote: true
+        self.session.buffers.reset _.values(_.clone(doc.snapshot.channels)), remote: true
+        plunker.mediator.trigger "intent:activate", self.session.last()
         
         self.start(doc)
         
@@ -157,6 +219,7 @@
               filename: channel.get("filename")
               content: "Loading..."
           buffers.reset buffs, remote: true
+          
           plunker.mediator.trigger "intent:activate", plunker.models.session.last()
       
       @on "add", (channel, coll, options) ->

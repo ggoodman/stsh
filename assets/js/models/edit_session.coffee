@@ -185,7 +185,7 @@
         description: options.description or "Untitled"
       
       plunker.mediator.trigger "event:reset"
-      plunker.mediator.trigger "intent:fileAdd", "index.html" unless options.leaveEmpty
+      plunker.mediator.trigger "intent:fileAdd", "index.html" unless @buffers.length
     
     import: (source) ->
       session = @
