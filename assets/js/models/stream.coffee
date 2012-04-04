@@ -5,29 +5,122 @@
   uid = (len = 16, prefix = "", keyspace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") ->
     prefix += keyspace.charAt(Math.floor(Math.random() * keyspace.length)) while len-- > 0
     prefix
+
   
   class plunker.Stream extends Backbone.Model
     initialize: ->
+      self = @
+      
       @share = new sharejs.Connection()
       @session = plunker.models.session
+      @local = _.extend {}, Backbone.Events
+      @remote = _.extend {}, Backbone.Events
       
-      @reset()
+      @watchSession()
       
-      plunker.mediator.on "intent:stream-start", @onIntentStreamStart
-      plunker.mediator.on "intent:stream-join", @onIntentStreamJoin
-      plunker.mediator.on "intent:stream-stop", @onIntentStreamStop
+      @bindLocalEvents()
+      @bindRemoteEvents()
       
-      @onLocalChangeDescription = _.throttle @onLocalChangeDescription, 500
+      # Handle interface intents for streaming
+      plunker.mediator.on "intent:stream-start", (id) ->
+        self.create id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
+      plunker.mediator.on "intent:stream-join", (id) ->
+        self.join id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
+      plunker.mediator.on "intent:stream-stop", (id) ->
+        self.stop()
+      
+      # Throttle local events
+      _.each ["onLocalChangeDescription"], (method) ->
+        self[method] = _.throttle self[method], 500
     
-    onIntentStreamStart: (id) =>
-      @create id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
+    watchSession: ->
+      self = @
+      
+      # Proxy changes to the session to the local emitter
+      @session.on "change:description", (model, value, options) ->
+        unless options.remote is true
+          self.local.trigger "description:change", value, options
+      
+      # Proxy local buffer events to the local emitter
+      @session.buffers.on "reset", (coll, options) ->
+        unless options.remote is true
+          self.local.trigger "buffers:reset", coll
+      @session.buffers.on "add", (model, coll, options) ->
+        unless options.remote is true
+          self.local.trigger "buffers:add", model
+      @session.buffers.on "remove", (model, coll, options) ->
+        unless options.remote is true
+          self.local.trigger "buffers:remove", model
+      @session.buffers.on "change:filename", (model, value, options) ->
+        unless options.remote is true
+          self.local.trigger "buffers:rename", value, model.previous("filename")
 
-    onIntentStreamJoin: (id) =>
-      @join id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
+    bindLocalEvents: ->
+      self = @
+      
+      # Send local changes to the description over sharejs
+      @local.on "description:change", (description) ->
+        if self.doc then self.doc.at("description").set description
+        
+      # Reset the entire channel object and send over sharejs
+      @local.on "buffers:reset", (buffers) ->
+        if self.doc then self.doc.at(["channels"]).set self.getLocalState().channels
+      
+      # Add new buffer to sharejs channels object
+      @local.on "buffers:add", (buffer) ->    
+        if self.doc
+          id = uid(16)
+          self.doc.at(["channels", id]).set
+              channel: id
+              filename: buffer.get("filename")
+            , -> buffer.set "channel", id
+      
+      # Remove buffer from sharejs channels object
+      @local.on "buffers:remove", (buffer) ->
+        if self.doc then self.doc.at(["channels", buffer.get("channel")]).remove()
     
-    onIntentStreamStop: =>
-      @leave()
-
+    bindRemoteEvents: ->
+      self = @
+      
+      @remote.on "description:change", (description) ->
+        self.session.set "description", description, remote: true
+      
+      @remote.on "channels:reset", (channels) ->
+        self.session.buffers.reset _.values(_.clone(channels)), remote: true
+      
+      @remote.on "channels:add", (channel) ->
+        self.session.buffers.add channel, remote: true
+      
+      @remote.on "channels:remove", (channel) ->
+        self.session.buffers.remove channel.filename, remote: true
+      
+      @remote.on "channels:rename", (filename, old_filename) ->
+        if buffer = self.session.buffers.get(old_filename)
+          buffer.set "filename", filename, remote: true
+      
+    
+    stop: ->
+      @doc.close()
+      
+      delete @id
+      delete @doc
+    
+    start: (@id, @doc) ->
+      self = @
+      
+      @doc.at("channels").on "insert", (id, channel) -> self.remote.trigger "channels:add", channel
+      
+      @doc.at("channels").on "delete", (id, channel) -> self.remote.trigger "channels:remove", channel
+        
+      @doc.on "change", (events) ->
+        _.each events, (e) ->
+          switch e.p.join(".")
+            when "description" then self.remote.trigger "description:change", e.oi or ""
+            when "channels" then self.remote.trigger "channels:reset", _.values(_.clone(self.doc.snapshot.channels))
+      
+      @doc.at("channels").on "child op", (p, op) ->
+        console.log "child op", arguments...
+        # TODO: Emit remote rename event
   
     getLocalState: ->
       state =
@@ -35,174 +128,41 @@
         description: @session.get("description")
       
       @session.buffers.each (buffer) ->
-        id = uid(16)
+        unless id = buffer.get("channel")
+          id = uid(16)
+          buffer.set "channel", id
+          
         state.channels[id] =
-          id: id
+          channel: id
           filename: buffer.get("filename")
-      
+        
       console.log "Local state", state
       
       state
-    
-    reset: ->
-      @channels = 
-        byId: {}
-        byFilename: {}
-    
-    leave: ->
-      self = @
-      
-      if @doc
-        @doc.close()
-        delete @doc
-      
-      _.each @channels.byId, (channel, id) ->
-        channel.close()
-      
-      @reset()
-    
-    start: (@doc) ->
-      self = @
-      console.log "Stream#start", arguments...
-      
-      @session.buffers.on "add", @onLocalBufferAdd
-      @session.buffers.on "remove", @onLocalBufferRemove
-      @session.buffers.on "change:filename", @onLocalBufferRename
-      @session.buffers.on "reset", @onLocalBufferReset
-      @session.buffers.on "all", ->
-        console.log "ALL", arguments...
-      
-      _.each doc.snapshot.channels, @watchChannel
-      
-      ["change", "insert", "delete", "replace", "move", "add", "child op"].forEach (op) ->
-        self.doc.at("channels").on op, -> console.log "CHANNEL", op, arguments...
-        
-      self.doc.at("channels").on "insert", (key, value) ->
-        json = 
-          filename: value.filename
-          content: ""
-        
-        self.session.buffers.add json, remote: true
-        
-        self.watchChannel(channel)
-      
-      self.doc.at("channels").on "delete", (key, value) ->
-        buffer = self.session.buffers.get(value.filename)
-        self.session.buffers.remove buffer, remote: true
-        
-        delete self.channels.byId[value.id]
-        delete self.channels.byFilename[value.filename]
-        
-      self.doc.on "change", (events) ->
-        _.each events, (e) ->
-          path = e.p.join(".")
-          
-          switch path
-            when "description" then self.session.set "description", e.oi or "", remote: true
-      
-      self.doc.at("channels").on "child op", (p, op) ->
-        channel = self.channels.byId[p[0]]
-        buffer = self.session.buffers.get(channel.filename)
-        
-        buffer.set "filename", op.oi, remote: true
-
-      plunker.models.session.on "change:description", @onLocalChangeDescription
-    
-    watchChannel: (channel) =>
-      console.log "Watching channel", channel
-      
-      @channels.byId[channel.id] = channel
-      @channels.byFilename[channel.filename] = channel
-
-    onLocalBufferReset: (coll, options) =>
-      console.log "onlocalbufferreset", arguments...
-
-      unless options.remote is true
-        @doc.at(["channels"]).set @getLocalState().channels
-
-    onLocalBufferAdd: (model, coll, options) =>
-      console.log arguments.callee.name, arguments...
-
-      unless options.remote is true
-        id = uid(16)
-        
-        @doc.at(["channels", id]).set
-          filename: model.get("filename")
-          id: id
-      
-      if channel = @channels.byFilename[model.get("filename")]
-        sharejs.open "channel:#{@id}:#{@channel.id}", "text", (err, doc) ->
-          if err then return plunker.mediator.trigger "message", "Connection error", """
-            Failed to join the stream #{id}. Please double-check that you entered
-            the right stream id. If the problem persists, please contact the
-            administrator.
-          """
-          
-          doc.attach_ace model.session.getDocument(), options.remote != true
-        
-    onLocalBufferRemove: (model, coll, options) =>
-      console.log arguments.callee.name, arguments...
-      
-      channel = @channels.byFilename[model.get("filename")]
-
-      unless options.remote is true
-        @doc.at(["channels", channel.id]).remove()
-        
-    onLocalBufferRename: (model, value, options) =>
-      console.log arguments.callee.name, arguments...
-
-      previous = model.previous("filename")
-      channel = @channels.byFilename[previous]
-      
-      console.log "previous", previous, "channel", channel
-      unless options.remote is true
-        channel.filename = value
-        @channels.byFilename[value] = channel
-        delete @channels.byFilename[previous]
-        
-        @doc.at(["channels", channel.id, "filename"]).set value
-        
-    onLocalChangeDescription: (model, value, options) =>
-      console.log arguments.callee.name, arguments...
-      
-      unless options.remote is true
-        @doc.at("description").set value
-    
-    onRemoteChangeDescription: =>
-      console.log arguments.callee.name, arguments...
-      
-      #@session.set "description", 
       
     join: (id) ->
-      console.log "Stream#join", arguments...
       self = @
       
       unless id then return plunker.mediator.trigger "error", "plunker.Stream#join missing id"
-      
-      @id = id
 
-      @share.openExisting "stream:#{@id}", (err, doc) ->
+      sharejs.open "stream:#{id}", "json", (err, doc) ->
         if err then return plunker.mediator.trigger "message", "Connection error", """
           Failed to join the stream #{id}. Please double-check that you entered
           the right stream id. If the problem persists, please contact the
           administrator.
         """
         
-        self.session.set "description", doc.snapshot.description, remote: true
-        self.session.buffers.reset _.values(_.clone(doc.snapshot.channels)), remote: true
-        plunker.mediator.trigger "intent:activate", self.session.last()
-        
-        self.start(doc)
+        self.remote.trigger "description:change", doc.snapshot.description, ""
+        self.remote.trigger "channels:reset", doc.snapshot.channels
+
+        self.start(id, doc)
         
     create: (id) ->
-      console.log "Stream#create", arguments...
       self = @
       
       unless id then return plunker.mediator.trigger "error", "plunker.Stream#create missing id"
-      
-      @id = id
 
-      @share.open "stream:#{@id}", "json", (err, doc) ->
+      @share.open "stream:#{id}", "json", (err, doc) ->
         if err then return plunker.mediator.trigger "message", "Connection error", """
           Failed to start the stream #{id}; please try again.
           If the problem persists, please contact the administrator.
@@ -211,181 +171,6 @@
         # Reset the channel to the current local state
         doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
           if err then plunker.mediator.trigger "error", "Error setting initial state"
-          else self.start(doc)
-
-  ###
-  class Channel extends Backbone.Model
-    initialize: (options) ->
-      self = @
-      
-      console.log "Ooptions", arguments...
-      
-      if buffer = plunker.models.session.buffers.get(@get("filename"))
-        @session = buffer.session
-        
-        console.log "BUFFER", buffer
-        
-        sharejs.open @get("stream") + ":" + @id, "text", (err, doc) ->
-          doc.attach_ace self.session.getDocument()
-      
-      self = @
-    
-  
-  class Channels extends Backbone.Collection
-    model: Channel
-    initialize: ->
-      self = @
-
-      buffers = plunker.models.session.buffers
-      
-      # Proxy remote Channel events to the Session's Buffers
-      
-      @on "reset", (coll, options) ->
-        console.log "ONRESET", arguments...
-        if options.remote is true and coll.length > 0
-          buffs = []
-          coll.each (channel) ->
-            buffs.push 
-              filename: channel.get("filename")
-              content: "Loading..."
-          buffers.reset buffs, remote: true
-          
-          plunker.mediator.trigger "intent:activate", plunker.models.session.last()
-      
-      @on "add", (channel, coll, options) ->
-        console.log "Channels::add", arguments...
-        if options.remote is true
-          buffer = 
-            filename: channel.get("filename")
-            content: "Loading..."
-          buffers.add buffer, remote: true
-      
-      @on "remove", (channel, coll, options) ->
-        if options.remote is true
-          if buffer = buffers.get(channel.get("filename"))
-            buffers.remove buffer, remote: true
-      
-      @on "change:filename", (channel, filename, options) ->
-        if options.remote is true
-          if buffer = buffers.get(channel.previous("filename"))
-            buffer.set "filename", filename
-      
-      # Proxy local events from the Session to the Channel
-      
-      buffers.on "add", (buffer, coll, options) ->
-        unless options.remote is true then self.add
-          id: uid()
-          filename: buffer.get("filename")
-          stream: self.stream.id
-      
-      buffers.on "remove", (buffer, coll, options) ->
-        unless options.remote is true
-          if channel = self.channels.find((c) -> c.get("filename") == buffer.get("filename"))
-            channels.remove channel
-      
-      buffers.on "change:filename", (buffer, filename, options) ->
-        unless options.remote is true
-          if channel = self.channels.find((c) -> c.get("filename") == buffer.previous("filename"))
-            channel.set "filename", filename
-        
-  class plunker.Stream extends Backbone.Model
-
-    initialize: ->
-      self = @
-      
-      plunker.mediator.on "intent:stream-start", @onIntentStreamStart
-      plunker.mediator.on "intent:stream-join", @onIntentStreamJoin
-      plunker.mediator.on "intent:stream-stop", @onIntentStreamStop
-      
-      @channels = new Channels
-      @channels.stream = @
-      
-      @channels.on "add", @onAdd
-      @channels.on "remove", @onRemove
-      @channels.on "change:filename", @onRename
-      
-      @channels.on "reset", (coll, options) ->
-        console.log "Resetting", self, arguments...
-        coll.each (channel) -> self.onAdd(channel, coll, options)
-    
-    toJSON: ->
-      json = super()
-      json.channels = {}
-      @channels.each (channel) -> json.channels[channel.id] = channel.toJSON()
-      json
-    
-    onAdd: (channel, coll, options) =>
-      if @share and options.remote isnt true
-        @share.at(["channels", channel.id]).set channel.toJSON()
-
-    onRemove: (channel, coll, options) =>
-      if @share and options.remote isnt true
-        @share.at(["channels", channel.id]).remove()
-
-    onRename: (channel, filename, options) =>
-      if @share and options.remote isnt true
-        @share.at(["channels", channel.id]).set filename
-        
-    init: (@share) ->
-      self = @
-      
-      $channels = @share.at("buffers")
-      
-      $channels.on "child op", (id, e) ->
-        if e.oi
-          self.channels.add e.oi, remote: true
-      
-      _.each ["change", "insert", "delete", "replace", "move", "child op"], (event) ->
-        $channels.on event, -> console.log event, arguments...
-
-    
-    # Start a new stream and define the buffers of that stream
-    onIntentStreamStart: (id) =>
-      self = @
-      
-      @id = id or prompt "Please provide the name of the stream. This should be a hard-to-guess string", uid(6)
-      
-      if @id
-        sharejs.open "state:#{@id}", "json", (err, doc) ->
-          if err then plunker.mediator.trigger "ShareJS Error: #{err}"
-          else
-            # Take current buffers and create a hash of UID => filename
-            channels = {}
-            session = plunker.models.session
-            description = session.get("description")
-            
-            session.buffers.each (buffer) ->
-              id = uid()
-              channels[id] =
-                id: id
-                filename: buffer.get("filename")
-                stream: self.id
-            
-            self.clear()
-            self.channels.reset(_.values(channels))
-            self.set "description", description
-          
-            # Reset the sharejs doc to the above
-            doc.submitOp [ { p: [], od: doc.snapshot, oi: self.toJSON() } ], (err) ->
-              self.init(doc)
-    
-    # Join an existing stream and create local buffers corresponding to those in the stream
-    onIntentStreamJoin: (id) =>
-      self = @
-      
-      @id = id or prompt "Please provide the name of the stream. This should be a hard-to-guess string", uid(6)
-      
-      if @id
-        sharejs.open "state:#{@id}", "json", (err, doc) ->
-          if err then plunker.mediator.trigger "ShareJS Error: #{err}"
-          else
-            self.channels.reset(_.values(_.clone(doc.snapshot.channels)), remote: true)
-            self.set "description", doc.snapshot.description, remote: true
-            
-            self.init(doc)
-            
-    
-    onIntentStreamStop: =>
-  ###
+          else self.start(id, doc)
 
 )(@plunker ||= {})
