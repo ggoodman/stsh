@@ -69,12 +69,30 @@
       @session.buffers.on "remove", @onLocalBufferRemove
       @session.buffers.on "change:filename", @onLocalBufferRename
       @session.buffers.on "reset", @onLocalBufferReset
+      @session.buffers.on "all", ->
+        console.log "ALL", arguments...
       
       _.each doc.snapshot.channels, @watchChannel
       
       ["change", "insert", "delete", "replace", "move", "add", "child op"].forEach (op) ->
         self.doc.at("channels").on op, -> console.log "CHANNEL", op, arguments...
+        
+      self.doc.at("channels").on "insert", (key, value) ->
+        json = 
+          filename: value.filename
+          content: ""
+        
+        self.session.buffers.add json, remote: true
+        
+        self.watchChannel(channel)
       
+      self.doc.at("channels").on "delete", (key, value) ->
+        buffer = self.session.buffers.get(value.filename)
+        self.session.buffers.remove buffer, remote: true
+        
+        delete self.channels.byId[value.id]
+        delete self.channels.byFilename[value.filename]
+        
       self.doc.on "change", (events) ->
         _.each events, (e) ->
           path = e.p.join(".")
@@ -97,7 +115,7 @@
       @channels.byFilename[channel.filename] = channel
 
     onLocalBufferReset: (coll, options) =>
-      console.log arguments.callee.name, arguments...
+      console.log "onlocalbufferreset", arguments...
 
       unless options.remote is true
         @doc.at(["channels"]).set @getLocalState().channels
@@ -111,12 +129,24 @@
         @doc.at(["channels", id]).set
           filename: model.get("filename")
           id: id
+      
+      if channel = @channels.byFilename[model.get("filename")]
+        sharejs.open "channel:#{@id}:#{@channel.id}", "text", (err, doc) ->
+          if err then return plunker.mediator.trigger "message", "Connection error", """
+            Failed to join the stream #{id}. Please double-check that you entered
+            the right stream id. If the problem persists, please contact the
+            administrator.
+          """
+          
+          doc.attach_ace model.session.getDocument(), options.remote != true
         
     onLocalBufferRemove: (model, coll, options) =>
       console.log arguments.callee.name, arguments...
+      
+      channel = @channels.byFilename[model.get("filename")]
 
       unless options.remote is true
-        ""
+        @doc.at(["channels", channel.id]).remove()
         
     onLocalBufferRename: (model, value, options) =>
       console.log arguments.callee.name, arguments...

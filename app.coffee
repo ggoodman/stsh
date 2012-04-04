@@ -9,7 +9,7 @@ app = module.exports = express.createServer()
 app.use assets()
 app.use gzippo.staticGzip("#{__dirname}/public")
 #app.use gzippo.compress() # To be put back in when it has better caching support
-#app.use express.static("#{__dirname}/public")
+app.use express.static("#{__dirname}/public")
 
 app.use "/api/v1", require("./servers/api/v1")
 app.use "/raw", require("./servers/plunks")
