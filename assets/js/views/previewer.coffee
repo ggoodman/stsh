@@ -70,6 +70,8 @@
         plunk = new plunker.Plunk _.defaults @model.toJSON(),
           expires: new Cromag(Cromag.now() + 30 * 1000).toISOString()
         
+        plunk.unset("index")
+        
         plunk.on "sync", ->
           $old = self.$("iframe")
           $iframe = $('<iframe frameborder="0" marginheight="0" marginwidth="0" width="100%" height="100%"></iframe>')
