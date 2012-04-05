@@ -2,6 +2,34 @@
   
   class plunker.Toolbar extends Backbone.View
     template: Handlebars.compile """
+      <div class="btn-toolbar streamer">
+        <div class="btn-group stream-enable">
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-random" />
+            <span class="text">Stream</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu shares">
+            <li>
+              <a class="start" href="javascript:void(0)">Start a new stream</a>
+            </li>
+            <li>
+              <a class="join" href="javascript:void(0)">Join an existing stream</a>
+            </li>
+          </ul>
+        </div>
+        <div class="btn-group stream-disable status">
+          <div class="input-prepend">
+            <span class="add-on">Stream:</span>
+            <input class="stream-id input-medium" type="text" value="{{stream}}" disabled>
+          </div>
+        </div>
+        <div class="btn-group stream-disable">
+          <button class="btn stop" title="Disconnect from collaborative editing">
+            <i class="icon-stop" />
+          </button>
+        </div>
+      </div>
       <div class="btn-toolbar">
         <div class="btn-group">
           <a class="btn btn-success new" href="/edit">
@@ -13,7 +41,7 @@
           </button>
           <ul class="dropdown-menu templates">
             <li>
-              <a href="/edit/from:1961272">Basic html</a>
+              <a href="/edit/from:2312729">Basic html</a>
             </li>
             <li class="divider"></li>
             <li>
@@ -63,27 +91,6 @@
             </button>
           </div>
         {{/if}}
-        <div class="btn-group stream-enable">
-          <button class="btn btn-warning dropdown-toggle" data-toggle="dropdown">
-            <i class="icon-random icon-white" />
-            <span class="text" title="Initiate collaborative editing">Stream</span>
-            <span class="caret"></span>
-          </button>
-          <ul class="dropdown-menu shares">
-            <li>
-              <a class="start" href="javascript:void(0)">Start a new stream</a>
-            </li>
-            <li>
-              <a class="join" href="javascript:void(0)">Join an existing stream</a>
-            </li>
-          </ul>
-        </div>
-        <div class="btn-group stream-disable">
-          <button class="btn btn-warning stop">
-            <i class="icon-random icon-white" />
-            <span class="text" title="Disconnect from collaborative editing">Leave</span>
-          </button>
-        </div>
       </div>
       <div class="btn-toolbar">
         <div class="btn-group">
@@ -151,8 +158,13 @@
       plunker.mediator.on "event:live-compile", -> self.$(".live button").removeClass("active").filter(".live-compile").addClass("active")
       plunker.mediator.on "event:live-preview", -> self.$(".live button").removeClass("active").filter(".live-preview").addClass("active")
       
-      plunker.mediator.on "event:stream-join event:stream-start", -> self.$el.addClass("streamed")
-      plunker.mediator.on "event:stream-stop", -> self.$el.removeClass("streamed")
+      plunker.mediator.on "event:stream-join event:stream-start", (id) ->
+        self.$el.addClass("streamed")
+        self.stream = id
+        self.$(".stream-id").val(id)
+      plunker.mediator.on "event:stream-stop", ->
+        delete self.stream
+        self.$el.removeClass("streamed")
       
 
 
@@ -160,6 +172,12 @@
       @$el.html @template
         session: @model.toJSON()
         plunk: @model.plunk.toJSON()
-      @
-
-)(@plunker ||= {})
+        stream: @stream
+        
+      @$(".stream-enable button").popover
+        placement: "bottom"
+        title: "Streaming session"
+        content: """
+          <p><span class="label label-warning">ALPHA QUALITY FEATURE</span></p>
+          <p>Streaming allows you to collaborate with others in real-time on the same
+          shared state, called a stream. A stream is independent of your 

@@ -45,11 +45,13 @@
       # Proxy local buffer events to the local emitter
       @session.buffers.on "reset", (coll, options) ->
         unless options.remote is true
-          self.local.trigger "buffers:reset", coll, options
+          self.local.trigger "buffers:reset", coll, _.extend options,
+            keep: true
         
         if self.doc
           _.each self.channels, (channel) -> self.unwatch channel.buffer
-          coll.each (buffer) -> self.watch(buffer, options)
+          coll.each (buffer) -> self.watch(buffer, keep: options.remote != true)
+          
       @session.buffers.on "add", (model, coll, options) ->
         unless options.remote is true
           self.local.trigger "buffers:add", model, options
@@ -82,14 +84,11 @@
             channel: id
             filename: buffer.get("filename")
 
-
-      
       # Remove buffer from sharejs channels object
       @local.on "buffers:remove", (buffer) ->
         if self.doc then self.doc.at(["channels", buffer.get("channel")]).remove()
         
       @local.on "buffers:rename", (buffer) ->
-        console.log "Local rename ->", buffer, ["channels", buffer.get("channel"), "filename"], buffer.get("filename")
         if self.doc then self.doc.at(["channels", buffer.get("channel"), "filename"]).set buffer.get("filename")
     
     bindRemoteEvents: ->
@@ -113,7 +112,6 @@
           buffer.set "filename", filename, remote: true
     
     watch: (buffer, options = {}) ->
-      console.log "WATCH", _.clone(buffer.attributes), arguments...
       self = @
       
       sharejs.open "channel:#{@id}:#{buffer.get('channel')}", "text", (err, doc) ->
@@ -130,7 +128,6 @@
         doc.attach_ace buffer.session.getDocument(), options.keep == true
     
     unwatch: (buffer) ->
-      console.log "UNWATCH", arguments...
       id = buffer.get("channel")
       if @channels[id]
         @channels[id].doc.detach_ace()
@@ -148,16 +145,18 @@
       delete @id
       delete @doc
       
+      plunker.mediator.trigger "event:stream-stop"
+      
     start: (@id, @doc) ->
       self = @
         
       @doc.on "change", (events) ->
         _.each events, (e) ->
-          console.log "change", e
           if e.p.length then switch e.p[0]
             when "description" then self.remote.trigger "description:change", e.oi or ""
             when "channels"
-              if e.p.length == 1 then self.remote.trigger "channels:reset", e.oi
+              # TODO: This first comparison is VERY inefficient
+              if e.p.length == 1 and not _.isEqual(self.getLocalState().channels, e.oi) then self.remote.trigger "channels:reset", e.oi
               else if e.p.length == 2
                 if e.od? then self.remote.trigger "channels:remove", e.od
                 else if e.oi? then self.remote.trigger "channels:add", e.oi
@@ -181,8 +180,6 @@
         state.channels[id] =
           channel: id
           filename: buffer.get("filename")
-        
-      console.log "Local state", state
       
       state
       
@@ -200,15 +197,21 @@
           administrator.
         """
         
-        console.log "joined", id, arguments...
-        
-        self.remote.trigger "description:change", doc.snapshot.description, ""
-        self.remote.trigger "channels:reset", doc.snapshot.channels, keep: true
+        if doc.snapshot
+          self.remote.trigger "description:change", doc.snapshot.description, ""
+          self.remote.trigger "channels:reset", doc.snapshot.channels, keep: true
+  
+          self.start(id, doc)
+          self.session.buffers.each (buffer) -> self.watch(buffer, keep: false)
+        else
+          # Reset the channel to the current local state
+          doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
+            if err then plunker.mediator.trigger "error", "Error setting initial state"
+            else self.start(id, doc)
 
-        self.start(id, doc)
+          self.session.buffers.each (buffer) -> self.watch(buffer, keep: true)
         
-        self.session.buffers.each (buffer) -> self.watch(buffer, keep: false)
-        
+        plunker.mediator.trigger "event:stream-join", id
         plunker.mediator.trigger "event:enable"
         
     create: (id) ->
@@ -224,8 +227,6 @@
           If the problem persists, please contact the administrator.
         """
         
-        console.log "started", id, arguments...
-        
         # Reset the channel to the current local state
         doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
           if err then plunker.mediator.trigger "error", "Error setting initial state"
@@ -233,6 +234,7 @@
                         
           self.session.buffers.each (buffer) -> self.watch(buffer, keep: true)
      
+          plunker.mediator.trigger "event:stream-start", id
           plunker.mediator.trigger "event:enable"
 
 )(@plunker ||= {})

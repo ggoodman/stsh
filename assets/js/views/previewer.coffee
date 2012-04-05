@@ -64,6 +64,9 @@
       self = @
   
       if @mode == "preview"
+        json = @model.toJSON()
+        
+        return if _.isEmpty(json.files)
         plunk = new plunker.Plunk _.defaults @model.toJSON(),
           expires: new Cromag(Cromag.now() + 30 * 1000).toISOString()
         
