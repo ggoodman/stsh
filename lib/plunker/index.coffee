@@ -48,7 +48,7 @@ class Creater
 
     json.index ||= do ->
       filenames = _.keys(json.files)
-
+      
       if "index.html" in filenames then "index.html"
       else
         html = _.filter filenames, (filename) -> /.html?$/.test(filename)
@@ -147,10 +147,6 @@ class Updater
       for filename, file of json.files
         former = old_files[filename]
 
-        console.log ""
-        console.log "Handling", filename, file
-        console.log ""
-        
         # Normalize file structure to hash
         if _.isString(file) then file =
           filename: filename
@@ -171,8 +167,6 @@ class Updater
         else if former
           # Houston, we have a rename!
           if (new_name = file.filename) and new_name != filename
-            console.log filename, file
-            console.log "new_files", new_files
             if new_files[new_name] then errors.push
               message: "Impossible to rename a file to a filename that already exists"
               field: "files['#{filename}'].filename"
@@ -203,10 +197,9 @@ class Updater
       field: "files"
     
     else
-      # Update index
-      plunk.files[plunk.index] or plunk.index = do ->
-        filenames = _.keys(plunk.files)
-  
+      plunk.index = do ->
+        filenames = _.pluck(plunk.files, "filename")
+        
         if "index.html" in filenames then "index.html"
         else
           html = _.filter filenames, (filename) -> /.html?$/.test(filename)
