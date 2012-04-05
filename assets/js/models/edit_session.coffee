@@ -92,7 +92,10 @@
             The plunk '#{plunk.get("description")}' has been deleted.
           """
         
-        plunker.mediator.trigger "intent:reset"
+        self.plunk.clear()
+        
+        #TODO: This is ugly, referring to the stream like this. Refactor needed
+        plunker.mediator.trigger "intent:reset" unless plunker.models.stream.doc
 
       plunker.mediator.on "intent:save", @onIntentSave
       plunker.mediator.on "intent:delete", @onIntentDelete

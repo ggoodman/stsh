@@ -29,6 +29,17 @@
         self.join id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream."
       plunker.mediator.on "intent:stream-stop", (id) ->
         self.stop()
+        
+      plunker.mediator.on "event:stream-start event:stream-join", (id) ->
+        $.gritter.add
+          title: "Joined stream: #{id}"
+          text: """
+            <p>All changes you make to your current edit session will be shared
+            with everyone else in the same stream.</p>
+            <p>Note that saving the editor's state will not affect the stream.
+            Similarly, if you save the state, that plunk will not be tied to the
+            stream.</p>
+          """
       
       # Throttle local events
       _.each ["onLocalChangeDescription"], (method) ->
