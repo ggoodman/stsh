@@ -27,14 +27,7 @@
     toJSON: ->
       filename: @get("filename")
       content: @session.getValue() or ""
-    
-    enableShare: (id) ->
-      self = @
-      
-      sharejs.open "#{id}/#{@id}", "text", (err, doc) ->
-        if err then plunker.mediator.trigger "error", "ShareJS Error: #{err}"
-        else
-          doc.attach_ace self.session.getDocument()
+
 
     setMode: =>
       self = @
