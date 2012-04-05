@@ -87,6 +87,7 @@
       
       @remote.on "channels:reset", (channels) ->
         self.session.buffers.reset _.values(_.clone(channels)), remote: true
+        plunker.mediator.trigger "intent:activate", _.values(channels)[0].filename
       
       @remote.on "channels:add", (channel) ->
         self.session.buffers.add channel, remote: true
@@ -152,6 +153,8 @@
           administrator.
         """
         
+        console.log "joined", id, arguments...
+        
         self.remote.trigger "description:change", doc.snapshot.description, ""
         self.remote.trigger "channels:reset", doc.snapshot.channels
 
@@ -167,6 +170,8 @@
           Failed to start the stream #{id}; please try again.
           If the problem persists, please contact the administrator.
         """
+        
+        console.log "started", id, arguments...
         
         # Reset the channel to the current local state
         doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
