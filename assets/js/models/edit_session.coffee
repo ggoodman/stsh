@@ -104,6 +104,16 @@
     last: -> _.first(@queue)
     getActiveBuffer: -> @buffers.get(@last())
     
+    guessIndex: ->
+      filenames = @buffers.pluck("filename")
+
+      if "index.html" in filenames then "index.html"
+      else
+        html = _.filter filenames, (filename) -> /.html?$/.test(filename)
+
+        if html.length then html[0]
+        else filenames[0]
+    
     toJSON: ->
       json =
         description: @get("description")

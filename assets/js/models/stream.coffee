@@ -53,7 +53,7 @@
           self.local.trigger "buffers:remove", model
       @session.buffers.on "change:filename", (model, value, options) ->
         unless options.remote is true
-          self.local.trigger "buffers:rename", value, model.previous("filename")
+          self.local.trigger "buffers:rename", model
 
     bindLocalEvents: ->
       self = @
@@ -78,6 +78,9 @@
       # Remove buffer from sharejs channels object
       @local.on "buffers:remove", (buffer) ->
         if self.doc then self.doc.at(["channels", buffer.get("channel")]).remove()
+        
+      @local.on "buffers:rename", (buffer) ->
+        if self.doc then self.doc.at(["channels", buffer.get("channel"), "filename"]).set buffer.get("filename")
     
     bindRemoteEvents: ->
       self = @
@@ -87,7 +90,7 @@
       
       @remote.on "channels:reset", (channels) ->
         self.session.buffers.reset _.values(_.clone(channels)), remote: true
-        plunker.mediator.trigger "intent:activate", _.values(channels)[0].filename
+        plunker.mediator.trigger "intent:activate", self.session.guessIndex()
       
       @remote.on "channels:add", (channel) ->
         self.session.buffers.add channel, remote: true
@@ -120,8 +123,8 @@
             when "channels" then self.remote.trigger "channels:reset", _.values(_.clone(self.doc.snapshot.channels))
       
       @doc.at("channels").on "child op", (p, op) ->
-        console.log "child op", arguments...
-        # TODO: Emit remote rename event
+        self.remote.trigger "channels:rename", op.oi, op.od
+
   
     getLocalState: ->
       state =
