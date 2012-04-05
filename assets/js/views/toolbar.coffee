@@ -180,4 +180,9 @@
         content: """
           <p><span class="label label-warning">ALPHA QUALITY FEATURE</span></p>
           <p>Streaming allows you to collaborate with others in real-time on the same
-          shared state, called a stream. A stream is independent of your 
+          shared state, called a stream. A stream is independent of your current
+          plunk and will not be affected by saving.</p>
+        """
+      @
+
+)(@plunker ||= {})
