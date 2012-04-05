@@ -65,8 +65,8 @@
       
       #plunker.mediator.on "event:fileRename", (to, from) -> self.queue = _.map self.queue, (el) -> if el == from then to else el
       plunker.mediator.on "event:activate", (filename) -> self.queue = [filename].concat _.without(self.queue, filename)
-      plunker.mediator.on "event:load:start", -> $("#wrap").addClass("loading")
-      plunker.mediator.on "event:load:end", -> $("#wrap").removeClass("loading")
+      plunker.mediator.on "event:disable", -> $("#wrap").addClass("loading")
+      plunker.mediator.on "event:enable", -> $("#wrap").removeClass("loading")
 
       plunker.mediator.on "event:reset", ->
         plunker.controller.navigate "/edit",
@@ -105,7 +105,7 @@
     getActiveBuffer: -> @buffers.get(@last())
     
     guessIndex: ->
-      filenames = @buffers.pluck("filename")
+      filenames = @queue
 
       if "index.html" in filenames then "index.html"
       else
@@ -168,7 +168,6 @@
           if confirm "Are you sure that you want to delete the file #{filename}?"
             @buffers.remove buffer
             plunker.mediator.trigger "event:removeFile", filename
-            plunker.mediator.trigger "intent:activate", @last()
         else $.gritter.add
           title: "Remove failed"
           text: "No such file #{filename}."
@@ -178,7 +177,7 @@
 
     onIntentFileRename: (filename, new_filename) =>
       if buffer = @buffers.get(filename)
-        if new_filename ||= prompt("New filename?")
+        if new_filename ||= prompt("New filename?", filename)
           @queue = _.map @queue, (el) -> if el == filename then new_filename else filename
           buffer.set "filename", new_filename
           plunker.mediator.trigger "event:fileRename", new_filename, filename
@@ -200,7 +199,7 @@
     import: (source) ->
       session = @
 
-      plunker.mediator.trigger "event:load:start"
+      plunker.mediator.trigger "event:disable"
 
       @plunk.clear()
       @buffers.reset()
@@ -219,14 +218,14 @@
             description: json.description
             
           plunker.mediator.trigger "intent:activate", json.index
-          plunker.mediator.trigger "event:load:end"
+          plunker.mediator.trigger "event:enable"
           plunker.mediator.trigger "event:import", json, source
         error: ->
           alert "Failed to fetch plunk"
           plunker.controller.navigate "/edit",
             trigger: true
             replace: true
-          plunker.mediator.trigger "event:load:end"                      
+          plunker.mediator.trigger "event:enable"                      
 
     load: (id) ->
       session = @
@@ -235,7 +234,7 @@
       @buffers.reset()
       @clear()
       
-      plunker.mediator.trigger "event:load:start"
+      plunker.mediator.trigger "event:disable"
       
       if id then @plunk
         .set("id", id)
@@ -253,14 +252,14 @@
                 replace: true
                 
             plunker.mediator.trigger "intent:activate", plunk.get("index")
-            plunker.mediator.trigger "event:load:end"
+            plunker.mediator.trigger "event:enable"
             plunker.mediator.trigger "event:load", plunk
           error: ->
             alert "Failed to fetch plunk"
             plunker.controller.navigate "/edit",
               trigger: true
               replace: true
-            plunker.mediator.trigger "event:load:end"
+            plunker.mediator.trigger "event:enable"
     
 
 )(@plunker ||= {})

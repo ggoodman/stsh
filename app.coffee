@@ -44,7 +44,7 @@ app.get /^\/([a-zA-Z0-9]{6})$/, (req, res) -> res.redirect("/#{req.params[0]}/",
 app.get /^\/edit(?:\/([a-zA-Z0-9]{6})\/?)?/, (req, res) ->
   res.render("editor", page: "/edit", views: req.param("views", "sidebar editor preview").split(/[ \.,]/).join(" "))
 
-
+app.use express.logger()
 
 if require.main == module
   app.listen process.env.PORT || 8080

@@ -29,7 +29,7 @@
   class plunker.Sidebar extends Backbone.View
     events:
       "click .add":         (e) -> plunker.mediator.trigger "intent:fileAdd"
-      "click .remove":      (e)-> plunker.mediator.trigger "intent:fileRemove"
+      "click .remove":      (e) -> plunker.mediator.trigger "intent:fileRemove", @model.last()
       
       "click .wordwrap":    (e) ->
         if buffer = @model.getActiveBuffer()
@@ -55,10 +55,14 @@
       removeBuffer = (buffer) ->
         self.views[buffer.cid].remove()
         delete self.views[buffer.cid]
+        
+        plunker.mediator.trigger "intent:activate", self.model.last()
       
       @model.buffers.on "reset", (coll) ->
         _.each self.views, (view) -> removeBuffer(view.model)
         coll.each addBuffer
+        
+        plunker.mediator.trigger "intent:activate", self.model.guessIndex()
       
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
