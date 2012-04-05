@@ -9,7 +9,6 @@ config = _.defaults require("../config"),
 
 
 app.use require("../lib/plunker").middleware(config)
-app.use express.logger()
 
 
 loadPlunk = (req, res, next) ->

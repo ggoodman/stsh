@@ -1,14 +1,3 @@
-#= require_tree importers
-#= require lib/modes
-#= require lib/themes
-#= require lib/importer
-#= require lib/compilers
-#= require models/plunks
-#= require models/edit_session
-#= require views/toolbar
-#= require views/sidebar
-#= require views/textarea
-#= require views/previewer
 #= require controllers/editor
 
 ((plunker) ->

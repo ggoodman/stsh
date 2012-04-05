@@ -5,14 +5,9 @@ _ = require("underscore")._
 
 
 # From connect/utils.js
-uid = (len = 6) ->
-  keyspace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-  key = ""
-
-  while len-- > 0
-    key += keyspace.charAt(Math.floor(Math.random() * keyspace.length))
-
-  key
+uid = (len = 6, prefix = "", keyspace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") ->
+  prefix += keyspace.charAt(Math.floor(Math.random() * keyspace.length)) while len-- > 0
+  prefix
 
 
 delay = (timeout, callback) -> setTimeout(callback, timeout)

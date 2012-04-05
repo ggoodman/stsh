@@ -29,7 +29,7 @@
   class plunker.Sidebar extends Backbone.View
     events:
       "click .add":         (e) -> plunker.mediator.trigger "intent:fileAdd"
-      "click .remove":      (e)-> plunker.mediator.trigger "intent:fileRemove"
+      "click .remove":      (e) -> plunker.mediator.trigger "intent:fileRemove", @model.last()
       
       "click .wordwrap":    (e) ->
         if buffer = @model.getActiveBuffer()
@@ -40,7 +40,7 @@
         plunker.themes.load $(e.target).attr("value"), (theme) ->
           plunker.views.textarea.ace.setTheme(theme)
       
-      "keyup .description": (e) -> @model.set("description", @$(e.target).val(), silent: true)
+      "keyup .description": (e) -> @model.set("description", @$(e.target).val(), handled: true)
 
     initialize: ->
       self = @
@@ -55,15 +55,21 @@
       removeBuffer = (buffer) ->
         self.views[buffer.cid].remove()
         delete self.views[buffer.cid]
+        
+        plunker.mediator.trigger "intent:activate", self.model.last()
       
       @model.buffers.on "reset", (coll) ->
         _.each self.views, (view) -> removeBuffer(view.model)
         coll.each addBuffer
+        
+        plunker.mediator.trigger "intent:activate", self.model.guessIndex()
       
       @model.buffers.on "add", addBuffer
       @model.buffers.on "remove", removeBuffer
       
-      @model.on "change:description", -> self.$(".description").val(self.model.get("description"))
+      @model.on "change:description", (model, value, options) ->
+        unless options.handled is true
+          self.$(".description").val(self.model.get("description"))
       
       plunker.mediator.on "event:activate", (filename) ->
         buffer = self.model.getActiveBuffer()

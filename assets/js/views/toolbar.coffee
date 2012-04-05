@@ -2,18 +2,46 @@
   
   class plunker.Toolbar extends Backbone.View
     template: Handlebars.compile """
+      <div class="btn-toolbar streamer">
+        <div class="btn-group stream-enable">
+          <button class="btn dropdown-toggle" data-toggle="dropdown">
+            <i class="icon-random" />
+            <span class="text">Stream</span>
+            <span class="caret"></span>
+          </button>
+          <ul class="dropdown-menu shares">
+            <li>
+              <a class="start" href="javascript:void(0)">Start a new stream</a>
+            </li>
+            <li>
+              <a class="join" href="javascript:void(0)">Join an existing stream</a>
+            </li>
+          </ul>
+        </div>
+        <div class="btn-group stream-disable status">
+          <div class="input-prepend">
+            <span class="add-on">Stream:</span>
+            <input class="stream-id input-medium" type="text" value="{{stream}}" disabled>
+          </div>
+        </div>
+        <div class="btn-group stream-disable">
+          <button class="btn stop" title="Disconnect from collaborative editing">
+            <i class="icon-stop" />
+          </button>
+        </div>
+      </div>
       <div class="btn-toolbar">
         <div class="btn-group">
           <a class="btn btn-success new" href="/edit">
             <i class="icon-file icon-white" />
-            <span class="text">New</span>
+            <span class="text" title="Create a new, blank plunk">New</span>
           </a>
           <button class="btn btn-success dropdown-toggle" data-toggle="dropdown">
             <span class="caret"></span>
           </button>
           <ul class="dropdown-menu templates">
             <li>
-              <a href="/edit/from:1961272">Basic html</a>
+              <a href="/edit/from:2312729">Basic html</a>
             </li>
             <li class="divider"></li>
             <li>
@@ -101,6 +129,9 @@
       "click .live-off": (e) -> plunker.mediator.trigger "intent:live-off"
       "click .live-compile": (e) -> plunker.mediator.trigger "intent:live-compile"
       "click .live-preview": (e) -> plunker.mediator.trigger "intent:live-preview"
+      "click .stream-enable .start": (e) -> plunker.mediator.trigger "intent:stream-start"
+      "click .stream-enable .join": (e) -> plunker.mediator.trigger "intent:stream-join"
+      "click .stream-disable .stop": (e) -> plunker.mediator.trigger "intent:stream-stop"
       "click .templates a": (e) ->       
         e.preventDefault()
         plunker.controller.navigate $(e.target).attr("href"),
@@ -126,11 +157,32 @@
       plunker.mediator.on "event:live-off", -> self.$(".live button").removeClass("active").filter(".live-off").addClass("active")
       plunker.mediator.on "event:live-compile", -> self.$(".live button").removeClass("active").filter(".live-compile").addClass("active")
       plunker.mediator.on "event:live-preview", -> self.$(".live button").removeClass("active").filter(".live-preview").addClass("active")
+      
+      plunker.mediator.on "event:stream-join event:stream-start", (id) ->
+        self.$el.addClass("streamed")
+        self.stream = id
+        self.$(".stream-id").val(id)
+      plunker.mediator.on "event:stream-stop", ->
+        delete self.stream
+        self.$el.removeClass("streamed")
+      
+
 
     render: =>
       @$el.html @template
         session: @model.toJSON()
         plunk: @model.plunk.toJSON()
+        stream: @stream
+        
+      @$(".stream-enable button").popover
+        placement: "bottom"
+        title: "Streaming session"
+        content: """
+          <p><span class="label label-warning">ALPHA QUALITY FEATURE</span></p>
+          <p>Streaming allows you to collaborate with others in real-time on the same
+          shared state, called a stream. A stream is independent of your current
+          plunk and will not be affected by saving.</p>
+        """
       @
 
 )(@plunker ||= {})
