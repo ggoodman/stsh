@@ -20,8 +20,7 @@
         </div>
         <div class="btn-group stream-disable status">
           <div class="input-prepend">
-            <span class="add-on">Stream:</span>
-            <input class="stream-id input-medium" type="text" value="{{stream}}" disabled>
+            <span class="add-on">Stream:</span><input class="stream-id input-medium" type="text" value="{{stream}}" disabled />
           </div>
         </div>
         <div class="btn-group stream-disable">

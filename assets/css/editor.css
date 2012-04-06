@@ -77,11 +77,12 @@
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
 #toolbar .btn-toolbar.streamer .status .input-prepend {
+  position: relative;
+  top: -11px;
   margin-bottom: 0;
 }
 #toolbar .btn-toolbar.streamer .status input {
   margin-bottom: 0;
-  float: right;
   cursor: text;
 }
 
