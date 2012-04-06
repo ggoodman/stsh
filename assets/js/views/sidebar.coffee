@@ -3,7 +3,13 @@
   class Filename extends Backbone.View
     tagName: "li"
     className: "file"
-    
+
+    template: Handlebars.compile """
+      {{filename}}
+      <span class="marker">*</span>
+    """
+
+
     events:
       "click":    -> plunker.mediator.trigger "intent:activate", @model.get("filename")
       "dblclick": -> plunker.mediator.trigger "intent:fileRename", @model.get("filename")
@@ -13,16 +19,29 @@
       
       plunker.mediator.on "event:activate", @onEventActivate
       
+      @model.on "remove", ->
+        plunker.mediator.off "event:activate", self.onEventActivate
+        self.model.off "change:filename", self.render
+        self.model.off "change:content", self.onChangeContent
+      
       @model.on "change:filename", @render
+      @model.on "change:content", @onChangeContent
 
     onEventActivate: (filename) =>
+      @active = filename
+      
       if @model.get("filename") == filename
         @$el.addClass("active")
+        @$el.removeClass("changed")
       else
         @$el.removeClass("active")
+        
+    onChangeContent: (buffer, content, options) =>
+      @$el.addClass("changed") unless @active == buffer.id
     
     render: =>
-      @$el.text(@model.get("filename"))
+      @$el.html @template
+        filename: @model.get("filename")
       @
     
 
