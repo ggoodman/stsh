@@ -3,6 +3,16 @@
   class plunker.Toolbar extends Backbone.View
     template: Handlebars.compile """
       <div class="btn-toolbar streamer">
+        <div class="stream-disable status">
+          <div class="input-prepend input-append">
+            <span class="add-on">Stream:</span><input class="stream-id input-medium" type="text" value="{{stream}}" disabled />
+          </div>
+        </div>
+        <div class="btn-group stream-disable">
+          <button class="btn stop" title="Disconnect from collaborative editing">
+            <i class="icon-stop" />
+          </button>
+        </div>
         <div class="btn-group stream-enable">
           <button class="btn dropdown-toggle" data-toggle="dropdown">
             <i class="icon-random" />
@@ -17,16 +27,6 @@
               <a class="join" href="javascript:void(0)">Join an existing stream</a>
             </li>
           </ul>
-        </div>
-        <div class="btn-group stream-disable status">
-          <div class="input-prepend">
-            <span class="add-on">Stream:</span><input class="stream-id input-medium" type="text" value="{{stream}}" disabled />
-          </div>
-        </div>
-        <div class="btn-group stream-disable">
-          <button class="btn stop" title="Disconnect from collaborative editing">
-            <i class="icon-stop" />
-          </button>
         </div>
       </div>
       <div class="btn-toolbar">

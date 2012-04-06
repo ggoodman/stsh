@@ -76,10 +76,11 @@
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
+#toolbar .btn-toolbar.streamer .status {
+  vertical-align: top;
+}
 #toolbar .btn-toolbar.streamer .status .input-prepend {
-  position: relative;
-  top: -11px;
-  margin-bottom: 0;
+  margin-top: 6px;
 }
 #toolbar .btn-toolbar.streamer .status input {
   margin-bottom: 0;
