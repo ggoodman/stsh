@@ -5,13 +5,10 @@
       <div class="btn-toolbar streamer">
         <div class="stream-disable status">
           <div class="input-prepend input-append">
-            <span class="add-on">Stream:</span><input class="stream-id input-medium" type="text" value="{{stream}}" disabled />
+            <span class="add-on" title="Streaming active"><i class="icon-random" /></span><input class="stream-id input-medium" type="text" value="{{stream}}" disabled /><button class="add-on btn stop" title="Disconnect from collaborative editing">
+              <i class="icon-stop" />
+            </button>
           </div>
-        </div>
-        <div class="btn-group stream-disable">
-          <button class="btn stop" title="Disconnect from collaborative editing">
-            <i class="icon-stop" />
-          </button>
         </div>
         <div class="btn-group stream-enable">
           <button class="btn dropdown-toggle" data-toggle="dropdown">
@@ -160,7 +157,7 @@
       plunker.mediator.on "event:stream-join event:stream-start", (id) ->
         self.$el.addClass("streamed")
         self.stream = id
-        self.$(".stream-id").val(id)
+        self.$(".stream-id").val(id).attr("size", id.length)
       plunker.mediator.on "event:stream-stop", ->
         delete self.stream
         self.$el.removeClass("streamed")
@@ -172,6 +169,8 @@
         session: @model.toJSON()
         plunk: @model.plunk.toJSON()
         stream: @stream
+      
+      @$("input.stream-id").attr "size", @stream.length if @stream
         
       @$(".stream-enable button").popover
         placement: "bottom"

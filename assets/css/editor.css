@@ -60,9 +60,20 @@
 }
 
 #toolbar.streamed .btn-toolbar.streamer {
-  padding: 0 6px;
-  border-right: 1px solid #333333;
-  border-left: 1px solid #333333;
+}
+#toolbar .btn-toolbar.streamer {
+  vertical-align: top;
+}
+#toolbar .btn-toolbar.streamer .status {
+  vertical-align: top;
+}
+#toolbar .btn-toolbar.streamer .status .input-prepend {
+  margin-top: 6px;
+}
+
+#toolbar .btn-toolbar.streamer .status span.add-on {
+  text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
+  color: #ffffff;
   background-color: #faa732;
   background-image: -moz-linear-gradient(top, #fbb450, #f89406);
   background-image: -ms-linear-gradient(top, #fbb450, #f89406);
@@ -76,15 +87,22 @@
   border-color: rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.1) rgba(0, 0, 0, 0.25);
   filter: progid:dximagetransform.microsoft.gradient(enabled=false);
 }
-#toolbar .btn-toolbar.streamer .status {
-  vertical-align: top;
-}
-#toolbar .btn-toolbar.streamer .status .input-prepend {
-  margin-top: 6px;
-}
 #toolbar .btn-toolbar.streamer .status input {
+  font-family: "Courier New", Courier, monospace;
   margin-bottom: 0;
   cursor: text;
+  width: auto;
+}
+
+#toolbar .btn-toolbar.streamer .status .stop {
+  height: 28px;
+  margin-top: 0;
+}
+
+@media (max-width: 663px) {
+  #toolbar .btn-toolbar.streamer .status input {
+    display: none;
+  }
 }
 
 @media (max-width: 606px) {
