@@ -24,15 +24,26 @@
       
       # Handle interface intents for streaming
       plunker.mediator.on "intent:stream-start", (id) ->
-        self.create id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
+        self.join id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream.", uid(16)
       plunker.mediator.on "intent:stream-join", (id) ->
         self.join id or prompt "Please provide the id of the stream. Anyone who has this id can join the stream."
       plunker.mediator.on "intent:stream-stop", (id) ->
         self.stop()
         
-      plunker.mediator.on "event:stream-start event:stream-join", (id) ->
+      plunker.mediator.on "event:stream-join", (id) ->
         $.gritter.add
           title: "Joined stream: #{id}"
+          text: """
+            <p>All changes you make to your current edit session will be shared
+            with everyone else in the same stream.</p>
+            <p>Note that saving the editor's state will not affect the stream.
+            Similarly, if you save the state, that plunk will not be tied to the
+            stream.</p>
+          """
+      
+      plunker.mediator.on "event:stream-start", (id) ->
+        $.gritter.add
+          title: "Started stream: #{id}"
           text: """
             <p>All changes you make to your current edit session will be shared
             with everyone else in the same stream.</p>
@@ -44,6 +55,10 @@
       # Throttle local events
       _.each ["onLocalChangeDescription"], (method) ->
         self[method] = _.throttle self[method], 500
+    
+    getConnection: ->
+      location = window.location
+      @conn ||= new sharejs.Connection("#{location.protocol}//#{location.host}/channel")
     
     watchSession: ->
       self = @
@@ -125,7 +140,9 @@
     watch: (buffer, options = {}) ->
       self = @
       
-      sharejs.open "channel:#{@id}:#{buffer.get('channel')}", "text", (err, doc) ->
+      conn = @getConnection()
+      
+      conn.open "channel:#{@id}:#{buffer.get('channel')}", "text", (err, doc) ->
         if err then return plunker.mediator.trigger "message", "Connection error", """
           Failed to join the stream #{id}. Please double-check that you entered
           the right stream id. If the problem persists, please contact the
@@ -153,8 +170,11 @@
       _.each @channels, (channel) ->
         self.unwatch(channel.buffer)
       
+      @conn.disconnect()
+      
       delete @id
       delete @doc
+      delete @conn
       
       plunker.mediator.trigger "event:stream-stop"
       
@@ -201,51 +221,29 @@
       
       plunker.mediator.trigger "event:disable"
 
-      sharejs.open "stream:#{id}", "json", (err, doc) ->
+      @getConnection().open "stream:#{id}", "json", (err, doc) ->
         if err then return plunker.mediator.trigger "message", "Connection error", """
           Failed to join the stream #{id}. Please double-check that you entered
           the right stream id. If the problem persists, please contact the
           administrator.
         """
         
-        if doc.snapshot
-          self.remote.trigger "description:change", doc.snapshot.description, ""
-          self.remote.trigger "channels:reset", doc.snapshot.channels, keep: true
-  
-          self.start(id, doc)
-          self.session.buffers.each (buffer) -> self.watch(buffer, keep: false)
-        else
+        if doc.created is true
           # Reset the channel to the current local state
           doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
             if err then plunker.mediator.trigger "error", "Error setting initial state"
-            else self.start(id, doc)
+            else
+              self.start(id, doc)
+              self.session.buffers.each (buffer) -> self.watch(buffer, keep: true)
+              plunker.mediator.trigger "event:stream-start", id
+              plunker.mediator.trigger "event:enable"
+        else
+          self.start(id, doc)
 
-          self.session.buffers.each (buffer) -> self.watch(buffer, keep: true)
-        
-        plunker.mediator.trigger "event:stream-join", id
-        plunker.mediator.trigger "event:enable"
-        
-    create: (id) ->
-      self = @
-      
-      unless id then return plunker.mediator.trigger "error", "plunker.Stream#create missing id"
-
-      plunker.mediator.trigger "event:disable"
-
-      sharejs.open "stream:#{id}", "json", (err, doc) ->
-        if err then return plunker.mediator.trigger "message", "Connection error", """
-          Failed to start the stream #{id}; please try again.
-          If the problem persists, please contact the administrator.
-        """
-        
-        # Reset the channel to the current local state
-        doc.submitOp [ { p: [], od: doc.snapshot, oi: self.getLocalState() } ], (err) ->
-          if err then plunker.mediator.trigger "error", "Error setting initial state"
-          else self.start(id, doc)
-                        
-          self.session.buffers.each (buffer) -> self.watch(buffer, keep: true)
-     
-          plunker.mediator.trigger "event:stream-start", id
+          self.remote.trigger "description:change", doc.snapshot.description, ""
+          self.remote.trigger "channels:reset", doc.snapshot.channels, keep: true
+  
+          plunker.mediator.trigger "event:stream-join", id
           plunker.mediator.trigger "event:enable"
 
 )(@plunker ||= {})

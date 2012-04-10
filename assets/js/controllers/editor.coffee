@@ -50,13 +50,6 @@
       
       
       
-      if @query.live == "compile" then plunker.mediator.trigger "intent:live-compile"
-      else if @query.live == "preview" then plunker.mediator.trigger "intent:live-preview"
-      
-      if @query.preview == "on" then plunker.mediator.trigger "intent:preview-enable"
-      
-      if @query.stream then plunker.mediator.trigger "intent:stream-join", @query.stream
-      
       plunker.mediator.on "message", (title, body) -> $.gritter.add
         title: title
         text: body
@@ -103,6 +96,13 @@
           replace: true
           trigger: false
           
+      if @query.live == "compile" then plunker.mediator.trigger "intent:live-compile"
+      else if @query.live == "preview" then plunker.mediator.trigger "intent:live-preview"
+      
+      if @query.preview == "on" then plunker.mediator.trigger "intent:preview-enable"
+      
+      if @query.stream then plunker.mediator.trigger "intent:stream-join", @query.stream
+      
     navigate: (query, options) ->
       super query + @encodeQuery(), options
 

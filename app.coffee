@@ -31,7 +31,9 @@ app.get "/about", (req, res) ->
 
 # Start the sharejs server before variable routes
 sharejs.server.attach app,
-  db: { type: "none" }
+  db:
+    type: "none"
+
 
 app.get /^\/([a-zA-Z0-9]{6})\/(.*)$/, (req, res) ->
   res.local "raw_url", "/raw" + req.url
