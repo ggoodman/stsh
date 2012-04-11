@@ -40,19 +40,24 @@
             lang: "javascript"
             title: "Compiled coffee-script"
         catch error
-          matches = error.message.match /^(.+) on line ([0-9]+)\: (.+)$/i
+          console.log "Error", error
           lines = code.split(/\r?\n/)
-          err =
-            line: parseInt(matches[2], 10)
-            reason: matches[3]
           
-          err.evidence = $.trim(lines[err.line - 1])
-          err.character = lines[err.line - 1].indexOf(err.evidence)
-            
-          return cb null,
-            type: "html"
-            body: buildErrorReport([err])
-            title: "Coffee errors"
+          if matches = error.message.match /^([^,]+)(?:, (starting))? on line ([0-9]+)(?:\: (.+))?$/i
+            console.log "1", matches
+            err =
+              line: parseInt(matches[3], 10)
+              reason: matches[4] or matches[1]
+
+            err.evidence = $.trim(lines[err.line - 1])
+            err.character = if matches[2] == "starting" then lines[err.line - 1].length else lines[err.line - 1].indexOf(err.evidence)
+          
+            return cb null,
+              type: "html"
+              body: buildErrorReport([err])
+              title: "Coffee errors"
+          else
+            return cb error
         return
       
     markdown: (code, cb) ->
