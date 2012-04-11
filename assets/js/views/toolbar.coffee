@@ -11,23 +11,14 @@
           </div>
         </div>
         <div class="btn-group stream-enable">
-          <button class="btn dropdown-toggle" data-toggle="dropdown">
+          <button class="btn start" data-toggle="dropdown">
             <i class="icon-random" />
             <span class="text">Stream</span>
-            <span class="caret"></span>
           </button>
-          <ul class="dropdown-menu shares">
-            <li>
-              <a class="start" href="javascript:void(0)">Start a new stream</a>
-            </li>
-            <li>
-              <a class="join" href="javascript:void(0)">Join an existing stream</a>
-            </li>
-          </ul>
         </div>
       </div>
       <div class="btn-toolbar">
-        <div class="btn-group">
+        <div class="btn-group group-new">
           <a class="btn btn-success new" href="/edit">
             <i class="icon-file icon-white" />
             <span class="text" title="Create a new, blank plunk">New</span>
@@ -126,7 +117,6 @@
       "click .live-compile": (e) -> plunker.mediator.trigger "intent:live-compile"
       "click .live-preview": (e) -> plunker.mediator.trigger "intent:live-preview"
       "click .stream-enable .start": (e) -> plunker.mediator.trigger "intent:stream-start"
-      "click .stream-enable .join": (e) -> plunker.mediator.trigger "intent:stream-join"
       "click .stream-disable .stop": (e) -> plunker.mediator.trigger "intent:stream-stop"
       "click .templates a": (e) ->       
         e.preventDefault()
@@ -142,7 +132,7 @@
       
       @render()
 
-      @model.plunk.on "change:token", @render
+      @model.plunk.on "change:token change:id", @render
 
       plunker.mediator.on "event:preview-enable", ->
         self.$(".run").addClass("active")
@@ -162,6 +152,7 @@
         delete self.stream
         self.$el.removeClass("streamed")
       
+      @render = _.throttle(@render, 500)
 
 
     render: =>

@@ -59,7 +59,8 @@
   display: none;
 }
 
-#toolbar.streamed .btn-toolbar.streamer {
+#toolbar.streamed .group-new {
+  display: none;
 }
 #toolbar .btn-toolbar.streamer {
   vertical-align: top;
