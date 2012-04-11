@@ -1,4 +1,5 @@
 fs = require("fs")
+util = require("util")
 Cromag = require("cromag")
 Backbone = require("backbone")
 _ = require("underscore")._
@@ -13,7 +14,7 @@ uid = (len = 6, prefix = "", keyspace = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklm
 delay = (timeout, callback) -> setTimeout(callback, timeout)
 
 class Collection extends Backbone.Collection
-  comparator: (model) -> -Cromag.parse(model.get("updated_at") or model.get("created_at"))
+  comparator: (model) -> -new Cromag(model.get("updated_at") or model.get("created_at")).valueOf()
   
   
 class Store
@@ -41,7 +42,9 @@ class Store
       delay 1, ->
         while self.plunks.length > self.options.size
           self.plunks.remove self.plunks.at(self.plunks.length - 1)
-
+    
+    @plunks.on "change:updated_at", ->
+      self.plunks.sort(silent: true)
     
     if @options.backup
       @plunks.on "add remove", _.throttle(@backup, @options.interval)
@@ -53,9 +56,15 @@ class Store
     fs.writeFile @filename, JSON.stringify(@plunks.toJSON()), (err) ->
       if err then console.log "Backup failed to: #{self.filename}"
       else console.log "Backup completed to: #{self.filename}"
+    
+    
 
   restore: =>
     self = @
+    
+    console.log "Attempting to archive previous state"
+    
+    util.pump fs.createReadStream(@filename), fs.createWriteStream(@filename + (new Date).valueOf())
     
     console.log "Attempting to restore data from: #{@filename}"
     fs.readFile @filename, "utf8", (err, data) ->
@@ -66,14 +75,16 @@ class Store
           plunks = _.map plunks, (json) ->
             if matches = json.html_url.match(/^(http:\/\/[^\/]+)(.+)$/)
               json.raw_url = "#{matches[1]}/raw#{matches[2]}"
+              json.edit_url = "#{matches[1]}/edit#{matches[2]}"
               
               for filename, file of json.files
                 file.raw_url = json.raw_url + filename
             json
   
           self.plunks.reset(plunks) and console.log "Restore succeeded from: #{self.filename}"
+          self.plunks.sort(silent: true)
         catch error
-          console.log "Error parsing restore data: #{self.filename}"
+          console.log "Error parsing #{self.filename}: #{error}"
   
   shrink: =>
     if @plunks.length > @options.size
@@ -110,4 +121,3 @@ store = null
 
 exports.createStore = (config) ->
   store ||= new Store(config)
-
