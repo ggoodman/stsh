@@ -1,12 +1,36 @@
+@import url(http://fonts.googleapis.com/css?family=Exo:900);
+
+
 #wrap {
   position: absolute;
   left: 0; top: 0; right: 0; bottom: 0;
-  min-width: 475px;
+  min-width: 400px;
   overflow: auto;
 }
 
 #wrap .navbar-fixed-top {
   position: absolute;
+}
+
+.navbar .brand {
+  padding-left: 40px;
+  background: rgba(0,0,0,0.0) url('../img/plunker.png') no-repeat left top;
+  background-size: 40px;
+  font-family: 'Exo', sans-serif;
+  font-size: 24px;
+  padding: 8px 20px 8px 40px;
+}
+
+@media (max-width: 506px) {
+  .navbar .brand {
+    width: 0px;
+    text-indent: -9999px;
+  }
+}
+
+.navbar .container-fluid {
+  height: 40px;
+  overflow: hidden;
 }
 
 #toolbar {
@@ -100,13 +124,10 @@
   margin-top: 0;
 }
 
-@media (max-width: 663px) {
+@media (max-width: 672px) {
   #toolbar .btn-toolbar.streamer .status input {
     display: none;
   }
-}
-
-@media (max-width: 606px) {
   #toolbar .btn span.text {
     display: none;
   }
@@ -141,6 +162,8 @@
   box-shadow: inset 0 1px 1px rgba(0, 0, 0, 0.05);
   box-sizing: border-box;
   padding: 0 14px;
+  overflow-x: hidden;
+  overflow-y: auto;
 }
 
 .sidebar #sidebar {

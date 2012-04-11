@@ -1,3 +1,5 @@
+@import url(http://fonts.googleapis.com/css?family=Exo:900);
+
 body {
   padding-top: 60px;
   position: relative;
@@ -14,6 +16,15 @@ body {
     width: auto;
     display: block;
   }
+}
+
+.navbar .brand {
+  padding-left: 40px;
+  background: rgba(0,0,0,0.0) url('../img/plunker.png') no-repeat left top;
+  background-size: 40px;
+  font-family: 'Exo', sans-serif;
+  font-size: 24px;
+  padding: 8px 20px 8px 40px;
 }
 
 .quick-links {

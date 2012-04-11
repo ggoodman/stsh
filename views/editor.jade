@@ -48,7 +48,7 @@ html
       nav.navbar.navbar-fixed-top
         div.navbar-inner
           div.container-fluid
-            a.brand(href="/") Plunker
+            a.brand(href="/",title="Plunker") Plunker
             div#toolbar
       div#content.sidebar.editor
         div#loading
@@ -56,11 +56,6 @@ html
           details.file-list(open="open")
             summary.header Files
             ul.files
-            div.operations
-              button.btn.btn-mini.add
-                i.icon-plus
-              button.btn.btn-mini.remove
-                i.icon-minus
           details.description(open="open")
             summary.header Description
             textarea.description(rows="4")
@@ -96,6 +91,11 @@ html
               option(value="tomorrow_night_bright") Tomorrow Night Bright
               option(value="tomorrow_night_eighties") Tomorrow Night 80s
               option(value="vibrant_ink") Vibrant Ink
+          div.operations
+            button.btn.btn-mini.add
+              i.icon-plus
+            button.btn.btn-mini.remove
+              i.icon-minus
         div#edit-live
           div#textarea
           div#live
