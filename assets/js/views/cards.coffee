@@ -157,10 +157,10 @@
       
       self.cards = {}
       @collection.on "reset", (coll) ->
-        card.remove() for card in self.cards
+        self.removeCard({id: id}, coll) for id, card of self.cards
         coll.chain().first(self.size).each (plunk, index) -> self.addCard(plunk, coll, index)
       @collection.on "add", (plunk, coll, options) -> self.addCard(plunk, coll, options.index)
-      @collection.on "destroy", (plunk, coll, options) -> self.removeCard(plunk, coll)
+      @collection.on "destroy remove", (plunk, coll, options) -> self.removeCard(plunk, coll)
 
     addCard: (plunk, coll, index) =>
       return unless plunk
