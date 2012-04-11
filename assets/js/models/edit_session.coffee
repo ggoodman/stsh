@@ -198,6 +198,8 @@
       plunker.mediator.trigger "event:disable"
 
       @plunk.clear()
+      #@buffers.reset()
+      #@clear()
 
       plunker.controller.navigate "/edit",
         replace: true
@@ -225,6 +227,8 @@
       session = @
 
       @plunk.clear()
+      #@buffers.reset()
+      #@clear()
       
       plunker.mediator.trigger "event:disable"
       

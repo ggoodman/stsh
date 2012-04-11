@@ -79,7 +79,6 @@ class Creater
         url: "#{self.config.url}/api/v1/plunks/#{id}"
         html_url: "#{self.config.url}/#{id}/"
         raw_url: "#{self.config.url}/raw/#{id}/"
-        edit_url: "#{self.config.url}/edit/#{id}/"
       
       unless json.source
         json.source =
