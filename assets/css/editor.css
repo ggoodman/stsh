@@ -4,7 +4,7 @@
 #wrap {
   position: absolute;
   left: 0; top: 0; right: 0; bottom: 0;
-  min-width: 400px;
+  min-width: 335px;
   overflow: auto;
 }
 
@@ -12,20 +12,18 @@
   position: absolute;
 }
 
+#content {
+  position: absolute;
+  left: 0; top: 40px; right: 0; bottom: 0;
+  overflow: hidden;
+}
+
 .navbar .brand {
-  padding-left: 40px;
   background: rgba(0,0,0,0.0) url('../img/plunker.png') no-repeat left top;
   background-size: 40px;
   font-family: 'Exo', sans-serif;
   font-size: 24px;
   padding: 8px 20px 8px 40px;
-}
-
-@media (max-width: 506px) {
-  .navbar .brand {
-    width: 0px;
-    text-indent: -9999px;
-  }
 }
 
 .navbar .container-fluid {
@@ -124,20 +122,7 @@
   margin-top: 0;
 }
 
-@media (max-width: 672px) {
-  #toolbar .btn-toolbar.streamer .status input {
-    display: none;
-  }
-  #toolbar .btn span.text {
-    display: none;
-  }
-}
 
-#content {
-  position: absolute;
-  left: 0; top: 40px; right: 0; bottom: 0;
-  overflow: hidden;
-}
 
 #loading {
   display: none;
@@ -375,4 +360,35 @@
 
 #live ul.jshint-errors li {
   margin-bottom: 15px;
+}
+
+
+@media (max-width: 672px) {
+  #toolbar .btn-toolbar.streamer .status input {
+    display: none;
+  }
+  #toolbar .btn span.text {
+    display: none;
+  }
+}
+
+@media (max-width: 506px) {
+  .navbar .brand {
+    width: 0px;
+    text-indent: -9999px;
+    background-size: 30px;
+    font-size: 14px;
+    padding: 8px 20px 8px 30px;
+  }
+  .navbar .container-fluid {
+    height: 30px;
+  }
+  #content {
+    top: 30px;
+  }
+  #toolbar .btn, #toolbar .add-on {
+    padding: 2px 6px;
+    font-size: 11px;
+    line-height: 14px;
+  }
 }
