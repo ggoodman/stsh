@@ -380,12 +380,15 @@
     font-size: 14px;
     padding: 8px 20px 8px 30px;
   }
+  
   .navbar .container-fluid {
     height: 30px;
   }
+  
   #content {
     top: 30px;
   }
+  
   #toolbar .btn, #toolbar .add-on {
     padding: 2px 6px;
     font-size: 11px;
