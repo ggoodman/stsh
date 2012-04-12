@@ -91,7 +91,7 @@
   vertical-align: top;
 }
 #toolbar .btn-toolbar.streamer .status .input-prepend {
-  margin-top: 6px;
+  margin-top: 5px;
 }
 
 #toolbar .btn-toolbar.streamer .status span.add-on {
@@ -118,8 +118,8 @@
 }
 
 #toolbar .btn-toolbar.streamer .status .stop {
-  height: 28px;
   margin-top: 0;
+  height: auto;
 }
 
 
@@ -389,9 +389,14 @@
     top: 30px;
   }
   
+  #toolbar .btn.add-on {
+    height: 14px;
+  }
+  
   #toolbar .btn, #toolbar .add-on {
     padding: 2px 6px;
     font-size: 11px;
     line-height: 14px;
+    height: auto;
   }
 }
