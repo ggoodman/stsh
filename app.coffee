@@ -3,8 +3,15 @@ express = require("express")
 gzippo = require("gzippo")
 assets = require("connect-assets")
 sharejs = require("share")
+subdomains = require("express-subdomains")
+
+subdomains
+  .use "raw"
 
 app = module.exports = express.createServer()
+
+
+app.use subdomains.middleware
 
 app.use assets()
 app.use gzippo.staticGzip("#{__dirname}/public")
@@ -36,10 +43,10 @@ sharejs.server.attach app,
 
 
 app.get /^\/([a-zA-Z0-9]{6})\/(.*)$/, (req, res) ->
-  res.local "raw_url", "/raw" + req.url
+  res.local "raw_url", "http://raw.#{req.plunker.config.url}/#{req.url}"
   res.local "plunk_id", req.params[0]
   res.render "preview"
-  
+
 app.get /^\/([a-zA-Z0-9]{6})$/, (req, res) -> res.redirect("/#{req.params[0]}/", 301)
 
 

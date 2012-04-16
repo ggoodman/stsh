@@ -18,10 +18,10 @@ class Creater
 
   validate: (json, next) ->
     {@valid, @errors} = validator.validate(json, require("./schema/create"))
-    
+
     # See http://regexlib.com/REDetails.aspx?regexp_id=3344
     iso8601regex = /^(?:(?=[02468][048]00|[13579][26]00|[0-9][0-9]0[48]|[0-9][0-9][2468][048]|[0-9][0-9][13579][26])\d{4}(?:(-|)(?:(?:00[1-9]|0[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-6])|(?:01|03|05|07|08|10|12)(?:\1(?:0[1-9]|[12][0-9]|3[01]))?|(?:04|06|09|11)(?:\1(?:0[1-9]|[12][0-9]|30))?|02(?:\1(?:0[1-9]|[12][0-9]))?|W(?:0[1-9]|[1-4][0-9]|5[0-3])(?:\1[1-7])?))?)$|^(?:(?![02468][048]00|[13579][26]00|[0-9][0-9]0[48]|[0-9][0-9][2468][048]|[0-9][0-9][13579][26])\d{4}(?:(-|)(?:(?:00[1-9]|0[1-9][0-9]|[1-2][0-9][0-9]|3[0-5][0-9]|36[0-5])|(?:01|03|05|07|08|10|12)(?:\2(?:0[1-9]|[12][0-9]|3[01]))?|(?:04|06|09|11)(?:\2(?:0[1-9]|[12][0-9]|30))?|(?:02)(?:\2(?:0[1-9]|1[0-9]|2[0-8]))?|W(?:0[1-9]|[1-4][0-9]|5[0-3])(?:\2[1-7])?))?)$/
-    
+
     if json.expires
       try
         json.expires = new Cromag(json.expires).toISOString()
@@ -35,7 +35,7 @@ class Creater
     unless @valid then return next
       message: "Validation failed"
       errors: @errors
-      
+
     next null, json
 
   mapFiles: (json, next) ->
@@ -48,7 +48,7 @@ class Creater
 
     json.index ||= do ->
       filenames = _.keys(json.files)
-      
+
       if "index.html" in filenames then "index.html"
       else
         html = _.filter filenames, (filename) -> /.html?$/.test(filename)
@@ -76,11 +76,11 @@ class Creater
         id: id
         token: uid()
         created_at: now.toISOString()
-        url: "#{self.config.url}/api/v1/plunks/#{id}"
-        html_url: "#{self.config.url}/#{id}/"
-        raw_url: "#{self.config.url}/raw/#{id}/"
-        edit_url: "#{self.config.url}/edit/#{id}/"
-      
+        url: "http://#{self.config.url}/api/v1/plunks/#{id}"
+        html_url: "http://#{self.config.url}/#{id}/"
+        raw_url: "http://raw.#{self.config.url}/#{id}/"
+        edit_url: "http://#{self.config.url}/edit/#{id}/"
+
       unless json.source
         json.source =
           url: json.html_url
@@ -110,7 +110,7 @@ class Updater
 
   validate: (json, next) =>
     {@valid, @errors} = validator.validate(json, require("./schema/update"))
-    
+
     if json.expires
       try
         json.expires = new Cromag(json.expires).toISOString()
@@ -120,7 +120,7 @@ class Updater
         @errors.push
           message: "Expiry date must be a valid ISO8601 date"
           field: "expires"
-    
+
     unless @valid then return next
       message: "Validation failed"
       errors: @errors
@@ -129,7 +129,7 @@ class Updater
 
   handleFileChanges: (plunk, json, next) ->
     errors = []
-    
+
     # Update description
     plunk.description = json.description or plunk.description
     plunk.updated_at = new Cromag().toISOString()
@@ -138,7 +138,7 @@ class Updater
       changed = _.keys(json.files)
       old_files = {}
       new_files = {}
-      
+
       # Pre-populate the new_files hash with files that should be unaffected
       # Also create a hash of old files
       for filename, file of plunk.files
@@ -153,14 +153,14 @@ class Updater
           filename: filename
           content: file
           mime: mime.lookup(filename)
-        
+
         # The file is being deleted; don't put it in new_files. Make sure to
         # check against index
         if _.isNull(file)
           unless former then errors.push
             message: "Impossible to delete a file that did not exist"
             field: "files['#{filename}']"
-        
+
         # The file already exists. We may need to
         #  1) Rename the file
         #  2) Update the contents
@@ -180,7 +180,7 @@ class Updater
             filename: filename
             content: file.content or former.content
             mime: file.mime or former.mime
-        
+
         # This is a new file, therefore requires content
         else
           unless file.content then errors.push
@@ -190,21 +190,21 @@ class Updater
             filename: filename
             content: file.content
             mime: file.mime || mime.lookup(filename)
-            
+
       plunk.files = new_files
-    
+
     if _.keys(plunk.files).length <= 0 then errors.push
       message: "Minimum of 1 file required"
       field: "files"
-    
+
     else
       plunk.index = do ->
         filenames = _.pluck(plunk.files, "filename")
-        
+
         if "index.html" in filenames then "index.html"
         else
           html = _.filter filenames, (filename) -> /.html?$/.test(filename)
-  
+
           if html.length then html[0]
           else filenames[0]
 
@@ -214,9 +214,9 @@ class Updater
 
   update: (plunk, json, cb) ->
     self = @
-    
-    json = JSON.parse(json) if _.isString(json) 
-    
+
+    json = JSON.parse(json) if _.isString(json)
+
     self.validate json, (err, json) ->
       if err then cb(err)
       else self.handleFileChanges plunk, json, (err, json) ->
@@ -250,6 +250,6 @@ module.exports = do ->
     middleware ||= new Interface(config)
 
     (req, res, next) ->
-      middleware.config.url ||= "http://#{req.headers.host}"
+      middleware.config.url ||= req.headers.host
       req.plunker = middleware
       next()

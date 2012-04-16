@@ -1,6 +1,19 @@
 {
-  "name": "plunker",
-  "version": "0.1.3",
+  "name": "plnkr",
+  "subdomain": "plnkr",
+  "domains": [
+    "plnkr.co",
+    "run.plnkr.co",
+    "api.plnkr.co",
+    "edit.plnkr.co"
+  ],
+  "scripts": {
+    "start": "server.js"
+  },
+  "engines": {
+    "node": "0.6.x"
+  },
+  "version": "0.1.3-24",
   "private": true,
   "dependencies": {
     "coffee-script": "1.2.x",
@@ -13,6 +26,7 @@
     "underscore": "1.3.x",
     "backbone": "0.9.x",
     "connect-assets": "2.1.x",
-    "share": "https://github.com/ggoodman/ShareJS/tarball/master"
+    "share": "https://github.com/ggoodman/ShareJS/tarball/master",
+    "express-subdomains": "0.0.x"
   }
 }
