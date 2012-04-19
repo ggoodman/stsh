@@ -11,6 +11,11 @@ append scripts
   script(type="text/javascript",src="/js/underscore.min.js")
   script(type="text/javascript",src="/js/backbone.min.js")
   script(type="text/javascript",src="/js/handlebars.js")
+  if user
+    script
+      plunker = {
+        user: !{JSON.stringify(user)}
+      };
 
 
   != js("landing")

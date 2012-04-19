@@ -4,11 +4,14 @@ html
     meta(charset="utf-8")
     meta(name="viewport",content="width=device-width, initial-scale=1.0")
     title Plunker - Editor
-  
-    link(rel="stylesheet",href="/css/bootstrap.fixed.min.css")
+    
+    != css("/bootstrap/less/bootstrap")
+
     link(rel="stylesheet",href="/css/jquery.gritter.css")
 
+    
     != css("editor")
+    != css("signin")
 
     // if lt IE 9
       script(src="http://html5shim.googlecode.com/svn/trunk/html5.js")
@@ -32,6 +35,12 @@ html
 
     != js("editor")
 
+    if user
+      script
+        $(function(){
+          plunker.user.clear().set(!{JSON.stringify(user._json)});
+        });
+
     script
       var _gaq = _gaq || [];
       _gaq.push(['_setAccount', 'UA-28929036-1']);
@@ -50,6 +59,7 @@ html
           div.container-fluid
             a.brand(href="/",title="Plunker") Plunker
             div#toolbar
+
       div#content.sidebar.editor
         div#loading
         div#sidebar

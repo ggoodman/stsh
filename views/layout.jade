@@ -11,7 +11,7 @@ html
       else
         title Plunker
     block styles
-      link(rel="stylesheet",href="/css/bootstrap.min.css")
+      //link(rel="stylesheet",href="/css/bootstrap.min.css")
       //link(rel="stylesheet",href="/css/plunker.css")
       != css("plunker")
     // if lt IE 9
@@ -29,6 +29,8 @@ html
         ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
         var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
       })();
+
+    != css("signin")
   
   body
     nav.navbar.navbar-fixed-top
@@ -48,6 +50,20 @@ html
                   li(class="active"): a(href=url)= text
                 else
                   li: a(href=url)= text
+          if user
+            ul.nav.pull-right.user
+              li.divider-vertical
+              li.dropdown
+                a.dropdown-toggle(href="javascript:void(0)",data-toggle="dropdown")
+                  img.gravatar(src="http://www.gravatar.com/avatar/#{user._json.gravatar_id}?s=20")
+                  != user.username
+                  b.caret
+                ul.dropdown-menu
+                  li
+                    a(href="/logout") Logout
+          else
+            div.pull-right.login
+              a.btn-auth.btn-github(href="/auth/github") Sign in
     div.container
       block content
       hr

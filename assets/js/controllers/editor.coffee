@@ -6,6 +6,7 @@
 #= require ../models/plunks
 #= require ../models/edit_session
 #= require ../models/stream
+#= require ../models/user
 #= require ../views/toolbar
 #= require ../views/sidebar
 #= require ../views/textarea
@@ -21,6 +22,8 @@
       @route /^edit\/([a-zA-Z0-9]{6})(\?.+)?/, "loadPlunk"
       
       @parseQuery()
+    
+      plunker.user = @user = new plunker.User
       
       # Model defining the editing session that is taking place on Plunker
       plunker.models.session = @session = new plunker.Session

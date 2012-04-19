@@ -106,6 +106,31 @@
           </button>
         </div>
       </div>
+      <div class="btn-toolbar">
+        <div class="btn-group">
+          {{#if user.username}}
+            <button class="btn dropdown-toggle" data-toggle="dropdown">
+              <i class="icon-github-sign" />
+              <span class="text">ggoodman</span>
+              <span class="caret"></span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <a href="/edit/from:2312729">Basic html</a>
+              </li>
+              <li class="divider"></li>
+              <li>
+                <a class="logout" href="/logout">Logout</a>
+              </li>
+            </ul>
+          {{else}}
+            <a class="btn login" href="/auth/github" title="Sign in with Github">
+              <i class="icon-github-sign" />
+              <span class="text">Sign in</span>
+            </a>
+          {{/if}}
+        </div>
+      </div>
     """
 
     events:
@@ -125,6 +150,10 @@
       "click .new": (e) ->
         e.preventDefault()
         plunker.mediator.trigger "intent:reset"
+        
+      "click .login": (e) ->
+        e.preventDefault()
+        plunker.mediator.trigger "intent:login", "github"
       
     
     initialize: ->
@@ -160,6 +189,7 @@
         session: @model.toJSON()
         plunk: @model.plunk.toJSON()
         stream: @stream
+        user: plunker.user.toJSON()
       
       @$("input.stream-id").attr "size", @stream.length if @stream
         
