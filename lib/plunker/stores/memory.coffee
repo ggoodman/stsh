@@ -68,7 +68,7 @@ class Store
     
     console.log "Attempting to restore data from: #{@filename}"
     fs.readFile @filename, "utf8", (err, data) ->
-      if err then console.log "Failed to restore data: #{self.filename}"
+      if err then console.log "Failed to restore data: #{self.filename} *Note: On your first run of `node server.js` this is expected (you have not stored any data yet)."
       else
         try
           plunks = JSON.parse(data)
