@@ -50,14 +50,18 @@ app.error (err, req, res, next) -> apiError(res, err)
 
 # CORS Headers
 app.all "*", (req, res, next) ->
-  res.header("Access-Control-Allow-Origin", "*")
+  # Just send the headers all the time. That way we won't miss the right request ;-)
+  # Other CORS middleware just wouldn't work for me
+  # TODO: Minimize these headers to only those needed at the right time
 
-  #if req.method == "OPTIONS"
-  res.header("Access-Control-Allow-Headers", req.header("Access-Control-Request-Headers")) # I hear an echo. Do you?
-  res.header("Access-Control-Allow-Methods", "GET, POST, PATCH, PUT, DELETE")
-  res.header("Access-Control-Max-Age", 60 * 60 * 24 * 2) # 2 days
+  res.header("Access-Control-Allow-Origin", req.headers.origin or "*")
+  res.header("Access-Control-Allow-Methods", "OPTIONS,GET,PUT,POST,DELETE")
+  res.header("Access-Control-Allow-Headers", "User-Agent, Referer, Proxy-Authorization, Proxy-Connection, Accept-Language, Accept-Encoding, Accept-Charset, Connection, Content-Length, Host, Origin, Pragma, Accept-Charset, Cache-Control, Accept, Content-Type")
+  res.header("Access-Control-Allow-Credentials", "true")
+  res.header("Access-Control-Max-Age", "60")
 
-  next()
+  if req.method is "OPTIONS" then res.send(200)
+  else next()
 
 # Index
 app.get "/plunks", (req, res) ->
