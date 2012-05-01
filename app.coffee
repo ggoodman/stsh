@@ -2,7 +2,7 @@ coffee = require("coffee-script")
 express = require("express")
 gzippo = require("gzippo")
 assets = require("connect-assets")
-sharejs = require("share")
+sharejs = require("./ShareJS") # WTF no.de; why do you not respect my package.json?
 
 app = module.exports = express.createServer()
 
