@@ -2,7 +2,7 @@ coffee = require("coffee-script")
 express = require("express")
 gzippo = require("gzippo")
 assets = require("connect-assets")
-sharejs = require("plunker-share")
+sharejs = require("share")
 
 app = module.exports = express.createServer()
 
