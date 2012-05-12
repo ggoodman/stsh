@@ -1,6 +1,6 @@
 {
   "name": "plunker",
-  "version": "0.1.4-1",
+  "version": "0.1.4-2",
   "private": true,
   "dependencies": {
     "coffee-script": "1.2.x",
