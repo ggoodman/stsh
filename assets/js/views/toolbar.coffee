@@ -60,7 +60,7 @@
             </li>
             <li class="divider"></li>
             <li>
-              <a href="/edit/from:1961272">AngularJS</a>
+              <a href="/edit/from:2246015">AngularJS</a>
             </li>
           </ul>
         </div>
