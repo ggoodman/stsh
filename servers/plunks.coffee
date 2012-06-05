@@ -28,9 +28,11 @@ app.get "/:id/", loadPlunk, (req, res) ->
   return res.send(404) unless plunk = req.plunk
 
   file = plunk.files[plunk.index]
+  mime = if /^text\//.test(file.mime) then file.mime else "text/plain"
+  mime = "text/plain" unless req.accepts(mime)
   
   return res.send(404) unless file
-  return res.send(file.content, {"Content-Type": if req.accepts(file.mime) then file.mime else "text/plain"})
+  return res.send(file.content, {"Content-Type": mime})
 app.get "/:id", (req, res) -> res.redirect("/#{req.params.id}/", 301)
 
 # Serve a specific file in a plunk
