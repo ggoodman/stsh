@@ -1,6 +1,6 @@
 # Plunker
 
-Plunker is a website and RESTful API for creating, previewing and sharing web snippets online.
+[Plunker](http://plunker.no.de) is a website and RESTful API for creating, previewing and sharing web snippets online.
 
 ## What is a plunk?
 
